@@ -6,11 +6,85 @@ goog.provide('anychart.exportsModule.offline');
  * @enum {string}
  */
 anychart.exportsModule.offline.MIME_TYPES = {
-  PNG: 'image/png',
-  JPG: 'image/jpeg',
-  SVG: 'image/svg+xml'
+  'png': 'image/png',
+  'jpg': 'image/jpeg',
+  'svg': 'image/svg+xml',
+  'csv': 'text/csv',
+  'pdf': 'application/pdf',
+  'json': 'application/json',
+  'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'xml': 'text/xml'
 };
 
+/**
+ * Returns mime type by passed extension name.
+ *
+ * @param {string} extension - Extension name.
+ *
+ * @return {anychart.exportsModule.offline.MIME_TYPES|string}
+ */
+anychart.exportsModule.offline.getMimeType = function (extension) {
+  return anychart.exportsModule.offline.MIME_TYPES[extension] || '';
+};
+
+/**
+ * Try to save text data using blob and shared buffer.
+ *
+ * @param {string} data - Data to save.
+ * @param {string} fileName - Name of file.
+ * @param {string} fileExtension - Extension of file.
+ * @param {Function} failCallback - Function that calls something going wrong.
+ */
+anychart.exportsModule.offline.exportTextData = function (data, fileName, fileExtension, failCallback) {
+  try {
+    var mime = anychart.exportsModule.offline.getMimeType(fileExtension);
+    var blob = new Blob([data], {'type': mime});
+
+    anychart.exportsModule.offline.downloadDataUrl(blob, fileName, fileExtension);
+  } catch (e) {
+    failCallback();
+  }
+};
+
+/**
+ * Try to save xlsx file using blob and shared buffer.
+ *
+ * Uses external js library for xlsx create.
+ * @Link https://github.com/SheetJS/sheetjs
+ *
+ * @param {?anychart.core.VisualBase} target - Chart instance.
+ * @param {string} csv - Csv chart data.
+ * @param {string} fileName - File name to save.
+ * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ */
+anychart.exportsModule.offline.saveAsXlsx = function (target, csv, fileName, failCallback) {
+  anychart.exports.loadExternalDependencies(target)
+    .then(function () {
+      var XLSX = goog.global['XLSX'];
+      var xlsxUtils = XLSX['utils'];
+      var fileType = 'xlsx';
+      // Convert csv to array or arrays.
+      var csvParser = anychart.data.csv.parser();
+      var data = csvParser.parse(csv);
+
+      // Crete new xlsx book.
+      var book = xlsxUtils['book_new']();
+      // Crete sheet and append data to it.
+      var sheetWithData = xlsxUtils['aoa_to_sheet'](data);
+
+      // Link sheet with book.
+      xlsxUtils['book_append_sheet'](book, sheetWithData, 'data');
+
+      // Save book as BufferArray.
+      var arrayBuffer = XLSX['write'](book, {type: 'array'});
+      var blob = new Blob([arrayBuffer], {'type': anychart.exportsModule.offline.MIME_TYPES[fileType]});
+
+      anychart.exportsModule.offline.downloadDataUrl(blob, fileName, fileType);
+    })
+    .thenCatch(function () {
+      failCallback();
+    });
+};
 
 /**
  *
@@ -86,17 +160,7 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
  * @param {Function} failCallback
  */
 anychart.exportsModule.offline.renderSvgAsImage = function(svgElement, args, fileType, width, height, successCallback, failCallback) {
-  var mimeType;
-  switch (fileType) {
-    case acgraph.vector.Stage.ExportType.JPG:
-      mimeType = anychart.exportsModule.offline.MIME_TYPES.JPG;
-      break;
-    case acgraph.vector.Stage.ExportType.PNG:
-    default:
-      fileType = acgraph.vector.Stage.ExportType.PNG;
-      mimeType = anychart.exportsModule.offline.MIME_TYPES.PNG;
-      break;
-  }
+  var mimeType = anychart.exportsModule.offline.MIME_TYPES[fileType];
 
   var canvas = goog.dom.createElement('canvas');
   canvas.width = width;
@@ -169,7 +233,7 @@ anychart.exportsModule.offline.saveSvgToFileType = function(stage, svgElement, f
   var hasImages = svgElement.getElementsByTagName('image').length > 0;
 
   var saveDataUrl = function(imageDataUrl) {
-    anychart.exportsModule.offline.downloadDataUrl(imageDataUrl, fileName);
+    anychart.exportsModule.offline.downloadDataUrl(imageDataUrl, fileName, fileType);
     successCallback();
   };
 
@@ -178,7 +242,7 @@ anychart.exportsModule.offline.saveSvgToFileType = function(stage, svgElement, f
       case acgraph.vector.Stage.ExportType.SVG:
         var svgString = new XMLSerializer().serializeToString(svgElement);
         var blob = new Blob([svgString], {'type': 'image/svg+xml'});
-        anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
+        anychart.exportsModule.offline.downloadDataUrl(blob, fileName, fileType);
         successCallback();
         break;
       case acgraph.vector.Stage.ExportType.PNG:
@@ -217,8 +281,6 @@ anychart.exportsModule.offline.saveSvgToFileType = function(stage, svgElement, f
 anychart.exportsModule.offline.exportChartOffline = function(target, exportType, args, successCallback, failCallback) {
   anychart.exports.loadExternalDependencies(target)
       .then(function() {
-        anychart.exports.isExternLoaded = true;
-
         var stageDomElementClone;
 
         var stage = acgraph.utils.instanceOf(target, acgraph.vector.Stage) ?
@@ -345,41 +407,31 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
 
 /**
  * Tries to open url using <a> element, falls back to window.open() if <a>.download not supported.
- * @param {string|Blob} dataUrlOrBlob
- * @param {string=} opt_filename
+ *
+ * @param {string|Blob} dataUrlOrBlob - Data to save.
+ * @param {string} filename - File name.
+ * @param {string} fileExtension - File extension.
  */
-anychart.exportsModule.offline.downloadDataUrl = function(dataUrlOrBlob, opt_filename) {
+anychart.exportsModule.offline.downloadDataUrl = function(dataUrlOrBlob, filename, fileExtension) {
   var a = goog.dom.createElement('a');
-  var blob = goog.isString(dataUrlOrBlob) ? anychart.exportsModule.offline.dataURItoBlob(dataUrlOrBlob) : dataUrlOrBlob;
-  switch (blob.type) {
-    case 'image/svg+xml':
-      opt_filename += '.svg';
-      break;
-    case 'image/png':
-      opt_filename += '.png';
-      break;
-    case 'image/jpeg':
-      opt_filename += '.jpg';
-      break;
-    case 'application/pdf':
-      opt_filename += '.pdf';
-      break;
-  }
+  var blob = /**@type {!Blob}*/(goog.isString(dataUrlOrBlob) ? anychart.exportsModule.offline.dataURItoBlob(dataUrlOrBlob) : dataUrlOrBlob);
 
-  dataUrlOrBlob = goog.fs.url.createObjectUrl(blob);
+  filename = filename + '.' + fileExtension;
+
+  var url = goog.fs.url.createObjectUrl(blob);
   if (goog.isDef(a['download'])) {
     goog.dom.appendChild(anychart.document.body, a);
-    a.href = dataUrlOrBlob;
-    a.download = opt_filename || '';
+    a.href = url;
+    a.download = filename;
     a.click();
     goog.dom.removeNode(a);
   } else if (goog.isDef(goog.global.navigator.msSaveOrOpenBlob)) {
-    goog.global.navigator.msSaveOrOpenBlob(blob, opt_filename);
+    goog.global.navigator.msSaveOrOpenBlob(blob, filename);
   } else {
-    anychart.global['open'](dataUrlOrBlob, opt_filename);
+    anychart.global['open'](url, filename);
   }
 
-  goog.fs.url.revokeObjectUrl(dataUrlOrBlob);
+  goog.fs.url.revokeObjectUrl(url);
 };
 
 

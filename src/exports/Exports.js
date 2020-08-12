@@ -56,7 +56,12 @@ anychart.exportsModule.Exports = function() {
    * @type {Object}
    * @private
    */
-  this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
+  this.externalDependencies_ = [
+    'svg2pdf.min.js',
+    'jspdf.min.js',
+    'canvg.min.js',
+    'xlsx.core.min.js' // Offline xlsx export.
+  ];
 
   /**
    * This flag is set to true when all external dependencies are loaded.
@@ -248,10 +253,8 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
  */
 anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(target) {
   var exports = goog.global['anychart']['exports'];
-  if (exports && exports.isExternLoaded)
-    this.isExternLoaded = true;
 
-  if (this.isExternLoaded) {
+  if (exports.isExternLoaded) {
     return goog.Promise.resolve();
   } else {
     var deps = this.externalDependencies_;
@@ -284,7 +287,10 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(tar
       });
       proms.push(p);
     }
-    return goog.Promise.all(proms);
+    return goog.Promise.all(proms)
+      .then(function () {
+        exports.isExternLoaded = true;
+      });
   }
 };
 
