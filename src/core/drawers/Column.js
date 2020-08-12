@@ -111,7 +111,6 @@ anychart.core.drawers.Column.prototype.drawPointShape = function(point, path, ha
 
     var leftX = x - this.pointWidth / 2;
     var rightX = leftX + this.pointWidth;
-    var shared = point.meta('shared');
 
     var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
 
@@ -127,17 +126,6 @@ anychart.core.drawers.Column.prototype.drawPointShape = function(point, path, ha
       } else {
         zero = anychart.utils.applyPixelShift(zero, thickness);
       }
-    }
-
-
-    //This inversion allow to show single zero value.
-    var invertShift = this.calculatePxShiftInversion ?
-      (this.isVertical ? false : (shared ? !shared.hasNotZero : true)) :
-      false;
-
-    if (invertShift && point.get('value') == 0) {
-      y -= 1.5;
-      zero += 1.5;
     }
 
     anychart.core.drawers.move(path, this.isVertical, leftX, y);
