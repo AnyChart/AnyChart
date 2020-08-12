@@ -46,6 +46,18 @@ anychart.ui.GanttToolbar = function() {
   this.createButtonsAndMenus();
 
   /**
+   * Contains info about selected layout and selected print range.
+   *
+   * @type {Object}
+   *
+   * @private
+   */
+  this.printState_ = {
+    range: anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS.VISIBLE,
+    layout: anychart.ui.GanttToolbar.LAYOUT_OPTIONS.LANDSCAPE
+  };
+
+  /**
    * External print function for internal purposes.
    * Used in Qlik.
    * @type {?Function}
@@ -82,6 +94,12 @@ anychart.ui.GanttToolbar.CssClass = {
 anychart.ui.GanttToolbar.ButtonIds = {
   PRINT: 'print',
   SWITCH_PAGE_ORIENTATION: 'switchPageOrientation',
+  CHANGE_RANGE: 'changeRange',
+  CHANGE_LAYOUT: 'changeLayout',
+  ALL_DATES: 'allDates',
+  VISIBLE_DATES: 'visibleDates',
+  PORTRAIT: 'portrait',
+  LANDSCAPE: 'landscape',
   SAVE_AS: 'saveAs',
   ZOOM_IN: 'zoomIn',
   ZOOM_OUT: 'zoomOut',
@@ -95,7 +113,12 @@ anychart.ui.GanttToolbar.ButtonIds = {
  */
 anychart.ui.GanttToolbar.ButtonCaptions = {};
 anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.PRINT] = 'Print';
-anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION] = 'Switch page orientation';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.CHANGE_LAYOUT] = 'Layout';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.CHANGE_RANGE] = 'Range';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.ALL_DATES] = 'All dates';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.VISIBLE_DATES] = 'Visible dates';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.PORTRAIT] = 'Portrait';
+anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.LANDSCAPE] = 'Landscape';
 anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.SAVE_AS] = 'Save As';
 anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN] = 'Zoom In';
 anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.ZOOM_OUT] = 'Zoom Out';
@@ -105,27 +128,130 @@ anychart.ui.GanttToolbar.ButtonCaptions[anychart.ui.GanttToolbar.ButtonIds.COLLA
 
 
 /**
- * All the buttons and menus are created here.
- * Also this.buttonsWithIcons_ is populated. It is later used to reapply icons/texts.
+ * Create and returns menu with selectable items.
+ *
+ * @param {string} optionName - Label of menu.
+ * @param {Array.<{caption: string, value: string}>} options - Array with items that will be treated as value and caption.
+ * @param {Function} handler - Function that calls after menu change.
+ * @param {string=} opt_selected - Selected item by default.
+ *
+ * @return {anychart.ui.menu.SubMenu} - Menu.
+ *
+ * @private
  */
-anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
-  // --------- PRINTING ----------
-  /**
-   * Print menu.
-   * @type {anychart.ui.menu.Menu}
-   * @private
-   */
-  this.printMenu_ = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+anychart.ui.GanttToolbar.prototype.createMenuWithSelectableItems_ = function (optionName, options, handler, opt_selected) {
+  var menu = new anychart.ui.menu.SubMenu(optionName, void 0, true);
 
-  var switchMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION);
-  this.switchPageOrientation_ = new anychart.ui.menu.Item(switchMessage);
-  this.switchPageOrientation_.setModel({
-    id: anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION,
-    func: anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION,
-    isLandscape: true
+  var items = goog.array.map(options, function (data) {
+    var caption = data.caption;
+    var value = data.value;
+
+    var item = new anychart.ui.menu.Item(caption);
+    item.setValue(value);
+    item.setSelectable(true);
+    // Select default value.
+    item.setSelected(value == opt_selected);
+
+    return item;
   });
 
-  this.printMenu_.addChild(this.switchPageOrientation_, true);
+  // Append items into menu.
+  goog.array.forEach(items, menu.addItem, menu);
+
+  // Handle menu select.
+  menu.listen(goog.ui.Component.EventType.ACTION, function (e) {
+    var target = e.target;
+    var value = target.getValue();
+
+    // Deselect others.
+    goog.array.forEach(items, function (item) {
+      item.setSelected(item == target);
+    });
+
+    handler.call(this, value);
+
+    // Don't propagate event to toolbar.
+    e.stopPropagation();
+  }, void 0, this);
+
+  return menu;
+};
+
+
+/**
+ * Available layout options.
+ *
+ * @enum {string}
+ */
+anychart.ui.GanttToolbar.LAYOUT_OPTIONS = {
+  LANDSCAPE: 'landscape',
+  PORTRAIT: 'portrait'
+};
+
+/**
+ * Available range options.
+ *
+ * @enum {string}
+ */
+anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS = {
+  FULL: 'full',
+  VISIBLE: 'visible'
+};
+
+/**
+ * Creates menu that contains printing options.
+ *
+ * @private
+ */
+anychart.ui.GanttToolbar.prototype.createPrintMenu_ = function() {
+  this.printMenu_ = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+
+  var layoutOptions = [
+    {
+      caption: this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.LANDSCAPE),
+      value: anychart.ui.GanttToolbar.LAYOUT_OPTIONS.LANDSCAPE
+    },
+    {
+      caption: this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.PORTRAIT),
+      value: anychart.ui.GanttToolbar.LAYOUT_OPTIONS.PORTRAIT
+    }
+  ];
+
+  var layoutMenu = this.createMenuWithSelectableItems_(
+      this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.CHANGE_LAYOUT),
+      layoutOptions,
+      function (layout) {
+        this.printState_.layout = layout;
+        // Prevent menu close.
+        this.printMenu_.setVisible(true, true);
+      },
+      anychart.ui.GanttToolbar.LAYOUT_OPTIONS.LANDSCAPE
+  );
+
+  var rangeOptions = [
+    {
+      caption: this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.ALL_DATES),
+      value: anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS.FULL
+    },
+    {
+      caption: this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.VISIBLE_DATES),
+      value: anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS.VISIBLE
+    }
+  ];
+
+  var rangeMenu = this.createMenuWithSelectableItems_(
+      this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.CHANGE_RANGE),
+      rangeOptions,
+      function (range) {
+        this.printState_.range = range;
+        // Prevent menu close.
+        this.printMenu_.setVisible(true, true);
+      },
+      anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS.VISIBLE
+  );
+
+  this.printMenu_.addChild(layoutMenu, true);
+  this.printMenu_.addChild(rangeMenu, true);
   this.printMenu_.addChild(new goog.ui.MenuSeparator(), true);
 
   var printMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.PRINT);
@@ -138,7 +264,15 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   });
   this.addChild(this.printButton_, true);
   this.buttonsWithIcons_.push(this.printButton_);
+};
 
+
+/**
+ * All the buttons and menus are created here.
+ * Also this.buttonsWithIcons_ is populated. It is later used to reapply icons/texts.
+ */
+anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
+  this.createPrintMenu_();
   // --------- SAVE AS ----------
   this.addChild(new anychart.ui.toolbar.Separator(), true);
 
@@ -370,6 +504,45 @@ anychart.ui.GanttToolbar.prototype.setIconTo_ = function(item, opt_icon, opt_tex
 
 
 /**
+ * Call 'print' method of chart.
+ *
+ * @param {anychart.core.Chart} chart - Chart instance.
+ * @param {string} format - Paper format.
+ *
+ * @private
+ */
+anychart.ui.GanttToolbar.prototype.printChart_ = function (chart, format) {
+  var printRange = this.printState_.range;
+  var isLandscapeLayout = this.printState_.layout == 'landscape';
+  var args = [format, isLandscapeLayout];
+  /*
+    External print function is used in qlik to call custom gantt printing function.
+    On DVF-4248 refactor this case should be considered. And Qlik code altered according to new api.
+   */
+  if (goog.isFunction(this.externalPrintFunction)) {
+    args.push(printRange);
+    this.externalPrintFunction.apply(null, goog.array.concat([chart], args));
+    return;
+  }
+
+  if (chart) {
+    var fn = chart['print'];
+    if (goog.isFunction(fn)) {
+      var visibleRange = chart.getTimeline().scale().getRange();
+      if (printRange == anychart.ui.GanttToolbar.PRINT_RANGE_OPTIONS.FULL) {
+        chart.fitAll();
+      }
+      fn.apply(chart, args);
+      chart.zoomTo(visibleRange['min'], visibleRange['max']);
+    } else {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, ['print']);
+    }
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET);
+  }
+};
+
+/**
  * Handler for ACTION event on toolbar.
  * @param {goog.events.Event} e
  * @private
@@ -379,45 +552,42 @@ anychart.ui.GanttToolbar.prototype.handleAction_ = function(e) {
   var model = item.getModel();
   var funcName = model.func;
 
-  if (funcName == anychart.ui.GanttToolbar.ButtonIds.SWITCH_PAGE_ORIENTATION) {
-    var newOrientation = !model.isLandscape;
+  var args = model && model.args || [];
+  var chart = /**@type {anychart.core.Chart|null}*/(this.target());
 
-    this.updatePrintButtonsCaptions(newOrientation);
-    model.isLandscape = newOrientation;
+  if (funcName == anychart.ui.GanttToolbar.ButtonIds.PRINT) {
+    this.printChart_(chart, args[0]);
+    return;
+  }
 
-    // To save the menu is opened and first item highlighted.
-    this.printButton_.setOpen(true);
-    this.printMenu_.highlightFirst();
-
-  } else {
-    var args = model.args || [];
-    var switchPageOrientationModel = this.switchPageOrientation_.getModel();
-
-    if (funcName == anychart.ui.GanttToolbar.ButtonIds.PRINT) args[1] = switchPageOrientationModel.isLandscape;
-
-    var chart = this.target();
-    /*
-    External print function is used in qlik to call custom gantt printing function.
-    On DVF-4248 refactor this case should be considered. And Qlik code altered according to new api.
-     */
-    if (funcName == anychart.ui.GanttToolbar.ButtonIds.PRINT && goog.isFunction(this.externalPrintFunction)) {
-      this.externalPrintFunction.apply(null, goog.array.concat([chart], args));
-      return;
-    }
-
-    if (chart) {
-      var fn = chart[funcName];
-      if (goog.isFunction(fn)) {
-        fn.apply(chart, args);
-      } else {
-        anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, [funcName]);
-      }
+  if (chart) {
+    var fn = chart[funcName];
+    if (goog.isFunction(fn)) {
+      fn.apply(chart, args);
     } else {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, [funcName]);
     }
+  } else {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET);
   }
 };
 
+/**
+ * Remove paper size items from menu.
+ *
+ * @private
+ */
+anychart.ui.GanttToolbar.prototype.removePaperSizeItems_ = function() {
+  /*
+    0 - Layout options.
+    1 - Print range options.
+    2 - Separator.
+   */
+  var index = 3;
+  while (this.printMenu_.getChildCount() > index) {
+    this.printMenu_.removeChildAt(index, true);
+  }
+};
 
 /**
  * Sets print paper sizes.
@@ -429,9 +599,7 @@ anychart.ui.GanttToolbar.prototype.printPaperSizes = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.printPaperSizes_ = opt_value;
 
-    while (this.printMenu_.getChildCount() > 2) {
-      this.printMenu_.removeChildAt(2, true);
-    }
+    this.removePaperSizeItems_();
 
     this.exitDocument();
     this.draw();
@@ -449,10 +617,9 @@ anychart.ui.GanttToolbar.prototype.draw = function() {
 
   if (!this.isInDocument()) {
     var sizes = this.printPaperSizes();
-    var landscapeString = anychart.format.getMessage('Landscape');
     for (var i = 0; i < sizes.length; i++) {
       var size = sizes[i];
-      var printItem = new anychart.ui.menu.Item(landscapeString + ', ' + anychart.enums.normalizePaperSizeCaption(size));
+      var printItem = new anychart.ui.menu.Item(anychart.enums.normalizePaperSizeCaption(size));
       printItem.setModel({func: anychart.ui.GanttToolbar.ButtonIds.PRINT, args: [size]});
       printItem.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT + '-' + size);
       this.printMenu_.addChild(printItem, true);
@@ -489,21 +656,29 @@ anychart.ui.GanttToolbar.prototype.getLocalizedCaption = function(buttonId) {
   return anychart.format.getMessage(anychart.ui.GanttToolbar.ButtonCaptions[buttonId]);
 };
 
-
 /**
- * Updates localized captions of all print buttons.
- * @param {boolean} isLandscape - Current print orientation.
+ * Change captions of print menu and menu items.
+ *
+ * @private
  */
-anychart.ui.GanttToolbar.prototype.updatePrintButtonsCaptions = function(isLandscape) {
-  var captionBase = anychart.format.getMessage(isLandscape ? 'Landscape' : 'Portrait');
+anychart.ui.GanttToolbar.prototype.updatePrintMenuCaptions_ = function(){
+  var layoutMenu = this.printMenu_.getChildAt(0);
+  var rangeMenu = this.printMenu_.getChildAt(1);
 
-  this.printMenu_.forEachChild(function(item) {
-    var itemModel = item.getModel();
-    if (itemModel && itemModel.func == anychart.ui.GanttToolbar.ButtonIds.PRINT) {
-      var caption = captionBase + ',' + item.getCaption().split(',')[1];
-      item.setCaption(caption);
-    }
-  });
+  layoutMenu.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.CHANGE_LAYOUT));
+  rangeMenu.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.CHANGE_RANGE));
+
+  var landscapeItem = layoutMenu.getItemAt(0);
+  var portraitItem = layoutMenu.getItemAt(1);
+
+  landscapeItem.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.LANDSCAPE));
+  portraitItem.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.PORTRAIT));
+
+  var allDates = rangeMenu.getItemAt(0);
+  var visibleDates = rangeMenu.getItemAt(1);
+
+  allDates.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.ALL_DATES));
+  visibleDates.setCaption(this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.VISIBLE_DATES));
 };
 
 
@@ -512,7 +687,7 @@ anychart.ui.GanttToolbar.prototype.updatePrintButtonsCaptions = function(isLands
  * @return {anychart.ui.GanttToolbar}
  */
 anychart.ui.GanttToolbar.prototype.updateLocalizedCaptions = function() {
-  var buttons = goog.array.concat(this.buttonsWithIcons_, this.switchPageOrientation_);
+  var buttons = this.buttonsWithIcons_;
   for (var i = 0; i < buttons.length; i++) {
     var button = buttons[i];
     var buttonModel = button.getModel();
@@ -523,8 +698,7 @@ anychart.ui.GanttToolbar.prototype.updateLocalizedCaptions = function() {
     }
   }
 
-  this.updatePrintButtonsCaptions(this.switchPageOrientation_.getModel().isLandscape);
-
+  this.updatePrintMenuCaptions_();
   // We should call this method to make icons visible again.
   this.applyIconsAndTexts();
 
