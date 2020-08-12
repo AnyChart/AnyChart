@@ -1800,6 +1800,8 @@ anychart.stockModule.Plot.prototype.lineMarker = function(opt_indexOrValue, opt_
     lineMarker.addThemes('stock.defaultPlotSettings.defaultLineMarkerSettings', this.defaultLineMarkerSettings());
     lineMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.setParentEventTarget(this);
+    this.applyMarkersListeners_(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1836,6 +1838,8 @@ anychart.stockModule.Plot.prototype.rangeMarker = function(opt_indexOrValue, opt
     rangeMarker.addThemes('stock.defaultPlotSettings.defaultRangeMarkerSettings', this.defaultRangeMarkerSettings());
     rangeMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.setParentEventTarget(this);
+    this.applyMarkersListeners_(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1872,6 +1876,8 @@ anychart.stockModule.Plot.prototype.textMarker = function(opt_indexOrValue, opt_
     textMarker.addThemes('stock.defaultPlotSettings.defaultTextMarkerSettings', this.defaultTextMarkerSettings());
     textMarker.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
+    textMarker.setParentEventTarget(this);
+    this.applyMarkersListeners_(textMarker);
     textMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -2222,14 +2228,41 @@ anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
     //this.eventsInterceptor_.cursor(acgraph.vector.Cursor.EW_RESIZE);
     this.eventsInterceptor_.fill(anychart.color.TRANSPARENT_HANDLER);
     this.eventsInterceptor_.stroke(null);
-    this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
-    this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.handleTouchStart_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.TOUCHEND, this.handleTouchEnd_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOVER, this.handlePlotMouseOverAndMove_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEMOVE, this.handlePlotMouseOverAndMove_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOUT, this.handlePlotMouseOut_);
-    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.handlePlotMouseDown_);
+    this.eventsHandler.listenOnce(this, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
+    this.eventsHandler.listenOnce(this, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.TOUCHSTART, this.handleTouchStart_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.TOUCHEND, this.handleTouchEnd_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.MOUSEOVER, this.handlePlotMouseOverAndMove_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.MOUSEMOVE, this.handlePlotMouseOverAndMove_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.MOUSEOUT, this.handlePlotMouseOut_);
+    this.eventsHandler.listen(this, acgraph.events.EventType.MOUSEDOWN, this.handlePlotMouseDown_);
+  }
+};
+
+
+/**
+ * Applies listeners to marker.
+ * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase} marker 
+ */
+anychart.stockModule.Plot.prototype.applyMarkersListeners_ = function(marker) {
+  this.eventsHandler.listen(marker, [acgraph.events.EventType.TOUCHSTART, acgraph.events.EventType.MOUSEDOWN], this.markersListener_);
+};
+
+
+/**
+ * Markers listener. Needed for drag to work.
+ * @param {anychart.core.MouseEvent} event Axis marker event.
+ */
+anychart.stockModule.Plot.prototype.markersListener_ = function(event) {
+  var originalEvent = event.originalEvent;
+
+  var dragShouldStart = goog.isDef(this.dragger_) && 
+                        (event.type === acgraph.events.EventType.MOUSEDOWN ||
+                        event.type === acgraph.events.EventType.TOUCHSTART);
+
+  // Fixes dragging on axis markers.
+  if (dragShouldStart) {
+    this.dragger_.startDrag(originalEvent);
   }
 };
 
@@ -2662,12 +2695,14 @@ anychart.stockModule.Plot.prototype.refreshDragAnchor = function() {
 
 /**
  * Mousedown handler.
- * @param {acgraph.events.BrowserEvent} e
+ * @param {anychart.core.MouseEvent} e
  * @private
  */
 anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
+  var googBrowserEvent = e.originalEvent.getOriginalEvent();
+
   this.dragger_ = new anychart.stockModule.Plot.Dragger(this, this.eventsInterceptor_);
-  this.dragger_.startDrag(e.getOriginalEvent());
+  this.dragger_.startDrag(googBrowserEvent);
 };
 
 
@@ -2770,7 +2805,8 @@ anychart.stockModule.Plot.prototype.handleTouchEnd_ = function(e) {
  * @private
  */
 anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
-  if (this.seriesBounds_) {
+  var annotationsInitAndDrawing = this.annotations_ && this.annotations_.inDrawing;
+  if (this.seriesBounds_ && !annotationsInitAndDrawing) {
     var stageReferencePoint = this.container().getStage().getClientPosition();
     var x = e['clientX'] - stageReferencePoint.x - this.seriesBounds_.left;
     var y = e['clientY'] - stageReferencePoint.y - this.seriesBounds_.top;
@@ -2795,7 +2831,6 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
  * @private
  */
 anychart.stockModule.Plot.prototype.handlePlotMouseOut_ = function(e) {
-  this.dispatchEvent(acgraph.events.EventType.MOUSEOUT);
   this.frameHighlightRatio_ = NaN;
   this.frameHighlightYRatio_ = NaN;
   if (!goog.isDef(this.frame_))

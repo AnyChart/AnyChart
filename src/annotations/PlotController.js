@@ -174,6 +174,7 @@ anychart.annotationsModule.PlotController.prototype.draw = function() {
     this.annotationsLayer_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.initDragger_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOVER, this.handleAnnotationMouseOver_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOUT, this.handleAnnotationMouseOut_, false, this);
+    this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEMOVE, this.handleAnnotationMouseMove_, false, this);
 
     this.drawingOverlayRect_ = acgraph.rect(0, 0, 0, 0);
     this.drawingOverlayRect_.cursor(acgraph.vector.Cursor.CROSSHAIR);
@@ -306,6 +307,18 @@ anychart.annotationsModule.PlotController.prototype.handleAnnotationMouseOut_ = 
   e.stopWrapperPropagation();
   e.preventDefault();
   this.controller_.unhover();
+};
+
+
+/**
+ * Handles mouse out in drawing mode.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.annotationsModule.PlotController.prototype.handleAnnotationMouseMove_ = function(e) {
+  e.stopPropagation();
+  e.stopWrapperPropagation();
+  e.preventDefault();
 };
 
 
