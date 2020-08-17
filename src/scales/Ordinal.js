@@ -369,6 +369,10 @@ anychart.scales.Ordinal.prototype.resetDataRange = function() {
   this.resultNames_ = null;
   this.resultWeights_.length = 0;
   this.weightRatios_.length = 0;
+
+  if (this.ticks_)
+    this.ticks_.markInvalid();
+
   return this;
 };
 

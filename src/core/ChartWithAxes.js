@@ -1412,6 +1412,8 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
       item = this.xAxes_[i];
       if (item) {
+        item.invalidate(item.ALL_VISUAL_STATES);
+        item.dropBoundsCache();
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
         //Scale uid check fixes DVF-3678

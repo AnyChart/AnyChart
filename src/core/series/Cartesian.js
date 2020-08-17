@@ -422,8 +422,13 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
  */
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    var state = anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES;
+    // Map chart perform zoom invalidation on 1<<21.
+    if (anychart.utils.instanceOf(this.chart, anychart.core.ChartWithAxes)) {
+      state |= anychart.ConsistencyState.AXES_CHART_AXES;
+    }
     //this fixes DVF-3657 because makes chart recalculate drawing plan.
-    /** @type {anychart.core.Base} */(this.chart).invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
+    /** @type {anychart.core.Base} */(this.chart).invalidate(state);
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
   }
