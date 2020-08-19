@@ -325,6 +325,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Increase',
+          'categoryType': 'increase',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (risingFill),
           'sourceUid': goog.getUid(this),
@@ -345,6 +346,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Decrease',
+          'categoryType': 'decrease',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (fallingFill),
           'sourceUid': goog.getUid(this),
@@ -365,6 +367,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Total',
+          'categoryType': 'total',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (totalFill),
           'sourceUid': goog.getUid(this),
