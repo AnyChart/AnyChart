@@ -4277,12 +4277,12 @@ anychart.ganttModule.TimeLine.prototype.limitProgressWidth_ = function(progressV
  */
 anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(element, itemBounds, dataItem, opt_considerBaseline, opt_periodIndex) {
   var fixParentHeight = element.getType() == anychart.enums.TLElementTypes.GROUPING_TASKS;
-  var optionHeight = /** @type {string|number} */ (element.getHeight(dataItem, opt_periodIndex));
+  var optionHeight = element.getHeight(dataItem, opt_periodIndex);
   var height = opt_considerBaseline || fixParentHeight ? itemBounds.height / 2 : itemBounds.height;
   var barHeight = anychart.utils.normalizeSize(optionHeight, height);
   var anchor = /** @type {anychart.enums.Anchor} */ (element.getOption('anchor'));
   var position = /** @type {anychart.enums.Position} */ (element.getOption('position'));
-  var offset = /** @type {number|string} */ (element.getOption('offset'));
+  var offset = element.getOffset(dataItem, opt_periodIndex);
   var offsetNorm = anychart.utils.normalizeSize(offset, itemBounds.height);
   if (anchor == anychart.enums.Anchor.AUTO) {
     anchor = this.resolveAutoAnchorByType_(position, element.getType(), opt_considerBaseline);
@@ -4423,7 +4423,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var width = right - left;
           var el = /** @type {anychart.ganttModule.elements.PeriodsElement} */ (this.periods());
 
-          var optionHeight = /** @type {string|number} */ (el.getOption('height'));
+          var optionHeight = el.getHeight(dataItem, j);
           var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
           var itemBounds = new anychart.math.Rect(left, totalTop, width, itemHeight);
@@ -4433,7 +4433,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
             anchor = this.resolveAutoAnchorByType_(position, anychart.enums.TLElementTypes.PERIODS);
           }
 
-          var offset = /** @type {number|string} */ (el.getOption('offset'));
+          var offset = el.getOffset(dataItem, j);
           var offsetNorm = anychart.utils.normalizeSize(offset, itemHeight);
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
@@ -4873,7 +4873,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsCommonMilestone_ = function(
             stroke['thickness'] ? stroke['thickness'] : 1;
 
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-    var optionHeight = /** @type {string|number} */ (el.getHeight(dataItem, opt_periodIndex));
+    var optionHeight = el.getHeight(dataItem, opt_periodIndex);
     var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
     var halfHeight = Math.round(height / 2);
     var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
@@ -4945,7 +4945,7 @@ anychart.ganttModule.TimeLine.prototype.getResourceItemBounds_ = function(item, 
     el = /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones());
     startTimestamp = info.milestoneTimestamp;
     endTimestamp = info.milestoneTimestamp;
-    var optionHeight = /** @type {string|number} */ (el.getHeight(item, opt_periodIndex));
+    var optionHeight = el.getHeight(item, opt_periodIndex);
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }
@@ -4979,7 +4979,7 @@ anychart.ganttModule.TimeLine.prototype.getProjectItemBounds_ = function(item, i
   var isMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
   if (isMilestone) {
     endTimestamp = startTimestamp;
-    var optionHeight = /** @type {string|number} */ (this.milestones().getHeight(item));
+    var optionHeight = this.milestones().getHeight(item);
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }

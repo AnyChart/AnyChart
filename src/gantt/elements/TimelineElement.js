@@ -408,6 +408,70 @@ anychart.ganttModule.elements.TimelineElement.prototype.getColorResolutionContex
 
 
 /**
+ * This method is a kind of extension over the getPointSettings() method.
+ * It also tries to get the field from data item.
+ *
+ * It allows to set data item fields universally:
+ *  <code>
+ *
+ *    var rawItem = {
+ *      id: 0,
+ *      name: 'Item',
+ *      height: 50,
+ *      offset: 50,
+ *      label: {
+ *        format: 'I am label'
+ *      }
+ *    };
+ *
+ *    // instead of:
+ *
+ *    var rawItem = {
+ *      id: 0,
+ *      name: 'Item',
+ *      tasks: {
+ *        height: 50,
+ *        offset: 50,
+ *        label: {
+ *          format: 'I am label'
+ *        }
+ *      },
+ *      milestones: {
+ *        height: 50,
+ *        offset: 50,
+ *        label: {
+ *          format: 'I am label'
+ *        }
+ *      }
+ *    };
+ *
+ *    // NOTE: 'label' field is just an example of future improvements, it is not used in current implementation.
+ *
+ *  </code>
+ *
+ *
+ * In current implementation (15 Aug 2020) for DVF-4469 this method is
+ * used for getting 'height' and 'offset' settings from data.
+ *
+ * @param {string} field - Field name to receive.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree Data Item.
+ * @param {number=} opt_periodIndex - Period index for resource chart case.
+ * @return {*} - Value if is defined, undefined otherwise.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.getPointSettingsField = function(field, item, opt_periodIndex) {
+  var pointSettings = this.getPointSettings(item, opt_periodIndex);
+  if (pointSettings) {
+    var fieldValue = pointSettings[field];
+
+    if (goog.isDefAndNotNull(fieldValue))
+      return fieldValue;
+  }
+
+  return item.get(field);
+};
+
+
+/**
  * Gets point settings color.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree Data Item.
  * @param {number=} opt_periodIndex - Period index.
@@ -772,17 +836,45 @@ anychart.ganttModule.elements.TimelineElement.prototype.recreateShapeManager = f
   this.shapeManager.setContainer(this.getTimeline().getDrawLayer());
 };
 
+/**
+ * Universally gets field value from data point or from element settings.
+ *
+ * @param {string} field - Field name to receive.
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree Data Item.
+ * @param {number=} opt_periodIndex - Period index for resource chart case.
+ * @return {*} - Value if is defined, undefined otherwise.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.getValue = function(field, item, opt_periodIndex) {
+  var value = this.getPointSettingsField(field, item, opt_periodIndex);
+  if (goog.isDefAndNotNull(value)) {
+    return value;
+  }
+
+  return this.getOption(field);
+};
+
 
 /**
  * Returns height of the element.
- * Leave dataItem argument here because maybe in future it will be used for all gantt elements.
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Point data.
  * @param {number=} opt_periodIndex - Index of period for resources chart case.
  * @return {number|string} - Height of the element.
  */
 anychart.ganttModule.elements.TimelineElement.prototype.getHeight = function(dataItem, opt_periodIndex) {
-  return /**@type {number|string}*/(this.getOption('height'));
+  return /**@type {number|string}*/(this.getValue('height', dataItem, opt_periodIndex));
+};
+
+
+/**
+ * Returns offset of the element.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Point data.
+ * @param {number=} opt_periodIndex - Index of period for resources chart case.
+ * @return {number|string} - Height of the element.
+ */
+anychart.ganttModule.elements.TimelineElement.prototype.getOffset = function(dataItem, opt_periodIndex) {
+  return /**@type {number|string}*/(this.getValue('offset', dataItem, opt_periodIndex));
 };
 
 
