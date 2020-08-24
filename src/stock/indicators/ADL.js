@@ -2,7 +2,6 @@ goog.provide('anychart.stockModule.indicators.ADL');
 goog.require('anychart.enums');
 goog.require('anychart.stockModule.indicators.Base');
 goog.require('anychart.stockModule.math.adl');
-goog.require('anychart.utils');
 
 
 
