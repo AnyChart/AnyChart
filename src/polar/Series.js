@@ -154,6 +154,46 @@ anychart.polarModule.Series.prototype.setupByJSON = function(config, opt_default
 };
 
 
+/**
+ * Modify passed ratio for the point consider other points.
+ *
+ * @param {number} middleRatio - Middle ration of sector.
+ * @param {number} samePointsIndex - Index of point.
+ * @param {number} samePointsCount - Count of points that has same value in current sector.
+ *
+ * @return {number}
+ *
+ * @private
+ */
+anychart.polarModule.Series.prototype.getPointRatio_ = function(middleRatio, samePointsIndex, samePointsCount) {
+  var sectorsCount = this.xScale().values().length;
+
+  var currentSectorStartRatio = middleRatio - 1 / (sectorsCount * 2);
+
+  // Divide current sector into similar parts.
+  var dx = 2 * (middleRatio - currentSectorStartRatio) * (1 / (samePointsCount + 1));
+
+  // Move point along x.
+  return currentSectorStartRatio + dx * samePointsIndex;
+};
+
+
+/** @inheritDoc */
+anychart.polarModule.Series.prototype.makePointsMetaFromMap = function (rowInfo, map, xRatio) {
+  if (this.xScale().getType() == anychart.enums.ScaleTypes.ORDINAL) {
+    var x = /**@type {number|string}*/(rowInfo.get('x'));
+    var value = /**@type {number}*/(rowInfo.get('value'));
+
+    var samePointIndex = this.chart.getCountOfProcessedPoints(x, value, this);
+    var samePointsCount = this.chart.getCountOfPointsWithSameValue(x, value, this);
+
+    xRatio = this.getPointRatio_(xRatio, samePointIndex, samePointsCount);
+  }
+  anychart.polarModule.Series.base(this, 'makePointsMetaFromMap', rowInfo, map, xRatio);
+
+  rowInfo.meta('xRatio', xRatio);
+};
+
 //exports
 // from descriptors:
 //proto['closed'] = proto.closed;

@@ -624,6 +624,32 @@ anychart.enums.normalizePolarLayout = function(value, opt_default) {
 };
 
 
+/**
+ * Available polar point spread types.
+ *
+ * @enum {string}
+ */
+anychart.enums.PolarValuesSpreadType = {
+  NONE: 'none',
+  VALUE_EQUAL: 'valueEqual',
+  VALUE_50: 'value50'
+};
+
+
+/**
+ * Polar spread values type normalizer.
+ *
+ * @param {*} value - Value need to be normalized.
+ * @param {anychart.enums.PolarValuesSpreadType=} opt_default - Default value.
+ *
+ * @return {anychart.enums.PolarValuesSpreadType} Normalized value.
+ */
+anychart.enums.normalizePolarValueSpreadType = function(value, opt_default) {
+  return /** @type {anychart.enums.PolarValuesSpreadType}*/(anychart.enums.normalize(anychart.enums.PolarValuesSpreadType, value,
+      opt_default || anychart.enums.PolarValuesSpreadType.NONE));
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Orientation.

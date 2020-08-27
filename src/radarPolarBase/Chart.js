@@ -724,6 +724,16 @@ anychart.radarPolarBaseModule.Chart.prototype.getSeriesStatus = function(event) 
 
 
 //endregion
+//region --- Overrides
+/** @inheritDoc */
+anychart.radarPolarBaseModule.Chart.prototype.getScaleAdditionalInvalidationState = function () {
+  return anychart.radarPolarBaseModule.Chart.base(this, 'getScaleAdditionalInvalidationState') |
+      anychart.ConsistencyState.AXES_CHART_GRIDS |
+      anychart.ConsistencyState.AXES_CHART_AXES;
+};
+
+
+//endregion
 //region --- Serialization / Deserialization / Disposing
 //------------------------------------------------------------------------------
 //

@@ -19,11 +19,49 @@ goog.require('anychart.radarPolarBaseModule.Chart');
 anychart.polarModule.Chart = function() {
   anychart.polarModule.Chart.base(this, 'constructor', false);
 
+  /**
+   * Before invalidation handler for 'spreadValues'.
+   * Invalidate marker series.
+   */
+  function invalidateMarkerSeries() {
+    goog.array.forEach(this.seriesList, function (series) {
+      if (series.getType() == anychart.enums.PolarSeriesType.MARKER) {
+        series.invalidate(anychart.ConsistencyState.ALL);
+      }
+    });
+  }
+
+  anychart.core.settings.createDescriptorMeta(
+    this.descriptorsMeta,
+    'spreadValues',
+    anychart.ConsistencyState.SERIES_CHART_SERIES,
+    anychart.Signal.NEEDS_REDRAW,
+    void 0,
+    invalidateMarkerSeries,
+    this
+  );
+
   this.addThemes('polar');
 };
 goog.inherits(anychart.polarModule.Chart, anychart.radarPolarBaseModule.Chart);
 
 
+/**
+ * @type {!Object<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.polarModule.Chart.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  anychart.core.settings.createDescriptor(map,
+    anychart.enums.PropertyHandlerType.SINGLE_ARG,
+    'spreadValues',
+    anychart.enums.normalizePolarValueSpreadType
+  );
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.polarModule.Chart, anychart.polarModule.Chart.PROPERTY_DESCRIPTORS);
 //region --- Series
 //------------------------------------------------------------------------------
 //
@@ -248,7 +286,151 @@ anychart.polarModule.Chart.prototype.createSeriesInstance = function(type, confi
   return new anychart.polarModule.Series(this, this, type, config, false);
 };
 
+/**
+ * Creates map that contains info about points and points count.
+ */
+anychart.polarModule.Chart.prototype.calculateInfoAboutPoints_ = function() {
+  this.resetInfoAboutPoints_();
+  var spreadValues = this.getOption('spreadValues');
 
+  if (spreadValues != anychart.enums.PolarValuesSpreadType.NONE) {
+    goog.array.forEach(this.seriesList, function (series) {
+      if (series.getType() == anychart.enums.PolarSeriesType.MARKER) {
+        var iterator = series.getResetIterator();
+        var spreadAroundTick = spreadValues == anychart.enums.PolarValuesSpreadType.VALUE_50;
+
+        while (iterator.advance()) {
+          var x = iterator.get('x');
+          var value = iterator.get('value');
+
+          // Treat all points around tick as same.
+          value = spreadAroundTick ? series.yScale().ticks().valueToClosestTick(value) : value;
+
+          var pointData = this.pointsInfo_[x] && this.pointsInfo_[x][value];
+
+          if (!pointData) {
+            if (!this.pointsInfo_[x])
+              this.pointsInfo_[x] = {};
+            pointData = this.pointsInfo_[x][value] = {count: 0, alreadyProcessed: 0};
+          }
+
+          pointData.count++;
+        }
+      }
+    }, this);
+  }
+};
+
+/**
+ * Reset points info.
+ */
+anychart.polarModule.Chart.prototype.resetInfoAboutPoints_ = function() {
+  /**
+   * Object that contains info about points of all chart marker series.
+   *
+   * For this data set
+   * |    x    |  value |
+   * |  dim_1  |   10   |
+   * |  dim_1  |   10   |
+   * |  dim_1  |   30   |
+   * |  dim_2  |   20   |
+   * |  dim_3  |   15   |
+   * Object will contain
+   * {
+   *     dim_1: {
+   *         10: {
+   *             count: 2,
+   *             alreadyProcessed:0
+   *         },
+   *         30: {
+   *             count: 1,
+   *             alreadyProcessed:0
+   *         }
+   *     },
+   *     dim_2: {
+   *         20: {
+   *             count: 1,
+   *             alreadyProcessed:0
+   *         }
+   *     },
+   *     dim_3: {
+   *         15: {
+   *             count: 1,
+   *             alreadyProcessed:0
+   *         }
+   *     }
+   * }
+   *
+   * @type {Object}
+   *
+   * @private
+   */
+  this.pointsInfo_ = {};
+};
+
+/**
+ * Returns count of point with same 'x' and same 'value'.
+ *
+ * @param {string|number} x
+ * @param {number} value
+ * @param {anychart.polarModule.Series} series - Series instance.
+ *
+ * @return {number}
+ */
+anychart.polarModule.Chart.prototype.getCountOfPointsWithSameValue = function(x, value, series) {
+  var seriesType = series.getType();
+  var seriesXScale = series.xScale();
+  var seriesYScale = series.yScale();
+
+  var xScaleType = seriesXScale.getType();
+
+  var spreadValues = this.getOption('spreadValues');
+
+  if (spreadValues == anychart.enums.PolarValuesSpreadType.NONE ||
+      seriesType != anychart.enums.PolarSeriesType.MARKER ||
+      xScaleType != anychart.enums.ScaleTypes.ORDINAL) {
+    return 1;
+  }
+
+  value = spreadValues === anychart.enums.PolarValuesSpreadType.VALUE_50 ? seriesYScale.ticks().valueToClosestTick(value) : value;
+
+  return this.pointsInfo_[x] && this.pointsInfo_[x][value].count;
+};
+
+/**
+ * Returns count of point with same 'x' and same 'value' already processed.
+ *
+ * @param {string|number} x
+ * @param {number} value
+ * @param {anychart.polarModule.Series} series - Series instance.
+ *
+ * @return {number}
+ */
+anychart.polarModule.Chart.prototype.getCountOfProcessedPoints = function(x, value, series) {
+  var seriesType = series.getType();
+  var seriesXScale = series.xScale();
+  var seriesYScale = series.yScale();
+
+  var xScaleType = seriesXScale.getType();
+
+  var spreadValues = this.getOption('spreadValues');
+
+  if (spreadValues == anychart.enums.PolarValuesSpreadType.NONE ||
+      seriesType != anychart.enums.PolarSeriesType.MARKER ||
+      xScaleType != anychart.enums.ScaleTypes.ORDINAL) {
+    return 1;
+  }
+
+  value = spreadValues === anychart.enums.PolarValuesSpreadType.VALUE_50 ? seriesYScale.ticks().valueToClosestTick(value) : value;
+
+  return this.pointsInfo_[x] && ++this.pointsInfo_[x][value].alreadyProcessed;
+};
+
+/** @inheritDoc */
+anychart.polarModule.Chart.prototype.calculate = function () {
+  anychart.polarModule.Chart.base(this, 'calculate');
+  this.calculateInfoAboutPoints_();
+};
 //endregion
 //region --- Serialization / Deserialization
 //------------------------------------------------------------------------------

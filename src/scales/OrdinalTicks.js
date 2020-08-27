@@ -327,6 +327,24 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 };
 
 
+/**
+ * Round passed value to the closest tick value.
+ *
+ * @param {number} value - Value need to be rounded.
+ *
+ * @return {number} - Rounded value.
+ */
+anychart.scales.OrdinalTicks.prototype.valueToClosestTick = function(value) {
+  var ticks = this.getInternal();
+  if (ticks.length) {
+    return goog.array.reduce(ticks, function (prev, current) {
+      return (Math.abs(prev - value) > Math.abs(current - value)) ? current : prev;
+    }, Infinity);
+  }
+  return value;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------

@@ -167,6 +167,49 @@ anychart.scales.ScatterTicks.prototype.count = function(opt_valueOrMinValue, opt
 
 
 /**
+ * Round passed value to the closest tick value.
+ * If no ticks presented return passed value.
+ *
+ * @param {number} value - Value need to be rounded.
+ *
+ * @return {number} - Rounded value.
+ */
+anychart.scales.ScatterTicks.prototype.valueToClosestTick = function(value) {
+  var ticks = this.getInternal();
+
+  if (ticks.length) {
+    var currentTick = ticks[0];
+    var nextTick = currentTick;
+    var minTick = Math.min.apply(null, ticks);
+    var maxTick = Math.max.apply(null, ticks);
+
+    var clampValue = goog.math.clamp(value, minTick, maxTick);
+
+    // All values that is greater then maximum tick or less then minimum tick.
+    if (clampValue != value) {
+      return clampValue;
+    }
+
+    for (var i = 0; i < ticks.length - 1; i++) {
+      currentTick = ticks[i];
+      nextTick = ticks[i + 1];
+      var interval = nextTick - currentTick;
+
+      var halfInterval = interval / 2;
+
+      var left = currentTick - halfInterval;
+      var right = currentTick + halfInterval;
+
+      if (value >= left && value < right) {
+        return currentTick;
+      }
+    }
+  }
+  return value;
+};
+
+
+/**
  * Getter/setter for base.
  * @param {number=} opt_value Base value for ticks.
  * @return {(number|anychart.scales.ScatterTicks)} Base value or itself for chaining.
