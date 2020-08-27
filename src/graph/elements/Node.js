@@ -2,7 +2,6 @@ goog.provide('anychart.graphModule.elements.Node');
 
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.OptimizedText');
-goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.graphModule.elements.Base');
 goog.require('anychart.reflow.IMeasurementsTargetProvider');
 goog.require('goog.math.Coordinate');
@@ -39,7 +38,7 @@ anychart.graphModule.elements.Node = function(chart) {
   this.labelsLayerEl_;
 
   /**
-   * @type {!anychart.data.Iterator}
+   * @type {?anychart.data.Iterator}
    * @private
    */
   this.iterator_;
@@ -92,6 +91,14 @@ anychart.graphModule.elements.Node.prototype.getLabelsLayer = function() {
 };
 
 
+/** @inheritDoc */
+anychart.graphModule.elements.Node.prototype.dropDataDependent = function() {
+  anychart.graphModule.elements.Node.base(this, 'dropDataDependent');
+
+  this.iterator_ = null;
+};
+
+
 /**
  * @return {!anychart.data.Iterator} iterator
  */
@@ -114,28 +121,6 @@ anychart.graphModule.elements.Node.prototype.provideMeasurements = function() {
   }
 
   return texts;
-};
-
-
-/**
- * Getter for tooltip settings.
- * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
- * @return {!(anychart.graphModule.elements.Node|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
- */
-anychart.graphModule.elements.Node.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.dropThemes();
-    this.setupCreated('tooltip', this.tooltip_);
-    this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip()));
-    this.tooltip_.chart(this.chart_);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
 };
 
 
@@ -195,20 +180,33 @@ anychart.graphModule.elements.Node.prototype.resolveSettings = function(node, se
   return finalSetting;
 };
 
+
+/** @inheritDoc */
+anychart.graphModule.elements.Node.prototype.getTooltipFormatContext = function(element) {
+  var context = anychart.graphModule.elements.Node.base(this, 'getTooltipFormatContext', element);
+  var edges = element.connectedEdges;
+
+  var siblings = goog.array.map(edges, function(edgeId) {
+    var edge = this.chart_.getEdgeById(edgeId);
+    var from = edge.from;
+    var to = edge.to;
+    var siblingId;
+    if (from != element.id) {
+      siblingId = from;
+    } else {
+      siblingId = to;
+    }
+
+    return siblingId;
+  }, this);
+
+  context['siblings'] = {value: siblings, type: anychart.enums.TokenType.UNKNOWN};
+
+  return context;
+};
+
+
 //region Labels
-// /**
-//  * Update label style of all nodes
-//  */
-// anychart.graphModule.elements.Node.prototype.updateLabelsStyle = function() {
-//   var nodes = this.chart_.getNodesArray();
-//
-//   for (var i = 0; i < nodes.length; i++) {
-//     var node = nodes[i];
-//     this.updateLabelStyle(node);
-//   }
-// };
-
-
 /**
  * Update labels style of node
  * @param {anychart.graphModule.Chart.Node} node
@@ -419,6 +417,7 @@ anychart.graphModule.elements.Node.prototype.drawLabels = function() {
 
 
 //endregion
+//region Visual Elements
 /**
  * Stick node to sibling.
  * @param {anychart.graphModule.Chart.Node} node

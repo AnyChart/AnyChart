@@ -1181,8 +1181,10 @@ anychart.graphModule.Chart.prototype.dropCurrentData_ = function() {
       this.edges_.clear(edge);
     }
   }
-  this.nodes().resetLabelSettings();
-  this.edges().resetLabelSettings();
+
+  this.nodes().dropDataDependent();
+  this.edges().dropDataDependent();
+
   this.nodesMap_ = {};
   this.edgesMap_ = {};
   this.nodesArray_ = null;

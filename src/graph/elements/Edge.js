@@ -1,7 +1,6 @@
 goog.provide('anychart.graphModule.elements.Edge');
 
 goog.require('anychart.core.ui.OptimizedText');
-goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.graphModule.elements.Base');
 goog.require('anychart.reflow.IMeasurementsTargetProvider');
 goog.require('goog.math.Coordinate');
@@ -477,6 +476,14 @@ anychart.graphModule.elements.Edge.prototype.getLength = function(edge) {
 };
 
 
+/** @inheritDoc */
+anychart.graphModule.elements.Edge.prototype.dropDataDependent = function() {
+  anychart.graphModule.elements.Edge.base(this, 'dropDataDependent');
+
+  this.iterator_ = null;
+};
+
+
 /**
  * Return edge iterator.
  * @return {!anychart.data.Iterator} iterator
@@ -630,28 +637,6 @@ anychart.graphModule.elements.Edge.prototype.getLayer = function() {
 
 //endregion
 //region tooltip and dispose
-/**
- * Getter for tooltip settings.
- * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
- * @return {!(anychart.graphModule.elements.Edge|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
- */
-anychart.graphModule.elements.Edge.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.dropThemes();
-    this.setupCreated('tooltip', this.tooltip_);
-    this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip()));
-    this.tooltip_.chart(this.chart_);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
-};
-
-
 /** @inheritDoc */
 anychart.graphModule.elements.Edge.prototype.serialize = function() {
   var json = anychart.graphModule.elements.Edge.base(this, 'serialize');
