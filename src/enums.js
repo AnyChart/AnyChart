@@ -5174,7 +5174,8 @@ anychart.enums.Store = {
   DATA_AREA: 'dataarea',
   SANKEY: 'sankey',
   TIMELINE_CHART: 'timelinechart',
-  GRAPH: 'graph'
+  GRAPH: 'graph',
+  WATERFALL: 'waterfall'
 };
 
 
