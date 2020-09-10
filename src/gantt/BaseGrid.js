@@ -794,6 +794,45 @@ anychart.ganttModule.BaseGrid.getPeriodInfo = function(item, periodIndex) {
 //endregion
 //region -- Format providers.
 /**
+ * Gets row type.
+ * Value us used for getting valid values for creating context and events.
+ *
+ * NOTE: in this case here's a difference between 'rowType' and 'elementType':
+ * elementType is type of currently hovered bar (bar under cursor).
+ * rowType is type used to draw element in current row.
+ *
+ * elementType appears in context or event only on bar hover.
+ * rowType always appears in context or event if data item contains
+ * no errors in date-time representation.
+ *
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @return {anychart.enums.TLElementTypes|undefined}
+ */
+anychart.ganttModule.BaseGrid.prototype.getRowType = function(item, opt_info) {
+  var rowType;
+
+  if (this.controller.isResources()) {
+    rowType = anychart.enums.TLElementTypes.PERIODS;
+  } else {
+    var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+    if (info.isValidBaseline) {
+      rowType = anychart.enums.TLElementTypes.BASELINES;
+    } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item, info)) {
+      rowType = anychart.enums.TLElementTypes.MILESTONES;
+    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
+      rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
+    } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
+      rowType = anychart.enums.TLElementTypes.TASKS;
+    }
+  }
+
+  return rowType;
+};
+
+
+/**
  * Fill values-object of context-provider with resource specific data.
  *
  * @param {Object.<string, anychart.core.BaseContext.TypedValue>} values - Typed values to be filled.
@@ -806,7 +845,11 @@ anychart.ganttModule.BaseGrid.prototype.processResourceFormatProviderValues_ = f
   var info = anychart.ganttModule.BaseGrid.getPeriodInfo(item, /** @type {number} */ (opt_periodIndex));
   var isMilestone = info.isValidMilestone;
 
-  values['rowType'] = {value: anychart.enums.TLElementTypes.PERIODS, type: anychart.enums.TokenType.STRING};
+  var rowType = this.getRowType(item);
+  if (rowType) {
+    values['rowType'] = { value: rowType, type: anychart.enums.TokenType.STRING };
+  }
+
   values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
   values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
   values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
@@ -859,8 +902,12 @@ anychart.ganttModule.BaseGrid.prototype.processResourceFormatProviderValues_ = f
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = function(values, item) {
-  var rowType;
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+  var rowType = this.getRowType(item, info);
+  if (rowType) {
+    values['rowType'] = { value: rowType, type: anychart.enums.TokenType.STRING };
+  }
 
   values['actualStart'] = {
     value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START),
@@ -892,7 +939,6 @@ anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = fu
   values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
 
   if (info.isValidBaseline) {
-    rowType = anychart.enums.TLElementTypes.BASELINES;
     values['baselineStart'] = {
       value: info.baselineStart,
       type: anychart.enums.TokenType.DATE_TIME
@@ -901,16 +947,7 @@ anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = fu
       value: info.baselineEnd,
       type: anychart.enums.TokenType.DATE_TIME
     };
-  } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item, info)) {
-    rowType = anychart.enums.TLElementTypes.MILESTONES;
-  } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
-    rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
-  } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
-    rowType = anychart.enums.TLElementTypes.TASKS;
   }
-
-  if (goog.isDef(rowType))
-    values['rowType'] = {value: rowType, type: anychart.enums.TokenType.STRING};
 };
 
 
@@ -1390,6 +1427,14 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
       newEvent['index'] = startIndex + index;
       newEvent['itemHeightMouseRatio'] = (mouseHeight - startHeight) / (this.gridHeightCache_[index] - startHeight);
     }
+
+    if (newEvent['item']) {
+      var rowType = this.getRowType(newEvent['item']);
+      if (rowType) {
+        newEvent['rowType'] = rowType;
+      }
+    }
+
     return newEvent;
   }
   return null;

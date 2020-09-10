@@ -894,7 +894,7 @@ anychart.ganttModule.Chart.prototype.rowMouseOver = function(event) {
 anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
   this.highlight();
   this.dg_.getTooltipInternal().hide();
-  this.tl_.getTooltipInternal(void 0, event['item']).hide();
+  this.tl_.getTooltipInternal(void 0, event['item'], event['periodIndex']).hide();
 };
 
 
@@ -1002,6 +1002,21 @@ anychart.ganttModule.Chart.prototype.rowUnselect = function(event) {
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.rowMouseUp = function(event) {
   event['target'].rowMouseUp(event);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.patchContextMenuContext = function(context) {
+  var event = context['event'];
+  var target = context['target'];
+
+  if (anychart.utils.instanceOf(target, anychart.ganttModule.BaseGrid)) {
+    context['interactivityEvent'] = target.getInteractivityEvent(event);
+  }
+
+  return context;
 };
 
 

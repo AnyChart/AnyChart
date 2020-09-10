@@ -2894,6 +2894,17 @@ anychart.tableModule.Table.contextMenuMap = {
 };
 
 
+/**
+ * Gets incoming raw common context object for context menu and patches it adding necessary fields.
+ *
+ * @param {anychart.ui.ContextMenu.PrepareItemsContext} context - Incoming raw common context object.
+ * @return {anychart.ui.ContextMenu.PrepareItemsContext} - Patched context object or a new one.
+ */
+anychart.tableModule.Table.prototype.patchContextMenuContext = function(context) {
+  return context;
+};
+
+
 //endregion
 //region --- Full screen
 //------------------------------------------------------------------------------

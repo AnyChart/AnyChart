@@ -1043,6 +1043,17 @@ anychart.core.Chart.prototype.specificContextMenuItems = function(items, context
 
 
 /**
+ * Gets incoming raw common context object for context menu and patches it adding necessary fields.
+ *
+ * @param {anychart.ui.ContextMenu.PrepareItemsContext} context - Incoming raw common context object.
+ * @return {anychart.ui.ContextMenu.PrepareItemsContext} - Patched context object or a new one.
+ */
+anychart.core.Chart.prototype.patchContextMenuContext = function(context) {
+  return context;
+};
+
+
+/**
  * Get selected points.
  * @return {Array.<anychart.core.Point>}
  */

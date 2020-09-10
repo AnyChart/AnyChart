@@ -319,10 +319,15 @@ anychart.ui.ContextMenu.prototype.prepareItems_ = function(event, target) {
   if (this.menuParent_) {
     var stage = this.menuParent_['container']() ? this.menuParent_['container']()['getStage']() : null;
     if (goog.isNull(stage) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return false;
+
     context['menuParent'] = this.menuParent_;
+    context['chart'] = this.menuParent_; // NOTE: This is added to follow the typedef and make api demos work well.
+
     if (goog.isFunction(this.menuParent_['getSelectedPoints'])) {
       context['selectedPoints'] = this.menuParent_['getSelectedPoints']() || [];
     }
+
+    context = this.menuParent_.patchContextMenuContext(context);
   }
 
   // Flow: itemsProvider -> itemsFormatter -> items -> render
