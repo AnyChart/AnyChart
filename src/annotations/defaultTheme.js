@@ -63,6 +63,9 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
     'ellipse': {},
     'triangle': {},
     'trendChannel': {},
+    'finiteTrendChannel': {
+      'channelWidth': 0
+    },
     'andrewsPitchfork': {},
     'fibonacciFan': {
       'levels': [
