@@ -75,12 +75,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     ],
     'stackLabels': {
-      'anchor': 'center-bottom',
+      'anchor': 'auto',
       'enabled': false,
       'format': function(context) {
         return context['value'];
       },
-      'position': 'center-top'
+      'position': 'auto'
     }
   }
 });
