@@ -5194,6 +5194,7 @@ anychart.enums.State = {
   LABELS_ENABLED: 'labelsEnabled',
   LABELS_BOUNDS: 'labelsBounds',
   NODES: 'nodes',
+  SELECTION: 'selection',
   EDGES: 'edges',
   LAYOUT: 'layout',
   TRANSFORM: 'transform',
