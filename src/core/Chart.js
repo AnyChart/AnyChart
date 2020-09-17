@@ -3870,15 +3870,21 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
  * Saves chart data as excel document.
  * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {string=} opt_filename file name to save.
+ * @param {{headers:Function}=} opt_exportOptions - Additional export options.
  */
-anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename) {
+anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename, opt_exportOptions) {
   var exports = anychart.window['anychart']['exports'];
   if (exports) {
-    var csv = this.toCsv(opt_chartDataExportMode, {
+    var csvOptions = {
       'rowsSeparator': '\n',
       'columnsSeparator': ',',
       'ignoreFirstRow': false
-    });
+    };
+
+    goog.mixin(csvOptions, opt_exportOptions || {});
+
+    var csv = this.toCsv(opt_chartDataExportMode, csvOptions);
+
     exports.saveAsXlsx(this, csv, opt_filename);
   } else {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);

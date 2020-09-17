@@ -1485,12 +1485,14 @@ anychart.utils.serializeCsv = function(headers, data, settings) {
   var colSep = (settings && settings['columnsSeparator']) || ',';
   var noHeader = (settings && settings['ignoreFirstRow']) || false;
   var formats = (settings && settings['formats']) || void 0;
+  var headersFormatter = (settings && settings['headers']) || void 0;
+
   if (!data.length || !anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
     return '';
 
   var strings = [];
   if (!noHeader) {
-    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length));
+    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length, headers, headersFormatter));
   }
 
   for (var i = 0; i < data.length; i++) {
