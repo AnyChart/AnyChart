@@ -136,12 +136,7 @@ anychart.ganttModule.header.Header.DESCRIPTORS = (function() {
 
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'levelHeight', anychart.core.settings.numberOrPercentNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', anychart.core.settings.booleanNormalizer, 'drawTopLine'],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', anychart.core.settings.booleanNormalizer, 'drawRightLine'],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', anychart.core.settings.booleanNormalizer, 'drawBottomLine'],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', anychart.core.settings.booleanNormalizer, 'drawLeftLine']
-
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'levelHeight', anychart.core.settings.numberOrPercentNormalizer]
   ]);
   return map;
 })();
@@ -365,123 +360,6 @@ anychart.ganttModule.header.Header.prototype.holidays = function(opt_value) {
 
 
 //endregion
-//region -- Deprecated API.
-/**
- * @param {acgraph.vector.Fill=} opt_value
- * @return {anychart.ganttModule.header.Header|acgraph.vector.Fill}
- * @deprecated Since 8.2.0. Use background().fill() instead.
- */
-anychart.ganttModule.header.Header.prototype.backgroundFill = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['backgroundFill()', 'background().fill()'], true);
-  if (goog.isDef(opt_value)) {
-    this.background()['enabled'](true);
-    this.background()['fill'](opt_value);
-    return this;
-  }
-  return /** @type {acgraph.vector.Fill} */(this.background().getOption('fill'));
-};
-
-
-/**
- * Getter/setter for padding.
- * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
- * @param {(string|number)=} opt_rightOrRightAndLeft .
- * @param {(string|number)=} opt_bottom .
- * @param {(string|number)=} opt_left .
- * @return {anychart.ganttModule.header.Header|anychart.core.utils.Padding} .
- * @deprecated Since 8.5.0. Use labels().padding() instead.
- */
-anychart.ganttModule.header.Header.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['padding()', 'labels().padding()'], true);
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.labels().padding().setup.apply(this.labels().padding(), arguments);
-    return this;
-  }
-  return /** @type {anychart.core.utils.Padding} */ (this.labels().padding());
-};
-
-
-/**
- * @param {acgraph.vector.Stroke=} opt_value
- * @return {acgraph.vector.Stroke|anychart.ganttBaseModule.TimeLineHeader}
- * @deprecated Since 8.2.0. Use stroke() instead.
- */
-anychart.ganttModule.header.Header.prototype.levelsSeparationStroke = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['levelsSeparationStroke()', 'stroke()'], true);
-  return this['stroke'](opt_value);
-};
-
-
-/**
- * Getter for top level of header.
- * @param {(Object|boolean)=} opt_value - Value to set.
- * @return {anychart.ganttModule.header.Header|anychart.ganttModule.header.Level} - Top level or itself for chaining..
- * @deprecated Since 8.2.0. Use level(2) instead.
- */
-anychart.ganttModule.header.Header.prototype.topLevel = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['topLevel()', 'level(2)'], true);
-  var level = this.level(2);
-  if (goog.isDef(opt_value)) {
-    level.setup(opt_value);
-    return this;
-  } else {
-    return level;
-  }
-};
-
-
-/**
- * Getter for mid level of header.
- * @param {(Object|boolean)=} opt_value - Value to set.
- * @return {anychart.ganttModule.header.Header|anychart.ganttModule.header.Level} - Mid level or itself for chaining..
- * @deprecated Since 8.2.0. Use level(1) instead.
- */
-anychart.ganttModule.header.Header.prototype.midLevel = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['midLevel()', 'level(1)'], true);
-  var level = this.level(1);
-  if (goog.isDef(opt_value)) {
-    level.setup(opt_value);
-    return this;
-  } else {
-    return level;
-  }
-};
-
-
-/**
- * Getter for low level of header.
- * @param {(Object|boolean)=} opt_value - Value to set.
- * @return {anychart.ganttModule.header.Header|anychart.ganttModule.header.Level} - Low level or itself for chaining..
- * @deprecated Since 8.2.0. Use level(0) instead.
- */
-anychart.ganttModule.header.Header.prototype.lowLevel = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['lowLevel()', 'level(0)'], true);
-  var level = this.level(0);
-  if (goog.isDef(opt_value)) {
-    level.setup(opt_value);
-    return this;
-  } else {
-    return level;
-  }
-};
-
-
-/**
- * Overlay element. Dummy method, not working for gantt.
- * Left here for backward compatibility.
- * @param {(string|Object|null|boolean)=} opt_value .
- * @return {anychart.ganttModule.header.Header|anychart.ganttBaseModule.Overlay}
- * @deprecated Since 8.5.0. Don't use it in gantt.
- */
-anychart.ganttModule.header.Header.prototype.overlay = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    return this;
-  }
-  return this.overlay_;
-};
-
-
-//endregion
 //region -- Draw.
 /**
  * @private
@@ -630,27 +508,6 @@ anychart.ganttModule.header.Header.prototype.setupByJSON = function(config, opt_
   this.background().setupInternal(!!opt_default, config['background']);
   this.labels().setupInternal(!!opt_default, config['labels']);
 
-  //deprecated API.
-  var level = config['topLevel'];
-  if (level) {
-    this.level(2, level);
-    if (!opt_default)
-      anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['topLevel()', 'level(2)'], true);
-  }
-  level = config['midLevel'];
-  if (level) {
-    this.level(1, level);
-    if (!opt_default)
-      anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['midLevel()', 'level(1)'], true);
-  }
-  level = config['lowLevel'];
-  if (level) {
-    this.level(0, level);
-    if (!opt_default)
-      anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['lowLevel()', 'level(0)'], true);
-  }
-  //end of deprecated API
-
   var levels = config['levels'];
   if (goog.isArray(levels)) {
     for (var i = 0; i < levels.length; i++) {
@@ -687,19 +544,9 @@ anychart.ganttModule.header.Header.prototype.disposeInternal = function() {
 (function() {
   var proto = anychart.ganttModule.header.Header.prototype;
   proto['background'] = proto.background;
-  proto['holidays'] = proto.holidays;
   proto['level'] = proto.level;
   proto['labels'] = proto.labels;
   proto['getPixelBounds'] = proto.getPixelBounds;
-
-  // deprecated API
-  proto['backgroundFill'] = proto.backgroundFill;
-  proto['overlay'] = proto.overlay;
-  proto['padding'] = proto.padding;
-  proto['levelsSeparationStroke'] = proto.levelsSeparationStroke;
-  proto['topLevel'] = proto.topLevel;
-  proto['midLevel'] = proto.midLevel;
-  proto['lowLevel'] = proto.lowLevel;
 })();
 
 

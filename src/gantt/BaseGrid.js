@@ -1451,22 +1451,6 @@ anychart.ganttModule.BaseGrid.prototype.getGridHeightCache = function() {
 
 
 /**
- * Enables/disables live edit mode.
- * @param {boolean=} opt_value - Value to be set.
- * @deprecated since 8.3.0 use grid.edit() instead. DVF-3623
- * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
- */
-anychart.ganttModule.BaseGrid.prototype.editing = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['dataGrid.editing() or timeline.editing()', 'dataGrid.edit() or timeline.edit()'], true);
-  if (goog.isDef(opt_value)) {
-    this.edit()['enabled'](opt_value);
-    return this;
-  }
-  return /** @type {boolean} */ (this.edit().getOption('enabled'));
-};
-
-
-/**
  * Sets interactivity handler.
  * @param {!anychart.ganttModule.IInteractiveGrid} value - Interactivity handler.
  */
@@ -2094,45 +2078,9 @@ anychart.ganttModule.BaseGrid.prototype.paletteInvalidated_ = function(event) {
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().fill() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewFill = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewFill()', 'timeline.edit().fill()'], true);
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().stroke() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewStroke = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewStroke()', 'timeline.edit().stroke()'], true);
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().placementStroke() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewDashStroke()', 'timeline.edit().placementStroke()'], true);
-  return arguments.length ? target['placementStroke'].apply(target, arguments) : target['placementStroke']();
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Private.
@@ -3362,11 +3310,6 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
 
   json['headerHeight'] = this.headerHeight_;
   json['edit'] = /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).serialize();
-  // json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
-  // json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
-  // json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
-
-  // json['editing'] = this.editable;
 
   return json;
 };
@@ -3396,10 +3339,6 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
 
   if ('edit' in config)
     /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).setupInternal(!!opt_default, config['edit']);
-  // this.editStructurePreviewFill(config['editStructurePreviewFill']);
-  // this.editStructurePreviewStroke(config['editStructurePreviewStroke']);
-  // this.editStructurePreviewDashStroke(config['editStructurePreviewDashStroke']);
-  // this.editing(config['editing']);
 };
 
 

@@ -84,14 +84,6 @@ anychart.ganttModule.IInteractiveGrid.prototype.rowUnselect = function(event) {}
 anychart.ganttModule.IInteractiveGrid.prototype.rowExpandCollapse = function(event) {};
 
 
-// /**
-//  * Enables/disables live edit mode.
-//  * @param {boolean=} opt_value - Value to be set.
-//  * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
-//  */
-// anychart.ganttModule.IInteractiveGrid.prototype.editing = function(opt_value) {};
-
-
 /**
  * Live edit settings.
  * @param {Object=} opt_value - Value to be set.
