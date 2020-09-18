@@ -852,11 +852,14 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
     this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
     var tooltip;
-    var item = event['item'];
-    if (event['elementType'] == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
-      // https://anychart.atlassian.net/browse/DVF-4356
-      item = event['originalEvent']['domTarget'].tag.item;
-    }
+    /*
+      Item is saved in the tooltipItem field for milestone previews, including
+      cases when milestone preview label is hovered. This is to avoid mouse
+      click interactivity on previews, while having separate tooltip for them.
+      https://anychart.atlassian.net/browse/DVF-4356
+     */
+    var item = event['tooltipItem'] ? event['tooltipItem'] : event['item'];
+
     tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item, event['periodIndex']));
 
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {

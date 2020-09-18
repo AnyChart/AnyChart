@@ -30,6 +30,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.scales.GanttDateTime');
 goog.require('goog.array');
 goog.require('goog.fx.Dragger');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -383,12 +384,13 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
 
   /**
    * Indexes of this array represent gantt chart rows
-   * and each contains array of sorted tags.
+   * and each contains array of tags sorted by the anchor position
+   * of the label associated with the tag.
    *
    * @type {Array.<Array.<anychart.ganttModule.TimeLine.Tag>>}
    * @private
    */
-  this.tagsForCropLabels_ = [];
+  this.sortedTags_ = [];
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['cropLabels', anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS, anychart.Signal.NEEDS_REDRAW],
@@ -4060,16 +4062,92 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
 
     evt['hoverRatio'] = ratio;
     evt['hoverDateTime'] = timestamp;
-    if (elType)
+
+    if (elType) {
       evt['elementType'] = elType;
+
+      /*
+        For milestone preview - save item to the tooltipItem field, to only
+        show tooltip for it and avoid selection by mouseclick.
+        https://anychart.atlassian.net/browse/DVF-4356
+       */
+      if (elType === anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
+        evt['tooltipItem'] = evt['originalEvent']['domTarget'].tag.item;
+      }
+    }
+
 
     if (this.controller.isResources() && target.tag) {
       evt['period'] = target.tag.period;
       evt['periodIndex'] = target.tag.periodIndex;
     }
+
+    // Patches interactivity event in case elements (period or milestone preview) label is hovered.
+    this.patchInteractivityEvent(event, evt);
   }
 
   return evt;
+};
+
+
+/**
+ * If there is label under mouse cursor, write element
+ * info to the interactivity event.
+ * Alters interactivityEvent in the process.
+ *
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent 
+ * @param {Object} interactivityEvent 
+ */
+anychart.ganttModule.TimeLine.prototype.patchInteractivityEvent = function(originalEvent, interactivityEvent) {
+  // Find period tag by the label.
+  var tag = this.getTagByMouseEvent(originalEvent);
+  if (tag) {
+    if (this.controller.isResources()) {
+      interactivityEvent['period'] = tag.period;
+      interactivityEvent['periodIndex'] = tag.periodIndex;
+      interactivityEvent['elementType'] = tag.type;
+    } else { // Project chart.
+      // On project chart only milestone preview labels hovers are detected.
+      interactivityEvent['tooltipItem'] = tag.item;
+    }
+  }
+};
+
+
+/**
+ * Checks if period or milestone preview label is under
+ * the mouse cursor. If label exists - returns tag of the element
+ * whose label it is. Uses array of sorted arrays of tags, used in
+ * labels crop mechanism.
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} event - Mouse event.
+ * @return {?anychart.ganttModule.TimeLine.Tag}
+ */
+anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
+  var gridHeightCache = this.getGridHeightCache();
+  var headerHeight = this.headerHeight();
+  var timelineHeaderBottom = this.pixelBoundsCache.top +
+    this.container().getStage().getClientPosition().y +
+    headerHeight;
+
+  var mouseHeightFromHeaderBottom = event.clientY - timelineHeaderBottom;
+
+  var index = goog.array.binarySearch(gridHeightCache, mouseHeightFromHeaderBottom);
+  index = index >= 0 ? index : ~index; //Index of row under mouse.
+  index += /** @type {number} */(this.controller.startIndex());
+
+  var curRowTags = this.sortedTags_[index] || [];
+
+  var mouseCoordinate = new goog.math.Coordinate(event.offsetX, event.offsetY);
+  return goog.array.find(curRowTags, function(tag) {
+    if (tag.label.enabled()) {
+      var tagLabelBounds = this.getTagLabelBounds_(tag.label);
+
+      if (tagLabelBounds.distance(mouseCoordinate) === 0) {
+          return true;
+      }
+    }
+    return false;
+  }, this);
 };
 
 
@@ -5949,7 +6027,7 @@ anychart.ganttModule.TimeLine.prototype.cropElementsLabels_ = function() {
       They contain element bounds and instance of label being drawn. And also when we collect
       tags we only get what is drawn on the screen.
      */
-    var tags = this.tagsForCropLabels_[i] || [];
+    var tags = this.sortedTags_[i] || [];
     this.cropTagsLabels_(tags);
   }
 };
@@ -6108,15 +6186,15 @@ anychart.ganttModule.TimeLine.prototype.cropTagsLabels_ = function(tags) {
  * @param {anychart.ganttModule.TimeLine.Tag} tag
  */
 anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) {
-  if (!goog.isArray(this.tagsForCropLabels_[tag.row])) {
-    this.tagsForCropLabels_[tag.row] = [];
+  if (!goog.isArray(this.sortedTags_[tag.row])) {
+    this.sortedTags_[tag.row] = [];
   }
   
   var isResourcePeriodOrMilestone =
     (tag.type === anychart.enums.TLElementTypes.PERIODS) ||
     (tag.type === anychart.enums.TLElementTypes.MILESTONES);
   
-    var isProjectMilestonePreview =
+  var isProjectMilestonePreview =
     (tag.type === anychart.enums.TLElementTypes.MILESTONES_PREVIEW);
   
   var isResource = this.controller.isResources();
@@ -6126,7 +6204,7 @@ anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) 
 
   if (suits1 || suits2) {
     goog.array.binaryInsert(
-      this.tagsForCropLabels_[tag.row],
+      this.sortedTags_[tag.row],
       tag,
       anychart.ganttModule.TimeLine.tagsBinaryInsertCallback
     );
@@ -6141,7 +6219,7 @@ anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) 
 anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
   this.labels().suspendSignalsDispatching();
   this.labels().clear();
-  this.tagsForCropLabels_ = [];
+  this.sortedTags_ = [];
 
   var isCropLabelsEnabled = this.getOption('cropLabels');
 
@@ -6232,9 +6310,7 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
             }
             tag.label.draw();
 
-            if (isCropLabelsEnabled) {
-              this.insertTagForCropLabels_(tag);
-            }
+            this.insertTagForCropLabels_(tag);
           }
         }
       }
