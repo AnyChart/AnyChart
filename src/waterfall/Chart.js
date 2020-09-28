@@ -330,7 +330,7 @@ anychart.core.settings.populate(anychart.waterfallModule.Chart, anychart.waterfa
 anychart.waterfallModule.Chart.prototype.getFormatProviderForStackedLabel = function(index) {
   var provider = new anychart.format.Context();
 
-  var value = this.getStackSum(index);
+  var value = this.getStackAbsolutesSum(index);
 
   var values = {
     'index': {value: index, type: anychart.enums.TokenType.NUMBER},
@@ -462,7 +462,11 @@ anychart.waterfallModule.Chart.prototype.drawStackLabels = function() {
 anychart.waterfallModule.Chart.prototype.drawLabels = function() {
   this.stackLabels().clear();
 
-  if (this.getSeriesCount() > 1 && this.stackLabels().getOption('enabled')) {
+  var countOfVisibleSeries = goog.array.reduce(this.seriesList, function(count, series) {
+    return series.enabled() ? count + 1 : count;
+  }, 0);
+
+  if (countOfVisibleSeries > 1 && this.stackLabels().getOption('enabled')) {
     this.drawStackLabels();
   }
 
@@ -689,7 +693,7 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
 
 
 /**
- * Returns sum of stack.
+ * Returns sum of stack values.
  *
  * @param {number} index - Stack index.
  *
@@ -697,12 +701,39 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
  */
 anychart.waterfallModule.Chart.prototype.getStackSum = function(index) {
   return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
-    var iterator = currentSeries.getIterator();
-    iterator.select(index);
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+      iterator.select(index);
 
-    var absolute = iterator.meta('absolute');
+      var value = iterator.get('value') || 0;
 
-    return sum + absolute;
+      return sum + value;
+    }
+
+    return sum;
+  }, 0);
+};
+
+
+/**
+ * Returns sum of stack absolute values.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getStackAbsolutesSum = function(index) {
+  return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+      iterator.select(index);
+
+      var absolute = iterator.meta('absolute') || 0;
+
+      return sum + absolute;
+    }
+
+    return sum;
   }, 0);
 };
 
@@ -731,14 +762,17 @@ anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
  */
 anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
   return goog.array.reduce(this.seriesList, function(top, currentSeries) {
-    var iterator = currentSeries.getIterator();
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
 
-    iterator.select(index);
+      iterator.select(index);
 
-    var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
-    var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
 
-    return Math.max(top, stackedValue, stackedZero);
+      return Math.max(top, stackedValue, stackedZero);
+    }
+    return top;
   }, -Infinity);
 };
 
@@ -752,14 +786,17 @@ anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
  */
 anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
   return goog.array.reduce(this.seriesList, function(bottom, currentSeries) {
-    var iterator = currentSeries.getIterator();
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
 
-    iterator.select(index);
+      iterator.select(index);
 
-    var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
-    var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
 
-    return Math.min(stackedValue, stackedZero, bottom);
+      return Math.min(stackedValue, stackedZero, bottom);
+    }
+    return bottom;
   }, Infinity);
 };
 
@@ -780,6 +817,9 @@ anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
 anychart.waterfallModule.Chart.prototype.serialize = function() {
   var json = anychart.waterfallModule.Chart.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, json['chart']);
+  json['chart']['stackLabels'] = this.stackLabels().serialize();
+
+
   return json;
 };
 
@@ -787,6 +827,12 @@ anychart.waterfallModule.Chart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.waterfallModule.Chart.base(this, 'setupByJSON', config, opt_default);
+
+  var stackLabelsConfig = config['stackLabels'];
+  if (stackLabelsConfig) {
+    this.stackLabels().setupInternal(!!opt_default, stackLabelsConfig);
+  }
+
   anychart.core.settings.deserialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, config);
 };
 

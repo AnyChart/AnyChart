@@ -295,7 +295,7 @@ anychart.polarModule.Chart.prototype.calculateInfoAboutPoints_ = function() {
 
   if (spreadValues != anychart.enums.PolarValuesSpreadType.NONE) {
     goog.array.forEach(this.seriesList, function (series) {
-      if (series.getType() == anychart.enums.PolarSeriesType.MARKER) {
+      if (series.enabled() && series.getType() == anychart.enums.PolarSeriesType.MARKER) {
         var iterator = series.getResetIterator();
         var spreadAroundTick = spreadValues == anychart.enums.PolarValuesSpreadType.VALUE_50;
 

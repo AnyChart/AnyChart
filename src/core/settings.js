@@ -935,6 +935,7 @@ anychart.core.settings.descriptors = (function() {
   map.FONT_SIZE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontSize', anychart.core.settings.numberOrPercentOrNullOrFunctionNormalizer];
   // other text settings
   map.FONT_COLOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontColor', anychart.core.settings.stringOrNullNormalizer];
+  map.TEXT_SHADOW = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textShadow', acgraph.vector.normalizeTextShadow];
   map.FONT_OPACITY = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontOpacity', anychart.core.settings.numberNormalizer];
   map.FONT_DECORATION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontDecoration', anychart.enums.normalizeFontDecoration];
   // pert tasks
