@@ -1485,12 +1485,14 @@ anychart.utils.serializeCsv = function(headers, data, settings) {
   var colSep = (settings && settings['columnsSeparator']) || ',';
   var noHeader = (settings && settings['ignoreFirstRow']) || false;
   var formats = (settings && settings['formats']) || void 0;
+  var headersFormatter = (settings && settings['headers']) || void 0;
+
   if (!data.length || !anychart.utils.checkSeparator(rowSep) || !anychart.utils.checkSeparator(colSep))
     return '';
 
   var strings = [];
   if (!noHeader) {
-    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length));
+    strings.push(anychart.utils.toCsvRow_(headers, colSep, rowSep, headers.length, headers, headersFormatter));
   }
 
   for (var i = 0; i < data.length; i++) {
@@ -1735,7 +1737,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.8.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.9.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -2898,11 +2900,23 @@ anychart.utils.STYLE_EXCEPTIONS_ = {
 
 /**
  * Converts style object to DOM-attribute style string.
+ *
  * @param {Object} obj - Settings object.
+ *
  * @return {string} - Style string.
  */
 anychart.utils.toStyleString = function(obj) {
   var result = '';
+
+  if (obj['textOverflow'] == '...') {
+    obj['textOverflow'] = 'ellipsis';
+  }
+
+  var fontSize = obj['fontSize'];
+  if (goog.isNumber(fontSize)) {
+    obj['fontSize'] = fontSize.toString()+'px';
+  }
+
   for (var key in obj) {
     var selCase = anychart.utils.STYLE_EXCEPTIONS_[key] || goog.string.toSelectorCase(key);
     result += (selCase + ': ' + obj[key] + ';');

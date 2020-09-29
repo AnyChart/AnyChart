@@ -307,7 +307,7 @@ anychart.ganttModule.Column.prototype.setColumnFormat = function(fieldName, pres
     var width = settings['width'];
     var textStyle = settings['textStyle'];
 
-    if (goog.isDef(formatter)) this.labels().format(function() {
+    if (goog.isDef(formatter)) this.labels()['format'](function() {
       var item = this['item'];
       return formatter(item.get(fieldName));
     });
@@ -421,13 +421,6 @@ anychart.ganttModule.Column.prototype.setupText_ = function(text, opt_item, opt_
     }
 
     var provider = this.dataGrid_.createFormatProvider(opt_item);
-
-    if (!anychart.isAsync()) {
-      /*
-        ASYNC is an experimental feature, that's why it doesn't need deprecates.
-       */
-      this.fixDeprecatedFormatting(provider, opt_item);
-    }
     var textVal = labels.getText(provider);
     text.text(textVal);
   }
@@ -533,20 +526,6 @@ anychart.ganttModule.Column.prototype.getIndex = function() {
 
 
 /**
- * @param {(string|Function)=} opt_value - Value.
- * @deprecated since 8.2.0 use column.labels().format() instead.
- * @return {(string|Function|anychart.ganttModule.Column)}
- */
-anychart.ganttModule.Column.prototype.format = function(opt_value) {
-  if (goog.isDef(opt_value))
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['column.format()', 'column.labels().format()'], true);
-  var l = /** @type {anychart.core.ui.LabelsSettings} */ (this.labels());
-  var result = l['format'](opt_value);
-  return goog.isDef(opt_value) ? this : result;
-};
-
-
-/**
  * @param {Object=} opt_value - Value to be set.
  * @return {(anychart.ganttModule.Column|anychart.core.ui.LabelsSettings)} - Current value or itself for method chaining.
  */
@@ -572,21 +551,6 @@ anychart.ganttModule.Column.prototype.labels = function(opt_value) {
   }
 
   return this.labelsSettings_;
-};
-
-
-/**
- * @param {Object=} opt_value - .
- * @deprecated since 8.2.0 use column.labels() instead.
- * @return {(anychart.ganttModule.Column|anychart.core.ui.LabelsSettings)} - Current value or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.cellTextSettings = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['column.cellTextSettings()', 'column.labels()'], true);
-  if (goog.isDef(opt_value)) {
-    this.labels(opt_value);
-    return this;
-  }
-  return this.labels();
 };
 
 
@@ -655,19 +619,6 @@ anychart.ganttModule.Column.prototype.labelsOverrider = function(opt_value) {
     return this;
   }
   return this.labelsOverrider_;
-};
-
-
-/**
- * Gets/sets cells text settings overrider.
- * @param {function(anychart.core.ui.LabelsSettings, anychart.treeDataModule.Tree.DataItem)=} opt_value - New text settings
- *  overrider function.
- * @deprecated since 8.2.0 use column.labelsOverrider() instead. DVF-3625
- * @return {(anychart.ganttModule.Column|function(anychart.core.ui.LabelsSettings, anychart.treeDataModule.Tree.DataItem))} - Current value or itself for method chaining.
- */
-anychart.ganttModule.Column.prototype.cellTextSettingsOverrider = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['column.cellTextSettingsOverrider()', 'column.labelsOverrider()'], true);
-  return this.labelsOverrider(opt_value);
 };
 
 
@@ -803,23 +754,6 @@ anychart.ganttModule.Column.prototype.height = function(opt_value) {
 
 
 /**
- * Getter/setter for buttonCursor.
- * @param {(anychart.enums.Cursor|string)=} opt_value buttonCursor.
- * @return {anychart.enums.Cursor|anychart.ganttModule.Column} buttonCursor or self for chaining.
- * @deprecated since 8.2.0. Use anychart.core.ui.DataGrid#buttons().cursor() instead
- */
-anychart.ganttModule.Column.prototype.buttonCursor = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['buttonCursor()', 'dataGrid.buttons().cursor()'], true);
-  var buttons = this.dataGrid_.buttons();
-  if (goog.isDef(opt_value)) {
-    buttons['cursor'](opt_value);
-    return this;
-  }
-  return buttons['cursor']();
-};
-
-
-/**
  * Inner getter for this.cellsLayer_.
  * @return {acgraph.vector.Layer}
  * @private
@@ -890,31 +824,6 @@ anychart.ganttModule.Column.prototype.getPixelBounds = function() {
 anychart.ganttModule.Column.prototype.buttonInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
     this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Is in use because previous behaviour was like that - label.format().call(context, item);
- * Now, format function called like that - .call(context, context), but it happens in LabelsFactory.
- * For save legacy behaviour here is this mixin.
- * @param {anychart.format.Context} context - .
- * @param {anychart.treeDataModule.Tree.DataItem} item - .
- */
-anychart.ganttModule.Column.prototype.fixDeprecatedFormatting = function(context, item) {
-  var dataItemMethods = ['get', 'set', 'meta', 'del', 'getParent', 'addChild', 'addChildAt', 'getChildren', 'numChildren', 'getChildAt', 'remove', 'removeChild', 'removeChildAt', 'removeChildren', 'indexOfChild'];
-  goog.array.forEach(dataItemMethods, function(methodName) {
-    var wrappedMethod = item['__wrapped' + methodName];
-    if (!wrappedMethod) {
-      var bindedHandler = goog.bind(item[methodName], item);
-      wrappedMethod = function() {
-        anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['arguments[0].' + methodName + '()', 'arguments[0].item.' + methodName + '()'], true);
-        return bindedHandler.apply(item, arguments);
-      };
-
-      item['__wrapped' + methodName] = wrappedMethod;
-    }
-    context[methodName] = wrappedMethod;
-  }, this);
 };
 
 
@@ -1227,9 +1136,7 @@ anychart.ganttModule.Column.prototype.setupByJSON = function(json, opt_default) 
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.Column.DESCRIPTORS, json, opt_default);
 
-  if (goog.isDef(json['format']))
-    this.format(json['format']);
-
+  this.labels().setupInternal(!!opt_default, json['labels']);
   this.title().setupInternal(!!opt_default, json['title']);
 
   this.labelsOverrider(json['labelsOverrider'] || json['cellTextSettingsOverrider']);
@@ -1288,13 +1195,9 @@ anychart.ganttModule.Column.prototype.disposeInternal = function() {
   var proto = anychart.ganttModule.Column.prototype;
   proto['title'] = proto.title;
   proto['enabled'] = proto.enabled;
-  proto['format'] = proto.format;
   proto['labels'] = proto.labels;
-  proto['cellTextSettings'] = proto.cellTextSettings;
   proto['labelsOverrider'] = proto.labelsOverrider;
-  proto['cellTextSettingsOverrider'] = proto.cellTextSettingsOverrider;
   proto['setColumnFormat'] = proto.setColumnFormat;
-  proto['buttonCursor'] = proto.buttonCursor;
   proto['draw'] = proto.draw;
   proto['getPixelBounds'] = proto.getPixelBounds;
 })();

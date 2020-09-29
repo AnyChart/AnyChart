@@ -1295,6 +1295,22 @@ anychart.ganttModule.Controller.prototype.finalProcessor_ = function() {
       this.dataGrid_.drawInternal(this.positionRecalculated_);
     if (this.timeline_)
       this.timeline_.drawInternal(this.positionRecalculated_);
+
+    /*
+      Normally data grid would emit working events in prepareLabels(). For the case when it is
+      disabled we emit these events here.
+      https://anychart.atlassian.net/browse/DVF-4398 - order of working events.
+      https://anychart.atlassian.net/browse/QLIK-161 - ticket depending on this fix.
+     */
+    if (!isDataGridEnabled) {
+      var dispatcher = this.getDispatcher();
+      dispatcher.dispatchEvent(anychart.enums.EventType.WORKING_START);
+      dispatcher.dispatchEvent({
+        'type': anychart.enums.EventType.WORKING,
+        'progress': 100
+      });
+      dispatcher.dispatchEvent(anychart.enums.EventType.WORKING_FINISH);
+    }
   }, void 0, this));
 };
 

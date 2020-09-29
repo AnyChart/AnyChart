@@ -2569,85 +2569,158 @@ anychart.core.series.Base.prototype.applyAdditionalLabelSettings = goog.nullFunc
 
 
 /**
- * Draws one factory element.
+ * Check is passed setting of labels or markers factory different from default.
+ *
+ * @param {string} setting - Name of setting.
+ * @param {Array.<anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory>} factories - Factories need to check.
+ *
+ * @return {boolean} - Is setting changed.
+ *
+ * @private
+ */
+anychart.core.series.Base.prototype.isFactoriesSettingChanged_ = function(setting, factories){
+  var mainFactory = factories[0];
+  var currentFactory = factories[1] || mainFactory;
+
+  return mainFactory.getSettingsChangedStatesObj()[setting] ||
+    currentFactory.getSettingsChangedStatesObj()[setting] ||
+    (factories[2] && goog.isDef(factories[2][setting])) ||
+    (factories[3] && goog.isDef(factories[3][setting]));
+};
+
+
+/**
+ * Create and return marker factory item, set position provider to it and setup appearance settings.
+ *
+ * @param {Array.<anychart.core.ui.MarkersFactory|*>} factories - Array with factories that used to resolve settings for marker.
+ * @param {number|undefined} index - Index of point.
+ * @param {Object} positionProvider - Object with info about position.
+ *
+ * @return {anychart.core.ui.MarkersFactory.Marker} - Marker instance.
+ */
+anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function(factories, index, positionProvider) {
+  var mainFactory = /** @type {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} */(factories[0]);
+  var marker = mainFactory.getMarker(/** @type {number} */(index));
+  if (!marker) {
+    marker = mainFactory.add(void 0, index);
+  }
+
+  marker.positionProvider(positionProvider);
+  marker.resetSettings();
+
+  var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
+  var iterator = this.getIterator();
+
+  var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
+  var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
+  var state = this.getPointState(iterator.getIndex());
+  // this.shapeManager.updateMarkersColors(anychart.PointState.NORMAL, group);
+  this.shapeManager.updateMarkersColors(state, group);
+
+  var color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(
+      iterator.meta(this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'markerStroke' : 'markerFill'));
+
+  if (goog.isDef(color)) {
+    var autoFill = mainFactory == this.normal_.outlierMarkers() ? this.getOutliersFill(color) : this.getMarkerFill(color);
+    var isFillChanged = this.isFactoriesSettingChanged_('fill', factories);
+
+    if (!isFillChanged && anychart.color.isNotNullColor(autoFill)) {
+      marker.setAutoFill(autoFill);
+
+      var autoStroke = anychart.color.darken(autoFill);
+      var isStrokeChanged = this.isFactoriesSettingChanged_('stroke', factories);
+      if (!isStrokeChanged && anychart.color.isNotNullColor(autoStroke))
+        marker.setAutoStroke(autoStroke);
+    }
+  }
+
+  marker.currentMarkersFactory(currentFactory);
+  marker.setSettings(/** @type {Object} */(factories[2]), /** @type {Object} */(factories[3]));
+
+  return marker;
+};
+
+
+/**
+ * Create and return label instance, setup format and position provider for it.
+ *
+ * @param {anychart.core.ui.LabelsFactory} labelsFactory - Factory that used to create label.
+ * @param {Array} settings - Array with settings that used to resolve settings for label.
+ * @param {number|undefined} index - Index of point.
+ * @param {Object} positionProvider - Object with info about position.
+ * @param {Object} formatProvider - Format provider that label use.
+ * @param {(?anychart.enums.Position|string)=} opt_position - Position which is needed to calculate label auto anchor.
+ *
+ * @return {anychart.core.ui.LabelsFactory.Label} - Labels factory instance.
+ */
+anychart.core.series.Base.prototype.getSingleLabelsFactoryElement = function(labelsFactory, settings, index, positionProvider, formatProvider, opt_position) {
+  var label = labelsFactory.getLabel(/** @type {number} */(index));
+  if (!label) {
+    label = labelsFactory.add(void 0, void 0, index);
+  }
+
+  label.formatProvider(formatProvider);
+
+  positionProvider = this.modifyLabelPositionProvider(label,
+      /** @type {{value:{x:number, y:number}}}*/(positionProvider));
+
+  this.setPositionProvider(label, positionProvider);
+
+  label.resetSettings();
+
+  settings.unshift(label);
+  this.setupLabelDrawingPlan.apply(this, settings);
+
+  var anchor = label.getFinalSettings('anchor');
+  label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
+  if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
+    label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
+    this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(labelsFactory), label);
+  }
+
+  this.applyAdditionalLabelSettings(label, index);
+
+  return label;
+};
+
+
+/**
+ * Call draw method of passed factories.
+ *
+ * @param {Array.<anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory>} factories - Array with factories.
+ */
+anychart.core.series.Base.prototype.drawFactories = function (factories) {
+  goog.array.forEach(factories, function(factory) {
+    if (anychart.utils.instanceOf(factory, anychart.core.ui.LabelsFactory)) {
+      this.drawLabelsFactory(/**@type {anychart.core.ui.LabelsFactory}*/(factory));
+    } else {
+      factory.draw();
+    }
+    factory.resumeSignalsDispatching(false);
+  }, this);
+};
+
+
+/**
+ * Draws one factory element depend on passed arguments.
+ *
  * @param {Array.<anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|*>} factories [seriesNormal, seriesState, pointNormal, pointState]
  * @param {Array} settings [chartNormal, seriesNormal, pointNormal, chartState, seriesState, pointState, chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal, chartExtremumState, seriesExtremumState, pointExtremumState]
- * @param {number|undefined} index
- * @param {*} positionProvider
- * @param {*} formatProvider
- * @param {boolean} callDraw
+ * @param {number|undefined} index - Index of point.
+ * @param {Object} positionProvider - Position provider for item.
+ * @param {Object} formatProvider - Format provider for label.
+ * @param {boolean} callDraw - Call draw method of created item or not.
  * @param {(?anychart.enums.Position|string)=} opt_position Position which is needed to calculate label auto anchor.
- * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label}
- * @protected
+ *
+ * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label} - Item instance.
  */
 anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factories, settings, index, positionProvider, formatProvider, callDraw, opt_position) {
-  var mainFactory = /** @type {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} */(factories[0]);
-  var element = formatProvider ? mainFactory.getLabel(/** @type {number} */(index)) : mainFactory.getMarker(/** @type {number} */(index));
-  if (element) {
-    if (formatProvider)
-      element.formatProvider(formatProvider);
-    element.positionProvider(positionProvider);
-  } else {
-    if (formatProvider)
-      element = mainFactory.add(formatProvider, positionProvider, index);
-    else
-      element = mainFactory.add(positionProvider, index);
-  }
-  element.resetSettings();
+  var element;
   if (formatProvider) {
-    var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(element);
-    settings.unshift(label);
-    this.setupLabelDrawingPlan.apply(this, settings);
-
-    var anchor = label.getFinalSettings('anchor');
-    label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
-    if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
-      label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
-      this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(mainFactory), label);
-    }
-
-    this.applyAdditionalLabelSettings(label, index);
+    var labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(factories[0]);
+    element = this.getSingleLabelsFactoryElement(labelsFactory, settings, index, positionProvider, formatProvider, opt_position);
   } else {
-    var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
-    var iterator = this.getIterator();
-
-    var metaName = anychart.utils.instanceOf(this.shapeManager, anychart.core.shapeManagers.PerPoint) ? 'shapes' : 'shapeNames';
-    var group = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(metaName));
-    var state = this.getPointState(iterator.getIndex());
-    // this.shapeManager.updateMarkersColors(anychart.PointState.NORMAL, group);
-    this.shapeManager.updateMarkersColors(state, group);
-
-    var color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(
-        iterator.meta(this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'markerStroke' : 'markerFill'));
-
-    if (goog.isDef(color)) {
-      var autoFill;
-      if (mainFactory == this.normal_.outlierMarkers()) {
-        autoFill = this.getOutliersFill(color);
-      } else {
-        autoFill = this.getMarkerFill(color);
-      }
-      var autoStroke = anychart.color.darken(autoFill);
-
-      var fillChanged = mainFactory.getSettingsChangedStatesObj()['fill'] ||
-          currentFactory.getSettingsChangedStatesObj()['fill'] ||
-          (factories[2] && goog.isDef(factories[2]['fill'])) ||
-          (factories[3] && goog.isDef(factories[3]['fill']));
-
-      var strokeChanged = mainFactory.getSettingsChangedStatesObj()['stroke'] ||
-          currentFactory.getSettingsChangedStatesObj()['stroke'] ||
-          (factories[2] && goog.isDef(factories[2]['stroke'])) ||
-          (factories[3] && goog.isDef(factories[3]['stroke']));
-
-      if (!fillChanged && anychart.color.isNotNullColor(autoFill)) {
-        element.setAutoFill(autoFill);
-        if (!strokeChanged && anychart.color.isNotNullColor(autoStroke))
-          element.setAutoStroke(autoStroke);
-      }
-    }
-
-    element.currentMarkersFactory(currentFactory);
-    element.setSettings(/** @type {Object} */(factories[2]), /** @type {Object} */(factories[3]));
+    element = this.getSingleMarkersFactoryElement(factories, index, positionProvider);
   }
 
   if (callDraw)
@@ -2755,6 +2828,38 @@ anychart.core.series.Base.prototype.additionalLabelsInitialize = function() {
 };
 
 
+/**
+ * Call draw method of passed factory.
+ *
+ * @param {anychart.core.ui.LabelsFactory} factory - Labels factory instance.
+ */
+anychart.core.series.Base.prototype.drawLabelsFactory = function(factory) {
+  factory.draw();
+};
+
+
+/**
+ * Modify position provider for passed label.
+ *
+ * @param {anychart.core.ui.LabelsFactory.Label} label - Label instance.
+ * @param {{value: {x:number, y:number}}} positionProvider
+ *
+ * @return {{value: {x:number, y:number}}}
+ */
+anychart.core.series.Base.prototype.modifyLabelPositionProvider = function(label, positionProvider) {
+  return positionProvider;
+};
+
+
+/**
+ * Set position provider for passed label.
+ *
+ * @param {anychart.core.ui.LabelsFactory.Label} label - Label instance.
+ * @param {{value: {x:number, y:number}}} positionProvider - Position provider.
+ */
+anychart.core.series.Base.prototype.setPositionProvider = function(label, positionProvider) {
+  label.positionProvider(positionProvider);
+};
 //endregion
 //region --- Markers
 /**
@@ -3344,11 +3449,8 @@ anychart.core.series.Base.prototype.draw = function() {
     }
   }
 
-  for (i = 0; i < factoriesToFinalize.length; i++) {
-    factory = factoriesToFinalize[i];
-    factory.draw();
-    factory.resumeSignalsDispatching(false);
-  }
+  this.drawFactories(factoriesToFinalize);
+
   // no other elements depend on CONTAINER or SERIES_POINTS
   this.markConsistent(COMMON_STATES);
 

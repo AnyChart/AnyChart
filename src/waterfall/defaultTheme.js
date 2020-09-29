@@ -73,6 +73,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'softMinimum': 0,
         'stackDirection': 'reverse'
       }
-    ]
+    ],
+    'stackLabels': {
+      'anchor': 'auto',
+      'enabled': false,
+      'format': function(context) {
+        return context['value'];
+      },
+      'position': 'auto'
+    }
   }
 });

@@ -794,6 +794,45 @@ anychart.ganttModule.BaseGrid.getPeriodInfo = function(item, periodIndex) {
 //endregion
 //region -- Format providers.
 /**
+ * Gets row type.
+ * Value us used for getting valid values for creating context and events.
+ *
+ * NOTE: in this case here's a difference between 'rowType' and 'elementType':
+ * elementType is type of currently hovered bar (bar under cursor).
+ * rowType is type used to draw element in current row.
+ *
+ * elementType appears in context or event only on bar hover.
+ * rowType always appears in context or event if data item contains
+ * no errors in date-time representation.
+ *
+ * @param {anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem} item - Data item.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @return {anychart.enums.TLElementTypes|undefined}
+ */
+anychart.ganttModule.BaseGrid.prototype.getRowType = function(item, opt_info) {
+  var rowType;
+
+  if (this.controller.isResources()) {
+    rowType = anychart.enums.TLElementTypes.PERIODS;
+  } else {
+    var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+    if (info.isValidBaseline) {
+      rowType = anychart.enums.TLElementTypes.BASELINES;
+    } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item, info)) {
+      rowType = anychart.enums.TLElementTypes.MILESTONES;
+    } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
+      rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
+    } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
+      rowType = anychart.enums.TLElementTypes.TASKS;
+    }
+  }
+
+  return rowType;
+};
+
+
+/**
  * Fill values-object of context-provider with resource specific data.
  *
  * @param {Object.<string, anychart.core.BaseContext.TypedValue>} values - Typed values to be filled.
@@ -806,7 +845,11 @@ anychart.ganttModule.BaseGrid.prototype.processResourceFormatProviderValues_ = f
   var info = anychart.ganttModule.BaseGrid.getPeriodInfo(item, /** @type {number} */ (opt_periodIndex));
   var isMilestone = info.isValidMilestone;
 
-  values['rowType'] = {value: anychart.enums.TLElementTypes.PERIODS, type: anychart.enums.TokenType.STRING};
+  var rowType = this.getRowType(item);
+  if (rowType) {
+    values['rowType'] = { value: rowType, type: anychart.enums.TokenType.STRING };
+  }
+
   values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
   values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
   values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
@@ -859,8 +902,12 @@ anychart.ganttModule.BaseGrid.prototype.processResourceFormatProviderValues_ = f
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = function(values, item) {
-  var rowType;
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+
+  var rowType = this.getRowType(item, info);
+  if (rowType) {
+    values['rowType'] = { value: rowType, type: anychart.enums.TokenType.STRING };
+  }
 
   values['actualStart'] = {
     value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START),
@@ -892,7 +939,6 @@ anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = fu
   values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
 
   if (info.isValidBaseline) {
-    rowType = anychart.enums.TLElementTypes.BASELINES;
     values['baselineStart'] = {
       value: info.baselineStart,
       type: anychart.enums.TokenType.DATE_TIME
@@ -901,16 +947,7 @@ anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = fu
       value: info.baselineEnd,
       type: anychart.enums.TokenType.DATE_TIME
     };
-  } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item, info)) {
-    rowType = anychart.enums.TLElementTypes.MILESTONES;
-  } else if (anychart.ganttModule.BaseGrid.isGroupingTask(item, info)) {
-    rowType = anychart.enums.TLElementTypes.GROUPING_TASKS;
-  } else if (anychart.ganttModule.BaseGrid.isRegularTask(item, info)) {
-    rowType = anychart.enums.TLElementTypes.TASKS;
   }
-
-  if (goog.isDef(rowType))
-    values['rowType'] = {value: rowType, type: anychart.enums.TokenType.STRING};
 };
 
 
@@ -1390,6 +1427,14 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
       newEvent['index'] = startIndex + index;
       newEvent['itemHeightMouseRatio'] = (mouseHeight - startHeight) / (this.gridHeightCache_[index] - startHeight);
     }
+
+    if (newEvent['item']) {
+      var rowType = this.getRowType(newEvent['item']);
+      if (rowType) {
+        newEvent['rowType'] = rowType;
+      }
+    }
+
     return newEvent;
   }
   return null;
@@ -1402,22 +1447,6 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
  */
 anychart.ganttModule.BaseGrid.prototype.getGridHeightCache = function() {
   return this.gridHeightCache_;
-};
-
-
-/**
- * Enables/disables live edit mode.
- * @param {boolean=} opt_value - Value to be set.
- * @deprecated since 8.3.0 use grid.edit() instead. DVF-3623
- * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
- */
-anychart.ganttModule.BaseGrid.prototype.editing = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['dataGrid.editing() or timeline.editing()', 'dataGrid.edit() or timeline.edit()'], true);
-  if (goog.isDef(opt_value)) {
-    this.edit()['enabled'](opt_value);
-    return this;
-  }
-  return /** @type {boolean} */ (this.edit().getOption('enabled'));
 };
 
 
@@ -2049,45 +2078,9 @@ anychart.ganttModule.BaseGrid.prototype.paletteInvalidated_ = function(event) {
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().fill() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewFill = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewFill()', 'timeline.edit().fill()'], true);
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().stroke() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewStroke = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewStroke()', 'timeline.edit().stroke()'], true);
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.edit().placementStroke() instead. DVF-3623
- * @return {(acgraph.vector.Stroke|anychart.ganttModule.edit.StructureEdit)}
- */
-anychart.ganttModule.BaseGrid.prototype.editStructurePreviewDashStroke = function(var_args) {
-  var target = this.edit();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.editStructurePreviewDashStroke()', 'timeline.edit().placementStroke()'], true);
-  return arguments.length ? target['placementStroke'].apply(target, arguments) : target['placementStroke']();
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Private.
@@ -3317,11 +3310,6 @@ anychart.ganttModule.BaseGrid.prototype.serialize = function() {
 
   json['headerHeight'] = this.headerHeight_;
   json['edit'] = /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).serialize();
-  // json['editStructurePreviewFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_));
-  // json['editStructurePreviewStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_));
-  // json['editStructurePreviewDashStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_));
-
-  // json['editing'] = this.editable;
 
   return json;
 };
@@ -3351,10 +3339,6 @@ anychart.ganttModule.BaseGrid.prototype.setupByJSON = function(config, opt_defau
 
   if ('edit' in config)
     /** @type {anychart.ganttModule.edit.StructureEdit} */ (this.edit()).setupInternal(!!opt_default, config['edit']);
-  // this.editStructurePreviewFill(config['editStructurePreviewFill']);
-  // this.editStructurePreviewStroke(config['editStructurePreviewStroke']);
-  // this.editStructurePreviewDashStroke(config['editStructurePreviewDashStroke']);
-  // this.editing(config['editing']);
 };
 
 

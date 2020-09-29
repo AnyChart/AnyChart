@@ -5,6 +5,7 @@ goog.require('anychart.annotationsModule.FibonacciArc');
 goog.require('anychart.annotationsModule.FibonacciFan');
 goog.require('anychart.annotationsModule.FibonacciRetracement');
 goog.require('anychart.annotationsModule.FibonacciTimezones');
+goog.require('anychart.annotationsModule.FiniteTrendChannel');
 goog.require('anychart.annotationsModule.HorizontalLine');
 goog.require('anychart.annotationsModule.HorizontalRange');
 goog.require('anychart.annotationsModule.InfiniteLine');
@@ -174,6 +175,7 @@ anychart.annotationsModule.PlotController.prototype.draw = function() {
     this.annotationsLayer_.listenOnce(acgraph.events.EventType.TOUCHSTART, this.initDragger_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOVER, this.handleAnnotationMouseOver_, false, this);
     this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEOUT, this.handleAnnotationMouseOut_, false, this);
+    this.annotationsLayer_.listen(acgraph.events.EventType.MOUSEMOVE, this.handleAnnotationMouseMove_, false, this);
 
     this.drawingOverlayRect_ = acgraph.rect(0, 0, 0, 0);
     this.drawingOverlayRect_.cursor(acgraph.vector.Cursor.CROSSHAIR);
@@ -306,6 +308,18 @@ anychart.annotationsModule.PlotController.prototype.handleAnnotationMouseOut_ = 
   e.stopWrapperPropagation();
   e.preventDefault();
   this.controller_.unhover();
+};
+
+
+/**
+ * Handles mouse out in drawing mode.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.annotationsModule.PlotController.prototype.handleAnnotationMouseMove_ = function(e) {
+  e.stopPropagation();
+  e.stopWrapperPropagation();
+  e.preventDefault();
 };
 
 
@@ -872,6 +886,20 @@ anychart.annotationsModule.PlotController.prototype.trendChannel = function(opt_
 
 
 /**
+ * Creates and returns a finiteTrendChannel annotation.
+ * @param {Object=} opt_config 
+ * @return {anychart.annotationsModule.FiniteTrendChannel}
+ */
+anychart.annotationsModule.PlotController.prototype.finiteTrendChannel = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.FiniteTrendChannel} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.FINITE_TREND_CHANNEL));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
  * Creates and returns a andrewsPitchfork annotation.
  * @param {Object=} opt_config
  * @return {anychart.annotationsModule.AndrewsPitchfork}
@@ -1306,6 +1334,7 @@ anychart.annotationsModule.PlotController.AnchorDragger.prototype.handleDragEnd_
   proto['ellipse'] = proto.ellipse;
   proto['triangle'] = proto.triangle;
   proto['trendChannel'] = proto.trendChannel;
+  proto['finiteTrendChannel'] = proto.finiteTrendChannel;
   proto['andrewsPitchfork'] = proto.andrewsPitchfork;
   proto['fibonacciFan'] = proto.fibonacciFan;
   proto['fibonacciArc'] = proto.fibonacciArc;

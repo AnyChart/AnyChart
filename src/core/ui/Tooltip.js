@@ -10,6 +10,7 @@ goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Separator');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.GlobalTooltipContainer');
+goog.require('anychart.core.utils.InternalLabelsFormatters');
 goog.require('anychart.core.utils.LocalTooltipContainer');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.format.Context');
@@ -1260,7 +1261,12 @@ anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvid
   if (goog.isString(formatter))
     formatter = anychart.core.utils.TokenParser.getInstance().getFormat(formatter);
 
-  return formatter.call(contextProvider, contextProvider);
+  var maxLength = /** @type {number|null} */(this.getOption('maxLength'));
+  var text = formatter.call(contextProvider, contextProvider);
+
+  text = anychart.core.utils.InternalLabelsFormatters.textLengthFormatter(text, maxLength);
+
+  return text;
 };
 
 

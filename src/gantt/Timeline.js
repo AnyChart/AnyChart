@@ -30,6 +30,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.scales.GanttDateTime');
 goog.require('goog.array');
 goog.require('goog.fx.Dragger');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -320,6 +321,7 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.scale_ = new anychart.scales.GanttDateTime();
   this.scale_.listenSignals(this.scaleInvalidated_, this);
+  this.scale_.boundsProvider(this);
 
   /**
    *
@@ -380,9 +382,20 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.currentLowerTicksUnit_ = null;
 
+  /**
+   * Indexes of this array represent gantt chart rows
+   * and each contains array of tags sorted by the anchor position
+   * of the label associated with the tag.
+   *
+   * @type {Array.<Array.<anychart.ganttModule.TimeLine.Tag>>}
+   * @private
+   */
+  this.sortedTags_ = [];
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['cropLabels', anychart.ConsistencyState.TIMELINE_ELEMENTS_LABELS, anychart.Signal.NEEDS_REDRAW],
     ['zoomOnMouseWheel', 0, 0],
+    ['columnStroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['workingFill', 0, 0, 0, function() {
       var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('workingFill'));
       this.getWorkingPath_().fill(fill);
@@ -443,7 +456,8 @@ anychart.ganttModule.TimeLine.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   periodIndex: number,
  *   period: Object,
  *   label: anychart.core.ui.LabelsFactory.Label,
- *   labelPointSettings: Object
+ *   labelPointSettings: Object,
+ *   row: number
  * }}
  */
 anychart.ganttModule.TimeLine.Tag;
@@ -608,16 +622,19 @@ anychart.ganttModule.TimeLine.TICK_INTERVAL_GROWTH_MAP = (function() {
 
 
 //endregion
-//region -- Coloring.
+//region -- Descriptors.
 /**
+ * Timeline descriptors.
+ *
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
+anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   anychart.core.settings.createDescriptors(map, [
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'cropLabels', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'zoomOnMouseWheel', anychart.core.settings.booleanNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'columnStroke', anychart.core.settings.strokeNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'workingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
@@ -625,7 +642,7 @@ anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS = (function() {
   ]);
   return map;
 })();
-anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS);
+anychart.core.settings.populate(anychart.ganttModule.TimeLine, anychart.ganttModule.TimeLine.DESCRIPTORS);
 
 
 //endregion
@@ -828,7 +845,8 @@ anychart.ganttModule.TimeLine.prototype.createTag = function(item, element, boun
     item: item,
     labels: element.getLabelsResolutionOrder(),
     bounds: bounds,
-    labelPointSettings: element.getLabelPointSettings(item, opt_periodIndex)
+    labelPointSettings: element.getLabelPointSettings(item, opt_periodIndex),
+    row: this.getElementRowNumber_(bounds)
   };
 
   if (goog.isDef(opt_periodIndex)) {
@@ -895,876 +913,6 @@ anychart.ganttModule.TimeLine.prototype.visualElementInvalidated_ = function(eve
 
 
 //endregion
-//region -- DEPRECATED API.
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.elements().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baseFill = function(var_args) {
-  var target = this.elements();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baseFill()', 'timeline.elements().fill()'], true);
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.elements().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baseStroke = function(var_args) {
-  var target = this.elements();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baseStroke()', 'timeline.elements().stroke()'], true);
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.baselines().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baselineFill = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baselineFill()', 'timeline.baselines().fill()'], true);
-    target = this.baselines();
-    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.baselines().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baselineStroke = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.baselineStroke()', 'timeline.baselines().stroke()'], true);
-    target = this.baselines();
-    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.milestones().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.milestoneFill = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.milestoneFill()', 'timeline.milestones().fill()'], true);
-    target = this.milestones();
-    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.milestones().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.milestoneStroke = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.milestoneStroke()', 'timeline.milestones().stroke()'], true);
-    target = this.milestones();
-    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.groupingTasks().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.parentFill = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.parentFill()', 'timeline.groupingTasks().fill()'], true);
-    target = this.groupingTasks();
-    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.groupingTasks().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.parentStroke = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['timeline.parentStroke()', 'timeline.groupingTasks().stroke()'], true);
-    target = this.groupingTasks();
-    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.tasks().progress().fill() or timeline.groupingTasks().progress().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.progressFill = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressFill()', 'timeline.tasks().progress().fill() or timeline.groupingTasks().progress().fill()'], true);
-    target = this.tasks();
-    return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.tasks().progress().stroke() or timeline.groupingTasks().progress().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.progressStroke = function(var_args) {
-  var target;
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressStroke()', 'timeline.tasks().progress().stroke() or timeline.groupingTasks().progress().stroke()'], true);
-    target = this.tasks();
-    return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.elements().selected().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.selectedElementFill = function(var_args) {
-  var target = this.elements().selected();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.selectedElementFill()', 'timeline.elements().selected().fill()'], true);
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.elements().selected().stroke(). DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.selectedElementStroke = function(var_args) {
-  var target = this.elements().selected();
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.selectedElementStroke()', 'timeline.elements().selected().stroke()'], true);
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * Getter/setter for base labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @deprecated since 8.2.0 use timeline.elements().labels() instead. DVF-3625
- * @return {anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baseLabels = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.baseLabels()', 'timeline.elements().labels()'], true);
-  return this.elements().labels(opt_value);
-};
-
-
-/**
- * Getter/setter for baseline labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @deprecated since 8.2.0 use timeline.baselines().labels() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.baselineLabels = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineLabels()', 'timeline.baselines().labels()'], true);
-    return this.baselines().labels(opt_value);
-  }
-};
-
-
-/**
- * Getter/setter for parent labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @deprecated since 8.2.0 use timeline.groupingTasks().labels() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.parentLabels = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.parentLabels()', 'timeline.groupingTasks().labels()'], true);
-    return this.groupingTasks().labels(opt_value);
-  }
-};
-
-
-/**
- * Getter/setter for milestones labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @deprecated since 8.2.0 use timeline.milestones().labels() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.milestoneLabels = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.milestoneLabels()', 'timeline.milestones().labels()'], true);
-    return this.milestones().labels(opt_value);
-  }
-};
-
-
-/**
- * Getter/setter for progress labels.
- * @param {(Object|boolean|null)=} opt_value - Settings.
- * @deprecated since 8.2.0 use timeline.tasks().progress().labels() or timeline.groupingTasks().progress().labels() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|anychart.core.ui.LabelsFactory|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.progressLabels = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressLabels()', 'timeline.tasks().progress().labels() or timeline.groupingTasks().progress().labels()'], true);
-    return this.tasks().progress().labels(opt_value);
-  }
-};
-
-
-/**
- * Gets/sets 'baseline above' flag.
- * If the flag is set to 'true', baseline bar will be displayed abode an actual time bar.
- * @param {boolean=} opt_value - Value to be set.
- * @deprecated since 8.2.0 use timeline.baselines().above() instead. DVF-3625
- * @return {boolean|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.BaselinesElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineAbove = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineAbove()', 'timeline.baselines().above()'], true);
-    return this.baselines()['above'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.elements().height() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseBarHeight = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.baseBarHeight()', 'timeline.elements().height()'], true);
-  return this.elements()['height'](opt_value);
-};
-
-
-/**
- * @param {anychart.enums.Anchor=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.elements().anchor() instead. DVF-3625
- * @return {anychart.enums.Anchor|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseBarAnchor = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.baseBarAnchor()', 'timeline.elements().anchor()'], true);
-  return this.elements()['anchor'](opt_value);
-};
-
-
-/**
- * @param {anychart.enums.Position=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.elements().position() instead. DVF-3625
- * @return {anychart.enums.Position|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseBarPosition = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.baseBarPosition()', 'timeline.elements().position()'], true);
-  return this.elements()['position'](opt_value);
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.elements().offset() instead. DVF-3625
- * @return {string|number|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baseBarOffset = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.baseBarOffset()', 'timeline.elements().offset()'], true);
-  return this.elements()['offset'](opt_value);
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.groupingTasks().height() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentBarHeight = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.parentBarHeight()', 'timeline.groupingTasks().height()'], true);
-    return this.groupingTasks()['height'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Anchor=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.groupingTasks().anchor() instead. DVF-3625
- * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentBarAnchor = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.parentBarAnchor()', 'timeline.groupingTasks().anchor()'], true);
-    return this.groupingTasks()['anchor'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Position=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.groupingTasks().position() instead. DVF-3625
- * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentBarPosition = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.parentBarPosition()', 'timeline.groupingTasks().position()'], true);
-    return this.groupingTasks()['position'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.groupingTasks().offset() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.parentBarOffset = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.parentBarOffset()', 'timeline.groupingTasks().offset()'], true);
-    return this.groupingTasks()['offset'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.baselines().height() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineBarHeight = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineBarHeight()', 'timeline.baselines().height()'], true);
-    return this.baselines()['height'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Anchor=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.baselines().anchor() instead. DVF-3625
- * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineBarAnchor = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineBarAnchor()', 'timeline.baselines().anchor()'], true);
-    return this.baselines()['anchor'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Position=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.baselines().position() instead. DVF-3625
- * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineBarPosition = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineBarPosition()', 'timeline.baselines().position()'], true);
-    return this.baselines()['position'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.baselines().offset() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.baselineBarOffset = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.baselineBarOffset()', 'timeline.baselines().offset()'], true);
-    return this.baselines()['offset'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.tasks().progress().height() or
- *  timeline.groupingTasks().progress().height() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressBarHeight = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressBarHeight()', 'timeline.tasks().progress().height() or timeline.groupingTasks().progress().height()'], true);
-    return this.tasks().progress()['height'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Anchor=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.tasks().progress().anchor() or
- *  timeline.groupingTasks().progress().anchor() instead. DVF-3625
- * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressBarAnchor = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressBarAnchor()', 'timeline.tasks().progress().anchor() or timeline.groupingTasks().progress().anchor()'], true);
-    return this.tasks().progress()['anchor'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Position=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.tasks().progress().position() or
- *  timeline.groupingTasks().progress().position() instead. DVF-3625
- * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressBarPosition = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressBarPosition()', 'timeline.tasks().progress().position() or timeline.groupingTasks().progress().position()'], true);
-    return this.tasks().progress()['position'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.tasks().progress().offset() or
- *  timeline.groupingTasks().progress().offset() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.progressBarOffset = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.progressBarOffset()', 'timeline.tasks().progress().offset() or timeline.groupingTasks().progress().offset()'], true);
-    return this.tasks().progress()['offset'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.milestones().height() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneHeight = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.milestoneHeight()', 'timeline.milestones().height()'], true);
-    return this.milestones()['height'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Anchor=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.milestones().anchor() instead. DVF-3625
- * @return {anychart.enums.Anchor|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneAnchor = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.milestoneAnchor()', 'timeline.milestones().anchor()'], true);
-    return this.milestones()['anchor'](opt_value);
-  }
-};
-
-
-/**
- * @param {anychart.enums.Position=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.milestones().position() instead. DVF-3625
- * @return {anychart.enums.Position|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestonePosition = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.milestonePosition()', 'timeline.milestones().position()'], true);
-    return this.milestones()['position'](opt_value);
-  }
-};
-
-
-/**
- * @param {(string|number)=} opt_value - Value to set.
- * @deprecated since 8.2.0 use timeline.milestones().offset() instead. DVF-3625
- * @return {number|string|anychart.ganttModule.TimeLine|anychart.ganttModule.elements.TimelineElement} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.milestoneOffset = function(opt_value) {
-  if (this.controller.isResources()) {
-    return this;
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-        ['timeline.milestoneOffset()', 'timeline.milestones().offset()'], true);
-    return this.milestones()['offset'](opt_value);
-  }
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.connectors().fill() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.connectorFill = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.connectorFill()', 'timeline.connectors().fill()'], true);
-  var target = this.connectors();
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.connectors().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.connectorStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.connectorStroke()', 'timeline.connectors().stroke()'], true);
-  var target = this.connectors();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.2.0 use timeline.connectors().selected().stroke() instead. DVF-3625
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.selectedConnectorStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.selectedConnectorStroke()', 'timeline.connectors().selected().stroke()'], true);
-  var target = this.connectors().selected();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.connectors().previewStroke() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Stroke|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.connectorPreviewStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.connectorPreviewStroke()', 'timeline.connectors().previewStroke()'], true);
-  var target = this.connectors();
-  return arguments.length ? target['previewStroke'].apply(target, arguments) : target['previewStroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.elements().edit().fill() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editPreviewFill = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editPreviewFill()', 'timeline.elements().edit().fill()'], true);
-  var target = this.elements().edit();
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.connectors().stroke() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editPreviewStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editPreviewStroke()', 'timeline.elements().edit().stroke()'], true);
-  var target = this.elements().edit();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.tasks().progress().edit().fill() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editProgressFill = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editProgressFill()', 'timeline.tasks().edit().fill()'], true);
-  var target = this.tasks().edit();
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.tasks().edit().stroke() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editProgressStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editProgressStroke()', 'timeline.tasks().edit().stroke()'], true);
-  var target = this.tasks().edit();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().fill() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalThumbFill = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editIntervalThumbFill()', 'timeline.elements().edit().thumbs().fill()'], true);
-  var target = this.elements().edit().thumbs();
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().stroke() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalThumbStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editIntervalThumbStroke()', 'timeline.elements().edit().thumbs().stroke()'], true);
-  var target = this.elements().edit().thumbs();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.elements().edit().connectorThumbs().fill() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editConnectorThumbFill = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editConnectorThumbFill()', 'timeline.elements().edit().connectorThumbs().fill()'], true);
-  var target = this.elements().edit().connectorThumbs();
-  return arguments.length ? target['fill'].apply(target, arguments) : target['fill']();
-};
-
-
-/**
- * @param {...*} var_args - Args.
- * @deprecated since 8.3.0 use timeline.elements().edit().connectorThumbs().stroke() instead. DVF-3623
- * @return {anychart.ganttModule.TimeLine|acgraph.vector.Fill|anychart.ganttModule.elements.TimelineElement}
- */
-anychart.ganttModule.TimeLine.prototype.editConnectorThumbStroke = function(var_args) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editConnectorThumbStroke()', 'timeline.elements().edit().connectorThumbs().stroke()'], true);
-  var target = this.elements().edit().connectorThumbs();
-  return arguments.length ? target['stroke'].apply(target, arguments) : target['stroke']();
-};
-
-
-/**
- * @param {anychart.enums.MarkerType=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().type() instead. DVF-3623
- * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerType = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editStartConnectorMarkerType()', 'timeline.elements().edit().start().connectorThumb().type()'], true);
-  var target = this.elements().edit().start().connectorThumb();
-  return arguments.length ? target['type'].apply(target, arguments) : target['type']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().size() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerSize = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editStartConnectorMarkerSize()', 'timeline.elements().edit().start().connectorThumb().size()'], true);
-  var target = this.elements().edit().start().connectorThumb();
-  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().horizontalOffset() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerHorizontalOffset = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editStartConnectorMarkerHorizontalOffset()', 'timeline.elements().edit().start().connectorThumb().horizontalOffset()'], true);
-  var target = this.elements().edit().start().connectorThumb();
-  return arguments.length ? target['horizontalOffset'].apply(target, arguments) : target['horizontalOffset']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().start().connectorThumb().verticalOffset() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editStartConnectorMarkerVerticalOffset = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editStartConnectorMarkerVerticalOffset()', 'timeline.elements().edit().start().connectorThumb().verticalOffset()'], true);
-  var target = this.elements().edit().start().connectorThumb();
-  return arguments.length ? target['verticalOffset'].apply(target, arguments) : target['verticalOffset']();
-};
-
-
-/**
- * @param {anychart.enums.MarkerType=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().type() instead. DVF-3623
- * @return {anychart.enums.MarkerType|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerType = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editFinishConnectorMarkerType()', 'timeline.elements().edit().end().connectorThumb().type()'], true);
-  var target = this.elements().edit().end().connectorThumb();
-  return arguments.length ? target['type'].apply(target, arguments) : target['type']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().size() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerSize = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editFinishConnectorMarkerSize()', 'timeline.elements().edit().end().connectorThumb().size()'], true);
-  var target = this.elements().edit().end().connectorThumb();
-  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().horizontalOffset() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerHorizontalOffset = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editStartConnectorMarkerHorizontalOffset()', 'timeline.elements().edit().end().connectorThumb().horizontalOffset()'], true);
-  var target = this.elements().edit().end().connectorThumb();
-  return arguments.length ? target['horizontalOffset'].apply(target, arguments) : target['horizontalOffset']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().end().connectorThumb().verticalOffset() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editFinishConnectorMarkerVerticalOffset = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editFinishConnectorMarkerVerticalOffset()', 'timeline.elements().edit().end().connectorThumb().verticalOffset()'], true);
-  var target = this.elements().edit().end().connectorThumb();
-  return arguments.length ? target['verticalOffset'].apply(target, arguments) : target['verticalOffset']();
-};
-
-
-/**
- * @param {number=} opt_value - Value to set.
- * @deprecated since 8.3.0 use timeline.elements().edit().thumbs().size() instead. DVF-3623
- * @return {number|anychart.ganttModule.TimeLine} - Current value or itself for method chaining.
- */
-anychart.ganttModule.TimeLine.prototype.editIntervalWidth = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null,
-      ['timeline.editIntervalWidth()', 'timeline.elements().edit().thumbs().size()'], true);
-  var target = this.elements().edit().thumbs();
-  return arguments.length ? target['size'].apply(target, arguments) : target['size']();
-};
-
-
-//endregion
 //region -- Scale.
 /**
  * Gets timeline scale.
@@ -1787,13 +935,16 @@ anychart.ganttModule.TimeLine.prototype.scale = function(opt_value) {
  */
 anychart.ganttModule.TimeLine.prototype.scaleInvalidated_ = function(event) {
   var state = 0;
+
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.TIMELINE_SCALES | anychart.ConsistencyState.TIMELINE_MARKERS;
   }
+
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     // Calendar settings has been changed.
     state |= anychart.ConsistencyState.TIMELINE_CALENDAR;
   }
+
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -4041,16 +3192,92 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
 
     evt['hoverRatio'] = ratio;
     evt['hoverDateTime'] = timestamp;
-    if (elType)
+
+    if (elType) {
       evt['elementType'] = elType;
+
+      /*
+        For milestone preview - save item to the tooltipItem field, to only
+        show tooltip for it and avoid selection by mouseclick.
+        https://anychart.atlassian.net/browse/DVF-4356
+       */
+      if (elType === anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
+        evt['tooltipItem'] = evt['originalEvent']['domTarget'].tag.item;
+      }
+    }
+
 
     if (this.controller.isResources() && target.tag) {
       evt['period'] = target.tag.period;
       evt['periodIndex'] = target.tag.periodIndex;
     }
+
+    // Patches interactivity event in case elements (period or milestone preview) label is hovered.
+    this.patchInteractivityEvent(event, evt);
   }
 
   return evt;
+};
+
+
+/**
+ * If there is label under mouse cursor, write element
+ * info to the interactivity event.
+ * Alters interactivityEvent in the process.
+ *
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent 
+ * @param {Object} interactivityEvent 
+ */
+anychart.ganttModule.TimeLine.prototype.patchInteractivityEvent = function(originalEvent, interactivityEvent) {
+  // Find period tag by the label.
+  var tag = this.getTagByMouseEvent(originalEvent);
+  if (tag) {
+    if (this.controller.isResources()) {
+      interactivityEvent['period'] = tag.period;
+      interactivityEvent['periodIndex'] = tag.periodIndex;
+      interactivityEvent['elementType'] = tag.type;
+    } else { // Project chart.
+      // On project chart only milestone preview labels hovers are detected.
+      interactivityEvent['tooltipItem'] = tag.item;
+    }
+  }
+};
+
+
+/**
+ * Checks if period or milestone preview label is under
+ * the mouse cursor. If label exists - returns tag of the element
+ * whose label it is. Uses array of sorted arrays of tags, used in
+ * labels crop mechanism.
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} event - Mouse event.
+ * @return {?anychart.ganttModule.TimeLine.Tag}
+ */
+anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
+  var gridHeightCache = this.getGridHeightCache();
+  var headerHeight = this.headerHeight();
+  var timelineHeaderBottom = this.pixelBoundsCache.top +
+    this.container().getStage().getClientPosition().y +
+    headerHeight;
+
+  var mouseHeightFromHeaderBottom = event.clientY - timelineHeaderBottom;
+
+  var index = goog.array.binarySearch(gridHeightCache, mouseHeightFromHeaderBottom);
+  index = index >= 0 ? index : ~index; //Index of row under mouse.
+  index += /** @type {number} */(this.controller.startIndex());
+
+  var curRowTags = this.sortedTags_[index] || [];
+
+  var mouseCoordinate = new goog.math.Coordinate(event.offsetX, event.offsetY);
+  return goog.array.find(curRowTags, function(tag) {
+    if (tag.label.enabled()) {
+      var tagLabelBounds = this.getTagLabelBounds_(tag.label);
+
+      if (tagLabelBounds.distance(mouseCoordinate) === 0) {
+          return true;
+      }
+    }
+    return false;
+  }, this);
 };
 
 
@@ -4258,12 +3485,12 @@ anychart.ganttModule.TimeLine.prototype.limitProgressWidth_ = function(progressV
  */
 anychart.ganttModule.TimeLine.prototype.getBarBounds_ = function(element, itemBounds, dataItem, opt_considerBaseline, opt_periodIndex) {
   var fixParentHeight = element.getType() == anychart.enums.TLElementTypes.GROUPING_TASKS;
-  var optionHeight = /** @type {string|number} */ (element.getHeight(dataItem, opt_periodIndex));
+  var optionHeight = element.getHeight(dataItem, opt_periodIndex);
   var height = opt_considerBaseline || fixParentHeight ? itemBounds.height / 2 : itemBounds.height;
   var barHeight = anychart.utils.normalizeSize(optionHeight, height);
   var anchor = /** @type {anychart.enums.Anchor} */ (element.getOption('anchor'));
   var position = /** @type {anychart.enums.Position} */ (element.getOption('position'));
-  var offset = /** @type {number|string} */ (element.getOption('offset'));
+  var offset = element.getOffset(dataItem, opt_periodIndex);
   var offsetNorm = anychart.utils.normalizeSize(offset, itemBounds.height);
   if (anchor == anychart.enums.Anchor.AUTO) {
     anchor = this.resolveAutoAnchorByType_(position, element.getType(), opt_considerBaseline);
@@ -4404,7 +3631,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var width = right - left;
           var el = /** @type {anychart.ganttModule.elements.PeriodsElement} */ (this.periods());
 
-          var optionHeight = /** @type {string|number} */ (el.getOption('height'));
+          var optionHeight = el.getHeight(dataItem, j);
           var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
           var itemBounds = new anychart.math.Rect(left, totalTop, width, itemHeight);
@@ -4414,7 +3641,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
             anchor = this.resolveAutoAnchorByType_(position, anychart.enums.TLElementTypes.PERIODS);
           }
 
-          var offset = /** @type {number|string} */ (el.getOption('offset'));
+          var offset = el.getOffset(dataItem, j);
           var offsetNorm = anychart.utils.normalizeSize(offset, itemHeight);
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
@@ -4765,7 +3992,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, tot
         var progressWidth = this.limitProgressWidth_(/** @type {number} */ (progressValue), actualWidth, progressEl);
         var progressItemBounds = new anychart.math.Rect(actualBounds.left, actualBounds.top, progressWidth, actualBounds.height);
         var progressBounds = this.getBarBounds_(progressEl, progressItemBounds, dataItem);
-        var progressTag = this.createTag(dataItem, progressEl, actualBounds);
+        var progressTag = this.createTag(dataItem, progressEl, progressBounds);
         progressEl.rendering().callDrawer(dataItem, progressBounds, progressTag, void 0, isSelected);
         if (progressWidth) {
           this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
@@ -4854,7 +4081,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsCommonMilestone_ = function(
             stroke['thickness'] ? stroke['thickness'] : 1;
 
     var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-    var optionHeight = /** @type {string|number} */ (el.getHeight(dataItem, opt_periodIndex));
+    var optionHeight = el.getHeight(dataItem, opt_periodIndex);
     var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
     var halfHeight = Math.round(height / 2);
     var centerLeft = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio) + pixelShift;
@@ -4926,7 +4153,7 @@ anychart.ganttModule.TimeLine.prototype.getResourceItemBounds_ = function(item, 
     el = /** @type {anychart.ganttModule.elements.TimelineElement} */ (this.milestones());
     startTimestamp = info.milestoneTimestamp;
     endTimestamp = info.milestoneTimestamp;
-    var optionHeight = /** @type {string|number} */ (el.getHeight(item, opt_periodIndex));
+    var optionHeight = el.getHeight(item, opt_periodIndex);
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }
@@ -4960,7 +4187,7 @@ anychart.ganttModule.TimeLine.prototype.getProjectItemBounds_ = function(item, i
   var isMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
   if (isMilestone) {
     endTimestamp = startTimestamp;
-    var optionHeight = /** @type {string|number} */ (this.milestones().getHeight(item));
+    var optionHeight = this.milestones().getHeight(item);
     var mHeight = anychart.utils.normalizeSize(optionHeight, rowHeight);
     milestoneHalfWidth = Math.round(mHeight / 2);
   }
@@ -5614,14 +4841,16 @@ anychart.ganttModule.TimeLine.prototype.initScale = function() {
   this.scale_.trackedDataMax = dataMax;
 
   if (newScale && !isNaN(dataMin) && !isNaN(dataMax)) {
-    if (this.scale_.needsFitAll) {//If scale demands fit all - we call it.
+    if (this.scale_.needsFitAll) { // If scale demands fit all - we call it.
       this.scale_.fitAll();
-      this.scale_.needsFitAll = false;
-    } else if (this.scale_.needsZoomTo) {//If zoomTo was called on hidden container.
+    } else if (this.scale_.needsZoomTo) { // If zoomTo was called on hidden container.
       this.scale_.zoomTo.apply(this.scale_, this.scale_.neededZoomToArgs);
       this.scale_.needsZoomTo = false;
       this.scale_.neededZoomToArgs = null;
-    } else {// Or apply default zoom.
+    } else if (this.scale_.needsReapplyGaps) { // Before draw pixel gapping case.
+      this.scale_.reapplyGaps();
+    } else {
+      // Apply default zoom.
       var totalRange = this.scale_.getTotalRange();
       var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
       this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); //Initial visible range: 10% of total range.
@@ -5873,12 +5102,256 @@ anychart.ganttModule.TimeLine.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
+ * Sorting function for binary insert, used while collecting tags for label crop.
+ * If anchor is left, sort by bounds left side.
+ * If anchor is center, sort by bounds center.
+ * If anchor is right, sort by right side.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} tag1
+ * @param {?anychart.ganttModule.TimeLine.Tag} tag2
+ * @return {number}
+ */
+anychart.ganttModule.TimeLine.tagsBinaryInsertCallback = function(tag1, tag2) {
+  var pos1 = /** @type {string} */(tag1.label.getFinalSettings('position'));
+  var pos2 = /** @type {string} */(tag2.label.getFinalSettings('position'));
+
+  var tag1Anchor = anychart.utils.getCoordinateByAnchor(tag1.bounds, pos1);
+  var tag2Anchor = anychart.utils.getCoordinateByAnchor(tag2.bounds, pos2);
+
+  return (tag1Anchor.x - tag2Anchor.x) || -1;
+};
+
+
+/**
+ * Calculates element row number by bounds.
+ *
+ * @param {anychart.math.Rect} elementBounds - Element bounds.
+ * @return {number} - Row number.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getElementRowNumber_ = function(elementBounds) {
+  var height = this.controller.verticalOffset() + elementBounds.top - this.headerHeight() - this.pixelBoundsCache.top;
+
+  var startIndex = this.controller.startIndex();
+  var startRowTop = this.controller.getHeightCache()[startIndex - 1] || 0;
+
+  return this.controller.getIndexByHeight(startRowTop + height);
+};
+
+
+/**
+ * Checks if elements labels intersect on the row and crops them if they do.
+ * Only checks intersection of milestone previews on project and milestones + periods on
+ * resource chart.
+ *
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.cropElementsLabels_ = function() {
+  // Get indexes of items currently displayed on timeline.
+  var startIndex = /** @type {number} */(this.controller.startIndex());
+  var endIndex = /** @type {number} */(this.controller.endIndex());
+
+  for (var i = startIndex; i <= endIndex; i++) {
+    /*
+      Tags are used, because they have all the information needed to crop labels.
+      They contain element bounds and instance of label being drawn. And also when we collect
+      tags we only get what is drawn on the screen.
+     */
+    var tags = this.sortedTags_[i] || [];
+    this.cropTagsLabels_(tags);
+  }
+};
+
+
+/**
+ * Returns rightmost available x value for current tag label.
+ *
+ * @param {anychart.ganttModule.TimeLine.Tag} cur - Current tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} next - Next tag.
+ * @returns {number} - Right restraint for current tag label.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getRightRestraint_ = function(cur, next) {
+  if (!next) {
+    return +Infinity;
+  }
+
+  var delta = next.bounds.getLeft() - cur.bounds.getRight();
+  var nextTagLabelBounds = this.getTagLabelBounds_(next.label);
+
+  var halfDeltaX = cur.bounds.getRight() + delta / 2;
+
+  /*
+    ● - next element
+    █ - current element
+    As simple as that:
+      1) If next label is righter than next element itself, right restraint is left side of the next element.
+        █Long lab●Long label text
+      2) If next label is on the left side, but no further than middle point between current element right
+        and next element left, next label left side is a restraint.
+        █Long label text:Short●
+      3) If next label is on the left and crosses the middle point between elements, use middle point as a restraint.
+        █Long la:Long la●
+   */
+
+  if (nextTagLabelBounds.getLeft() < next.bounds.getLeft() && delta > 0) {
+    if (nextTagLabelBounds.getLeft() <= halfDeltaX) {
+      return halfDeltaX;
+    } else {
+      return nextTagLabelBounds.getLeft();
+    }
+  }
+
+  return next.bounds.getLeft();
+};
+
+
+/**
+ * Returns left restraint, based on previous element and label bounds.
+ * Left restraint is always the rightmost x value of previous element or label.
+ * If label is enabled, it is label right boundary. If label is disabled,
+ * it is element right boundary.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} prev - Previous tag.
+ * @returns {number} - Left restraint for current label.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getLeftRestraint_ = function(prev) {
+  if (prev) {
+    var elementRightBoundary = prev.bounds.getRight();
+
+    if (prev.label.enabled()) {
+      // Previous label might have been cropped. Draw method updates bounds.
+      prev.label.draw();
+      var prevLabelRight = this.getTagLabelBounds_(prev.label).getRight();
+      return Math.max(elementRightBoundary, prevLabelRight);
+    } else {
+      return elementRightBoundary;
+    }
+  }
+
+  return -Infinity;
+};
+
+
+/**
+ * Crops current tag label, taking previous and next tags and their labels into account.
+ *
+ * @param {?anychart.ganttModule.TimeLine.Tag} prev - Previous tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} cur - Current tag.
+ * @param {?anychart.ganttModule.TimeLine.Tag} next - Next tag.
+ */
+anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cur, next) {
+  var curTagLabelBounds = this.getTagLabelBounds_(cur.label);
+
+  // Get left and right bounds of available space for label.
+  var hardRightRestraint = this.getRightRestraint_(cur, next);
+  var hardLeftRestraint = this.getLeftRestraint_(prev);
+
+  var labelFinalRight = Math.min(hardRightRestraint, curTagLabelBounds.getRight());
+  var labelFinalLeft = Math.max(hardLeftRestraint, curTagLabelBounds.getLeft());
+
+  var newWidth = labelFinalRight - labelFinalLeft;
+
+  var curTagLabelAnchor = cur.label.getFinalSettings('anchor').split('-')[0];
+  if (curTagLabelAnchor === 'center') {
+    var curTagLabelPosition = cur.label.getFinalSettings('position').split('-')[0];
+    var anchorPoint = anychart.utils.getCoordinateByAnchor(cur.bounds, curTagLabelPosition);
+    newWidth = Math.min(anchorPoint.x - labelFinalLeft, labelFinalRight - anchorPoint.x) * 2;
+  }
+
+  // Minimum allowed width for labels, currently is not configurable.
+  var minimumAllowedWidth = 20;
+
+  if (newWidth >= minimumAllowedWidth && newWidth < curTagLabelBounds.width) {
+    cur.label.width(newWidth);
+    cur.label.height(curTagLabelBounds.height);
+  } else if (newWidth < minimumAllowedWidth) {
+    cur.label.enabled(false);
+  }
+};
+
+
+/**
+ * Returns tag label with widened bounds if needed.
+ *
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @returns {anychart.math.Rect}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.getTagLabelBounds_ = function(label) {
+  var backgroundSettings = label.getFinalSettings('background');
+
+  var textBounds = label.getTextElement().getBounds();
+  if (backgroundSettings && backgroundSettings.enabled) {
+    var padding = /** @type {Object} */(label.getFinalSettings('padding'));
+    var widenedBounds = /** @type {anychart.math.Rect} */(anychart.core.utils.Padding.widenBounds(textBounds, padding));
+    return widenedBounds;
+  }
+  return textBounds;
+};
+
+
+/**
+ * Iterates over sorted array of tags and crops their labels.
+ *
+ * @param {Array.<anychart.ganttModule.TimeLine.Tag>} tags - Sorted array of tags.
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.cropTagsLabels_ = function(tags) {
+  for (var i = 0; i < tags.length; i++) {
+    var previousTag = tags[i - 1] || null;
+    var currentTag = tags[i];
+    var nextTag = tags[i + 1] || null;
+
+    this.cropCurrentTagLabel_(previousTag, currentTag, nextTag);
+  }
+};
+
+
+/**
+ * Inserts tag using binary insert, to have sorted array.
+ * These tags are later used to crop elements labels.
+ *
+ * @param {anychart.ganttModule.TimeLine.Tag} tag
+ */
+anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) {
+  if (!goog.isArray(this.sortedTags_[tag.row])) {
+    this.sortedTags_[tag.row] = [];
+  }
+  
+  var isResourcePeriodOrMilestone =
+    (tag.type === anychart.enums.TLElementTypes.PERIODS) ||
+    (tag.type === anychart.enums.TLElementTypes.MILESTONES);
+  
+  var isProjectMilestonePreview =
+    (tag.type === anychart.enums.TLElementTypes.MILESTONES_PREVIEW);
+  
+  var isResource = this.controller.isResources();
+
+  var suits1 = (isResource && isResourcePeriodOrMilestone);
+  var suits2 = (!isResource && isProjectMilestonePreview);
+
+  if (suits1 || suits2) {
+    goog.array.binaryInsert(
+      this.sortedTags_[tag.row],
+      tag,
+      anychart.ganttModule.TimeLine.tagsBinaryInsertCallback
+    );
+  }
+};
+
+
+/**
  * Draws labels.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
   this.labels().suspendSignalsDispatching();
   this.labels().clear();
+  this.sortedTags_ = [];
+
+  var isCropLabelsEnabled = this.getOption('cropLabels');
 
   var els = this.initializeElements_();
 
@@ -5966,10 +5439,16 @@ anychart.ganttModule.TimeLine.prototype.drawLabels_ = function() {
               tag.label.enabled(false);
             }
             tag.label.draw();
+
+            this.insertTagForCropLabels_(tag);
           }
         }
       }
     }
+  }
+
+  if (isCropLabelsEnabled) {
+    this.cropElementsLabels_();
   }
 
   this.labels().resumeSignalsDispatching(true);
@@ -6246,7 +5725,7 @@ anychart.ganttModule.TimeLine.prototype.serialize = function() {
   json['markers'] = this.markers().serialize();
   json['header'] = this.header().serialize();
 
-  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, json, void 0, void 0, true);
+  anychart.core.settings.serialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, json, void 0, void 0, true);
 
   json['elements'] = this.elements().serialize();
   json['connectors'] = this.connectors().serialize();
@@ -6305,7 +5784,7 @@ anychart.ganttModule.TimeLine.prototype.setupByJSON = function(config, opt_defau
   if (('header' in config) && !opt_default)
     this.header().setupInternal(false, config['header']);
 
-  anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.COLOR_DESCRIPTORS, config, opt_default);
+  anychart.core.settings.deserialize(this, anychart.ganttModule.TimeLine.DESCRIPTORS, config, opt_default);
 
   this.elements().setupInternal(!!opt_default, config['elements']);
   this.milestones().setupInternal(!!opt_default, config['milestones']);
@@ -6510,6 +5989,7 @@ anychart.standalones.resourceTimeline = function() {
   // auto generated
   //proto['backgroundFill'] = proto.backgroundFill;
   //proto['columnStroke'] = proto.columnStroke;
+  //proto['cropLabels'] = proto.cropLabels;
 
   // row coloring
   //proto['rowFill'] = proto.rowFill;
@@ -6517,72 +5997,6 @@ anychart.standalones.resourceTimeline = function() {
   //proto['rowOddFill'] = proto.rowOddFill;
   //proto['rowHoverFill'] = proto.rowHoverFill;
   //proto['rowSelectedFill'] = proto.rowSelectedFill;
-
-  // DEPRECATED API
-  proto['baseFill'] = proto.baseFill;
-  proto['baseStroke'] = proto.baseStroke;
-  proto['baselineFill'] = proto.baselineFill;
-  proto['baselineStroke'] = proto.baselineStroke;
-  proto['milestoneFill'] = proto.milestoneFill;
-  proto['milestoneStroke'] = proto.milestoneStroke;
-  proto['parentFill'] = proto.parentFill;
-  proto['parentStroke'] = proto.parentStroke;
-  proto['progressFill'] = proto.progressFill;
-  proto['progressStroke'] = proto.progressStroke;
-  proto['baseLabels'] = proto.baseLabels;
-  proto['baselineLabels'] = proto.baselineLabels;
-  proto['parentLabels'] = proto.parentLabels;
-  proto['milestoneLabels'] = proto.milestoneLabels;
-  proto['progressLabels'] = proto.progressLabels;
-  proto['baselineAbove'] = proto.baselineAbove;
-  proto['baseBarHeight'] = proto.baseBarHeight;
-  proto['baseBarAnchor'] = proto.baseBarAnchor;
-  proto['baseBarPosition'] = proto.baseBarPosition;
-  proto['baseBarOffset'] = proto.baseBarOffset;
-  proto['parentBarHeight'] = proto.parentBarHeight;
-  proto['parentBarAnchor'] = proto.parentBarAnchor;
-  proto['parentBarPosition'] = proto.parentBarPosition;
-  proto['parentBarOffset'] = proto.parentBarOffset;
-  proto['baselineBarHeight'] = proto.baselineBarHeight;
-  proto['baselineBarAnchor'] = proto.baselineBarAnchor;
-  proto['baselineBarPosition'] = proto.baselineBarPosition;
-  proto['baselineBarOffset'] = proto.baselineBarOffset;
-  proto['progressBarHeight'] = proto.progressBarHeight;
-  proto['progressBarAnchor'] = proto.progressBarAnchor;
-  proto['progressBarPosition'] = proto.progressBarPosition;
-  proto['progressBarOffset'] = proto.progressBarOffset;
-  proto['milestoneHeight'] = proto.milestoneHeight;
-  proto['milestoneAnchor'] = proto.milestoneAnchor;
-  proto['milestonePosition'] = proto.milestonePosition;
-  proto['milestoneOffset'] = proto.milestoneOffset;
-  proto['selectedElementFill'] = proto.selectedElementFill;
-  proto['selectedElementStroke'] = proto.selectedElementStroke;
-  proto['connectorFill'] = proto.connectorFill;
-  proto['connectorStroke'] = proto.connectorStroke;
-  proto['selectedConnectorStroke'] = proto.selectedConnectorStroke;
-  proto['connectorPreviewStroke'] = proto.connectorPreviewStroke;
-  proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
-  proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
-  proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
-  proto['editing'] = proto.editing;
-  proto['editPreviewFill'] = proto.editPreviewFill;
-  proto['editPreviewStroke'] = proto.editPreviewStroke;
-  proto['editProgressFill'] = proto.editProgressFill;
-  proto['editProgressStroke'] = proto.editProgressStroke;
-  proto['editIntervalThumbFill'] = proto.editIntervalThumbFill;
-  proto['editIntervalThumbStroke'] = proto.editIntervalThumbStroke;
-  proto['editConnectorThumbFill'] = proto.editConnectorThumbFill;
-  proto['editConnectorThumbStroke'] = proto.editConnectorThumbStroke;
-  proto['editStartConnectorMarkerSize'] = proto.editStartConnectorMarkerSize;
-  proto['editStartConnectorMarkerType'] = proto.editStartConnectorMarkerType;
-  proto['editStartConnectorMarkerHorizontalOffset'] = proto.editStartConnectorMarkerHorizontalOffset;
-  proto['editStartConnectorMarkerVerticalOffset'] = proto.editStartConnectorMarkerVerticalOffset;
-  proto['editFinishConnectorMarkerSize'] = proto.editFinishConnectorMarkerSize;
-  proto['editFinishConnectorMarkerType'] = proto.editFinishConnectorMarkerType;
-  proto['editFinishConnectorMarkerHorizontalOffset'] = proto.editFinishConnectorMarkerHorizontalOffset;
-  proto['editFinishConnectorMarkerVerticalOffset'] = proto.editFinishConnectorMarkerVerticalOffset;
-  proto['editIntervalWidth'] = proto.editIntervalWidth;
-
 
   proto['edit'] = proto.edit;
   proto['horizontalScrollBar'] = proto.horizontalScrollBar;

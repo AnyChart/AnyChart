@@ -5,6 +5,7 @@ goog.require('anychart.core.Base');
 goog.require('anychart.core.StateSettings');
 goog.require('anychart.core.ui.LabelsSettings');
 goog.require('anychart.core.ui.OptimizedText');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.format.Context');
 
 
@@ -391,6 +392,25 @@ anychart.graphModule.elements.Base.prototype.needsMeasureLabels = function() {
 
 
 /**
+ * Create tooltip format context for passed element.
+ *
+ * @param {(anychart.graphModule.Chart.Edge|anychart.graphModule.Chart.Node)} element
+ *
+ * @return {Object} - Tooltip format context.
+ */
+anychart.graphModule.elements.Base.prototype.getTooltipFormatContext = function(element) {
+  var context = {};
+
+  var iterator = this.getIterator();
+  iterator.select(element.dataRow);
+  this.formatProvider_.dataSource(iterator);
+  context['type'] = {value: this.getType(), type: anychart.enums.TokenType.STRING};
+  context['id'] = {value: element.id, type: anychart.enums.TokenType.STRING};
+
+  return context;
+};
+
+/**
  * Return format provider for element.
  * @param {(anychart.graphModule.Chart.Edge|anychart.graphModule.Chart.Node)} element
  * @return {anychart.format.Context}
@@ -399,34 +419,9 @@ anychart.graphModule.elements.Base.prototype.createFormatProvider = function(ele
   if (!this.formatProvider_) {
     this.formatProvider_ = new anychart.format.Context();
   }
-  var values = {};
 
-  var iterator = this.getIterator();
-  iterator.select(element.dataRow);
-  this.formatProvider_.dataSource(iterator);
-  values['type'] = {value: this.getType(), type: anychart.enums.TokenType.STRING};
-  values['id'] = {value: element.id, type: anychart.enums.TokenType.STRING};
-
-  if (this.getType() == anychart.graphModule.Chart.Element.NODE) {
-    var edges = element.connectedEdges;
-    var siblings = /**Array.<string>*/([]);
-    for (var i = 0; i < edges.length; i++) {
-      var edge = this.chart_.getEdgeById(edges[i]);
-      var from = edge.from;
-      var to = edge.to;
-      var siblingId;
-      if(from != element.id) {
-        siblingId = from;
-      } else {
-        siblingId = to;
-      }
-      siblings.push(siblingId);
-    }
-
-    values['siblings'] = {value: siblings, type: anychart.enums.TokenType.UNKNOWN};
-  }
-
-  return /** @type {anychart.format.Context} */(this.formatProvider_.propagate(values));
+  var context = this.getTooltipFormatContext(element);
+  return /** @type {anychart.format.Context} */(this.formatProvider_.propagate(context));
 };
 
 
@@ -521,6 +516,28 @@ anychart.graphModule.elements.Base.prototype.getColorResolutionContext = functio
 };
 
 
+/**
+ * Getter for tooltip settings.
+ *
+ * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
+ *
+ * @return {!(anychart.graphModule.elements.Base|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
+ */
+anychart.graphModule.elements.Base.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
+    this.tooltip_.dropThemes();
+    this.setupCreated('tooltip', this.tooltip_);
+    this.tooltip_.parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip()));
+    this.tooltip_.chart(this.chart_);
+  }
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
 //endregion
 //region Setup and dispose
 /** @inheritDoc */
@@ -619,6 +636,14 @@ anychart.graphModule.elements.Base.prototype.clearAll = function() {
     var element = elements[i];
     this.clear(element);
   }
+};
+
+
+/**
+ * Drop all data dependent items.
+ */
+anychart.graphModule.elements.Base.prototype.dropDataDependent = function() {
+  this.resetLabelSettings();
 };
 
 

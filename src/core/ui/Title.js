@@ -4,6 +4,7 @@ goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.utils.InternalLabelsFormatters');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -196,12 +197,14 @@ anychart.core.ui.Title = function() {
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
       anychart.Signal.NEEDS_REDRAW);
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['width', anychart.ConsistencyState.BOUNDS],
     ['height', anychart.ConsistencyState.BOUNDS],
     ['align', anychart.ConsistencyState.BOUNDS],
     ['orientation', anychart.ConsistencyState.BOUNDS],
     ['rotation', anychart.ConsistencyState.BOUNDS],
+    ['maxLength', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS],
     ['text', anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS]
   ]);
 };
@@ -247,24 +250,6 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'width',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'height',
-      anychart.core.settings.numberOrPercentNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'align',
-      anychart.enums.normalizeAlign);
-
   function orientationNormalizer(val) {
     if (this.isStockPlotTitle_)
       return val == anychart.enums.Orientation.BOTTOM ? val : anychart.enums.Orientation.TOP;
@@ -272,23 +257,15 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       return anychart.enums.normalizeOrientation(val);
   }
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'orientation',
-      orientationNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'rotation',
-      anychart.core.settings.numberNormalizer);
-
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'text',
-      anychart.core.settings.stringNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'width', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.numberOrPercentNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'align', anychart.enums.normalizeAlign],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', orientationNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'rotation', anychart.core.settings.numberNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'text', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxLength', anychart.core.settings.numberOrNullNormalizer]
+  ]);
 
   return map;
 })();
@@ -797,22 +774,37 @@ anychart.core.ui.Title.prototype.getContentBounds = function() {
   return this.pixelBounds_.clone();
 };
 
+/**
+ * Returns title text value with applied formatters.
+ *
+ * @return {string|undefined} - Title text value.
+ */
+anychart.core.ui.Title.prototype.getText = function () {
+  var textVal = this.getOption('text');
+  var autoText = /** @type {string} */ (this.autoText());
 
+  if (goog.isDef(textVal) || goog.isDef(autoText)) {
+    var text = /** @type {string} */ (!textVal && goog.isDef(autoText) ? autoText : textVal);
+    var maxLength = /** @type {number|null}*/(this.getOption('maxLength'));
+
+    text = anychart.core.utils.InternalLabelsFormatters.textLengthFormatter(text, maxLength);
+
+    return text;
+  }
+};
 /**
  * Applies text settings to text element.
  * @param {boolean} isInitial - Whether is initial operation.
  */
 anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
-  var textVal = this.getOption('text');
-  var autoText = /** @type {string} */ (this.autoText());
   var useHtml = this.getOption('useHtml');
+  var text = this.getText();
 
-  if (isInitial || goog.isDef(textVal) || goog.isDef(autoText) || goog.isDef(useHtml)) {
-    var text = /** @type {string} */ (!textVal && goog.isDef(autoText) ? autoText : textVal);
+  if (isInitial || goog.isDef(text) || goog.isDef(useHtml)) {
     if (useHtml) {
-      this.text_.htmlText(text);
+      this.text_.htmlText(/**@type{string}*/(text));
     } else {
-      this.text_.text(text);
+      this.text_.text(/**@type{string}*/(text));
     }
   }
   this.text_.fontSize(/** @type {number|string} */ (this.getOption('fontSize')));

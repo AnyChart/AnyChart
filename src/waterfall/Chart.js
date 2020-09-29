@@ -1,8 +1,11 @@
 goog.provide('anychart.waterfallModule.Chart');
+
 goog.require('anychart.core.CartesianBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers');
+goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.waterfallModule.Series');
 
 
@@ -24,11 +27,28 @@ anychart.waterfallModule.Chart = function() {
   this.setType(anychart.enums.ChartTypes.WATERFALL);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['dataMode', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW],
-    ['connectorStroke', anychart.ConsistencyState.ONLY_DISPATCHING, anychart.Signal.NEEDS_REDRAW]
+    ['dataMode', anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES, anychart.Signal.NEEDS_REDRAW],
+    ['connectorStroke', anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.waterfallModule.Chart, anychart.core.CartesianBase);
+
+
+/**
+ * States that waterfall chart supports.
+ *
+ * @enum {string}
+ */
+anychart.waterfallModule.Chart.SUPPORTED_STATES = {
+  STACK_LABELS: 'stackLabels'
+};
+
+
+anychart.consistency.supportStates(
+  anychart.waterfallModule.Chart,
+  anychart.enums.Store.WATERFALL,
+  anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS
+);
 
 
 //region --- infrastructure
@@ -119,6 +139,17 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
     }
     prevValue += absSum;
     this.pointValueSums_.push(prevValue);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.drawContent = function(contentBounds) {
+  anychart.waterfallModule.Chart.base(this, 'drawContent', contentBounds);
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS) ||
+      this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS)) {
+    this.drawLabels();
   }
 };
 
@@ -288,6 +319,197 @@ anychart.core.settings.populate(anychart.waterfallModule.Chart, anychart.waterfa
 
 
 //endregion
+//region --- Labels
+/**
+ * Return format provider for stack labels.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {anychart.core.BaseContext}
+ */
+anychart.waterfallModule.Chart.prototype.getFormatProviderForStackedLabel = function(index) {
+  var provider = new anychart.format.Context();
+
+  var value = this.getStackAbsolutesSum(index);
+
+  var values = {
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'value': {value: value, type: anychart.enums.TokenType.NUMBER}
+  };
+
+  return provider.propagate(values);
+};
+
+
+/**
+ * Resolve label position for stack.
+ *
+ * @param {anychart.enums.Position} position - Labels position of labels factory.
+ * @param {number} index - Index of stack.
+ *
+ * @return {anychart.enums.Position}
+ */
+anychart.waterfallModule.Chart.prototype.resolvePositionForStackLabel = function(position, index) {
+  if (position == 'auto') {
+    var stackSum = this.getStackSum(index);
+    return stackSum >= 0 ? anychart.enums.Position.CENTER_TOP : anychart.enums.Position.CENTER_BOTTOM;
+  }
+
+  return position;
+};
+
+
+/**
+ * Resolve anchor for specific stack label.
+ *
+ * @param {anychart.enums.Anchor} anchor - Anchor for stack labels.
+ * @param {anychart.enums.Position} position - Position for stack labels.
+ * @param {number} index - Index of stack.
+ *
+ * @return {anychart.enums.Anchor} - Resolved anchor value for stack label.
+ */
+anychart.waterfallModule.Chart.prototype.resolveAnchorForStackLabel = function(anchor, position, index) {
+  if (anchor == anychart.enums.Anchor.AUTO) {
+    if (position == 'auto') {
+      var stackSum = this.getStackSum(index);
+
+      anchor = stackSum >= 0 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP;
+    } else if (position == anychart.enums.Position.CENTER) {
+      anchor = anychart.enums.Anchor.CENTER;
+    } else {
+      anchor = anychart.utils.rotateAnchor(position, 180);
+    }
+  }
+
+  return anychart.utils.rotateAnchor(anchor, this.isVertical() ? -90 : 0);
+};
+
+
+/**
+ * Return position provider for stack labels.
+ *
+ * @param {number} index - Stack index.
+ * @param {anychart.enums.Position} labelsPosition - Labels position.
+ *
+ * @return {{value: {x: number, y:number}}} - Position provider.
+ */
+anychart.waterfallModule.Chart.prototype.getPositionProviderForStackedLabel = function(index, labelsPosition) {
+  var bounds = this.getStackBounds(index);
+  var position = anychart.utils.getCoordinateByAnchor(bounds, labelsPosition);
+
+  var x = position['x'];
+  var y = position['y'];
+
+  var tmpX = x;
+  x = this.isVertical() ? y : x;
+  y = this.isVertical() ? tmpX : y;
+
+  return {
+    'value': {
+      x: x,
+      y: y
+    }
+  };
+};
+
+
+/**
+ * Draw stack labels of chart.
+ */
+anychart.waterfallModule.Chart.prototype.drawStackLabels = function() {
+  if (!this.stackLabelsLayer_) {
+    this.stackLabelsLayer_ = this.rootElement.layer();
+    this.stackLabelsLayer_.zIndex(40); //Above series.
+
+    this.stackLabels_.container(this.stackLabelsLayer_);
+  }
+
+  var series = this.getSeriesAt(0);
+
+  var iterator = series.getResetIterator();
+
+  var labelsAnchor = this.stackLabels_.anchor();
+  var labelsPosition = this.stackLabels_.position();
+
+  while (iterator.advance()) {
+    var index = iterator.getIndex();
+
+    if (this.isStackVisible(index)) {
+      var labelAnchor = this.resolveAnchorForStackLabel(labelsAnchor, labelsPosition, index);
+      var labelPosition = this.resolvePositionForStackLabel(labelsPosition, index);
+
+      var positionProvider = this.getPositionProviderForStackedLabel(index, labelPosition);
+      var formatProvider = this.getFormatProviderForStackedLabel(index);
+
+      var label = this.stackLabels_.getLabel(index);
+
+      label = label ? label : this.stackLabels_.add(null, null, index);
+
+      label.formatProvider(formatProvider);
+      label.positionProvider(positionProvider);
+
+      label.anchor(labelAnchor);
+    }
+  }
+
+  this.stackLabels_.draw();
+};
+
+
+/**
+ * Draw chart labels.
+ */
+anychart.waterfallModule.Chart.prototype.drawLabels = function() {
+  this.stackLabels().clear();
+
+  var countOfVisibleSeries = goog.array.reduce(this.seriesList, function(count, series) {
+    return series.enabled() ? count + 1 : count;
+  }, 0);
+
+  if (countOfVisibleSeries > 1 && this.stackLabels().getOption('enabled')) {
+    this.drawStackLabels();
+  }
+
+  this.stackLabels().markConsistent(this.stackLabels().SUPPORTED_CONSISTENCY_STATES);
+  this.markStateConsistent(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS);
+};
+
+
+/**
+ * Stack labels invalidation function.
+ */
+anychart.waterfallModule.Chart.prototype.stackLabelsInvalidated = function() {
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Labels factory getter/setter for stack labels.
+ *
+ * @param {Object=} opt_value - Labels config.
+ *
+ * @returns {anychart.waterfallModule.Chart|anychart.core.ui.LabelsFactory} - Chart or labels factory instance.
+ */
+anychart.waterfallModule.Chart.prototype.stackLabels = function(opt_value) {
+  if (!this.stackLabels_) {
+    this.stackLabels_ = new anychart.core.ui.LabelsFactory();
+    this.setupCreated('stackLabels', this.stackLabels_);
+    this.stackLabels_.markConsistent(this.stackLabels_.SUPPORTED_CONSISTENCY_STATES);
+    this.stackLabels_.listenSignals(this.stackLabelsInvalidated, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.stackLabels_.setup(opt_value);
+    return this;
+  }
+
+  return this.stackLabels_;
+};
+
+
+//endregion
 //region --- legend
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.legendItemCanInteractInMode = function(mode) {
@@ -325,6 +547,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Increase',
+          'categoryType': 'increase',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (risingFill),
           'sourceUid': goog.getUid(this),
@@ -345,6 +568,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Decrease',
+          'categoryType': 'decrease',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (fallingFill),
           'sourceUid': goog.getUid(this),
@@ -365,6 +589,7 @@ anychart.waterfallModule.Chart.prototype.createLegendItemsProvider = function(so
         };
         data.push({
           'text': 'Total',
+          'categoryType': 'total',
           'iconEnabled': true,
           'iconFill': /** @type {acgraph.vector.Fill} */ (totalFill),
           'sourceUid': goog.getUid(this),
@@ -443,11 +668,158 @@ anychart.waterfallModule.Chart.prototype.legendItemClick = function(item, event)
 
 
 //endregion
+//region --- Stack
+/**
+ * Returns bounds of stack.
+ * Used for labels position calculation.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {!anychart.math.Rect} - Bounds of stack.
+ */
+anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
+  var width = goog.array.reduce(this.drawingPlans, function(width, plan) {
+    var seriesPointWidth = plan.series.pointWidthCache;
+    return Math.max(seriesPointWidth, width);
+  }, -Infinity);
+
+  var left = this.drawingPlans[0].data[index].meta['valueX'] - width / 2;
+
+  var top = this.transformValue_(this.getStackTop(index));
+  var height = this.transformValue_(this.getStackBottom(index));
+
+  return anychart.math.rect(left, top, width, height - top);
+};
+
+
+/**
+ * Returns sum of stack values.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getStackSum = function(index) {
+  return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+      iterator.select(index);
+
+      var value = iterator.get('value') || 0;
+
+      return sum + value;
+    }
+
+    return sum;
+  }, 0);
+};
+
+
+/**
+ * Returns sum of stack absolute values.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getStackAbsolutesSum = function(index) {
+  return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+      iterator.select(index);
+
+      var absolute = iterator.meta('absolute') || 0;
+
+      return sum + absolute;
+    }
+
+    return sum;
+  }, 0);
+};
+
+
+/**
+ * Whether stack visible.
+ * Stack is visible when at least one point visible.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {boolean}
+ */
+anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
+  return goog.array.reduce(this.drawingPlans, function(isVisible, plan) {
+    return isVisible || !plan.data[index].meta['missing'];
+  }, false);
+};
+
+
+/**
+ * Return highest value of stack.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
+  return goog.array.reduce(this.seriesList, function(top, currentSeries) {
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+
+      iterator.select(index);
+
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
+
+      return Math.max(top, stackedValue, stackedZero);
+    }
+    return top;
+  }, -Infinity);
+};
+
+
+/**
+ * Return lowest value of stack.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
+  return goog.array.reduce(this.seriesList, function(bottom, currentSeries) {
+    if (currentSeries.enabled()) {
+      var iterator = currentSeries.getIterator();
+
+      iterator.select(index);
+
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
+
+      return Math.min(stackedValue, stackedZero, bottom);
+    }
+    return bottom;
+  }, Infinity);
+};
+
+
+//endregion
+//region --- Series
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS);
+
+  anychart.waterfallModule.Chart.base(this, 'seriesInvalidated', event);
+};
+
+
+//endregion
 //region --- setup/dispose
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.serialize = function() {
   var json = anychart.waterfallModule.Chart.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, json['chart']);
+  json['chart']['stackLabels'] = this.stackLabels().serialize();
+
+
   return json;
 };
 
@@ -455,13 +827,23 @@ anychart.waterfallModule.Chart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.setupByJSON = function(config, opt_default) {
   anychart.waterfallModule.Chart.base(this, 'setupByJSON', config, opt_default);
+
+  var stackLabelsConfig = config['stackLabels'];
+  if (stackLabelsConfig) {
+    this.stackLabels().setupInternal(!!opt_default, stackLabelsConfig);
+  }
+
   anychart.core.settings.deserialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
-  goog.dispose(this.connectorPath_);
+  goog.disposeAll(
+    this.stackLabels_,
+    this.stackLabelsLayer_,
+    this.connectorPath_
+  );
   anychart.waterfallModule.Chart.base(this, 'disposeInternal');
 };
 
@@ -475,6 +857,7 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
   //proto['dataMode'] = proto.dataMode;
   //proto['connectorStroke'] = proto.connectorStroke;
 
+  proto['stackLabels'] = proto.stackLabels;
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
   proto['crosshair'] = proto.crosshair;

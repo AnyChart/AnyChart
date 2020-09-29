@@ -301,6 +301,74 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.series.Cartesian.prototype.modifyLabelPositionProvider = function(label, positionProvider) {
+  if (this.labels().getOption('position') == 'auto' && this.xScale().mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) {
+    var position = positionProvider['value'];
+
+    var x = position.x;
+    var y = position.y;
+
+    var textElement = label.getTextElement();
+    if (textElement && textElement.text()) {
+      var halfLabelWidth = textElement.bounds.width / 2;
+
+      var boundsRight = this.boundsWithoutAxes.getRight();
+      var boundsLeft = this.boundsWithoutAxes.getLeft();
+
+      var labelRight = x + halfLabelWidth;
+      var labelLeft = x - halfLabelWidth;
+
+      if (boundsLeft > labelLeft && labelRight > boundsLeft) {
+        x += boundsLeft - labelLeft;
+      } else if (labelRight > boundsRight && labelLeft < boundsRight) {
+        x -= labelRight - boundsRight;
+      }
+
+      return {
+        'value': {
+          x: x,
+          y: y
+        }
+      };
+    }
+  }
+
+  return anychart.core.series.Cartesian.base(this, 'modifyLabelPositionProvider', label, positionProvider);
+};
+
+
+/**
+ * Updates position provider of passed labels factory.
+ *
+ * @param {anychart.core.ui.LabelsFactory} factory - Labels factory instance.
+ */
+anychart.core.series.Cartesian.prototype.repositionLabels = function(factory) {
+  var count = factory.labelsCount();
+
+  for (var i = 0; i < count; i++) {
+    var label = factory.getLabel(i);
+
+    if (label) {
+      var positionProvider = this.modifyLabelPositionProvider(label,
+          /**@type {{value:{x:number, y:number}}}*/(label.positionProvider()));
+
+      this.setPositionProvider(label, positionProvider);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Cartesian.prototype.drawLabelsFactory = function(factory) {
+  anychart.core.series.Cartesian.base(this, 'drawLabelsFactory', factory);
+
+  this.repositionLabels(factory);
+
+  factory.draw();
+};
+
+
 //endregion
 //region --- Path manager interface methods
 /** @inheritDoc */
@@ -422,8 +490,13 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
  */
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    var state = anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES;
+    // Map chart perform zoom invalidation on 1<<21.
+    if (anychart.utils.instanceOf(this.chart, anychart.core.ChartWithAxes)) {
+      state |= anychart.ConsistencyState.AXES_CHART_AXES;
+    }
     //this fixes DVF-3657 because makes chart recalculate drawing plan.
-    /** @type {anychart.core.Base} */(this.chart).invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
+    /** @type {anychart.core.Base} */(this.chart).invalidate(state);
     this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED | anychart.Signal.NEED_UPDATE_LEGEND);
   }

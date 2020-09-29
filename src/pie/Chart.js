@@ -452,9 +452,6 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   //     '',
   //     explodeNormalizer,
   //     'explode');
-  function outsideLabelsSpaceNormalizer(opt_value) {
-    return anychart.utils.normalizeNumberOrPercent(opt_value, '30%');
-  }
   function connectorLengthNormalizer(opt_value) {
     return anychart.utils.normalizeNumberOrPercent(opt_value, '20%');
   }
@@ -476,7 +473,6 @@ anychart.pieModule.Chart.PROPERTY_DESCRIPTORS = (function() {
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'radius', radiusNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'innerRadius', innerRadiusNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'sort', anychart.enums.normalizeSort],
-        [anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED, '', outsideLabelsSpaceNormalizer, 'outsideLabelsSpace'],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'insideLabelsOffset', anychart.utils.normalizeNumberOrPercent],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectorLength', connectorLengthNormalizer],
         [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'outsideLabelsCriticalAngle', criticalAngleNormalizer],
@@ -3985,41 +3981,6 @@ anychart.pieModule.Chart.prototype.getCenterAngle_ = function(startAngle, endAng
 };
 
 
-/**
- * Getter for the pie chart center point.<br/>
- * <b>Note:</b> Works only after {@link anychart.pieModule.Chart#draw} is called.
- * @example
- *  var pieInnerRadius = 40
- *  var pie = anychart.pie([10, 14, 8, 12])
- *      .container(stage)
- *      .innerRadius(pieInnerRadius+10)
- *      .draw();
- *  var pieCenter = pie.getCenterPoint();
- *  var labelBounds = anychart.math.rect(
- *      pieCenter.x - pieInnerRadius,
- *      pieCenter.y - pieInnerRadius,
- *      pieCenter.x + pieInnerRadius,
- *      pieCenter.y + pieInnerRadius
- *  );
- *  anychart.standalones.label()
- *      .text('Pie\ninner\nlabel')
- *      .parentBounds(labelBounds)
- *      .container(stage)
- *      .hAlign('center')
- *      .vAlign('center')
- *      .adjustFontSize(true)
- *      .width(2*pieInnerRadius)
- *      .height(2*pieInnerRadius)
- *      .draw();
- * @return {anychart.math.Coordinate} XY coordinate of the current pie chart center.
- * @deprecated since 8.2.0 use pie.center.getPoint() instead. DVF-3445
- */
-anychart.pieModule.Chart.prototype.getCenterPoint = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getCenterPoint()', 'center().getPoint()'], true);
-  return this.center().getPoint();
-};
-
-
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getCenterCoords = function() {
   return [this.cx, this.cy];
@@ -4214,55 +4175,6 @@ anychart.pieModule.Chart.prototype.legendItemOut = function(item, event) {
 
 //endregion
 //region --- Interactivity
-/**
- * Explodes slice at index.
- * @example
- * var chart = anychart.pie([10, 12, 14, 46]);
- * chart.explodeSlice(2);
- * chart.container(stage).draw();
- * @param {number} index Pie slice index that should be exploded or not.
- * @param {boolean=} opt_explode [true] Whether to explode.
- * @return {anychart.pieModule.Chart} .
- * @deprecated since 8.1.0 use select() instead. DVF-3404
- */
-anychart.pieModule.Chart.prototype.explodeSlice = function(index, opt_explode) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['explodeSlice()', 'select()'], true);
-  var currentPointState = this.state.getPointStateByIndex(index);
-  if (opt_explode || !goog.isDef(opt_explode)) {
-    if (!this.state.isStateContains(currentPointState, anychart.PointState.SELECT))
-      this.select(index);
-  } else {
-    this.unselect(index);
-  }
-  return this;
-};
-
-
-/**
- * Explodes all slices.
- * @example
- * var chart = anychart.pie([10, 12, 14, 46]);
- * chart.explodeSlices(true);
- * chart.container(stage).draw();
- * @param {boolean|Array.<number>} value Whether to explode.
- * @return {anychart.pieModule.Chart} .
- * @deprecated since 8.1.0 use select() instead. DVF-3404
- */
-anychart.pieModule.Chart.prototype.explodeSlices = function(value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['explodeSlices()', 'select()'], true);
-  if (goog.isBoolean(value)) {
-    if (value) {
-      this.select();
-    } else {
-      this.unselect();
-    }
-  } else {
-    this.select(value);
-  }
-  return this;
-};
-
-
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getSeriesStatus = function(event) {
   //todo (blackart) coming soon.
@@ -5271,14 +5183,11 @@ anychart.pieModule.Chart.PieOutsideLabelsDomain.prototype.calculate = function()
   // proto['sliceDrawer'] = proto.sliceDrawer;
   //deprecated
   // proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
-  proto['explodeSlice'] = proto.explodeSlice;//doc|ex
-  proto['explodeSlices'] = proto.explodeSlices;
   //actual
   proto['center'] = proto.center;
   proto['group'] = proto.group;//doc|ex|non-tr
   proto['data'] = proto.data;//doc|ex|
   proto['labels'] = proto.labels;//doc|ex
-  proto['getCenterPoint'] = proto.getCenterPoint;//doc|ex
   proto['getPixelRadius'] = proto.getPixelRadius;//doc|need-ex
   proto['getPixelInnerRadius'] = proto.getPixelInnerRadius;//doc|need-ex
   proto['getPixelExplode'] = proto.getPixelExplode;

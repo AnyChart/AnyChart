@@ -728,6 +728,7 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     lineMarker.setChart(this);
     lineMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.setParentEventTarget(this);
     lineMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -777,6 +778,7 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     rangeMarker.setChart(this);
     rangeMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.setParentEventTarget(this);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -827,6 +829,7 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     textMarker.setChart(this);
     textMarker.setDefaultLayout(this.isVertical() ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
+    textMarker.setParentEventTarget(this);
     textMarker.listenSignals(this.onMarkersSignal, this);
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -846,7 +849,8 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
  * @protected
  */
 anychart.core.ChartWithAxes.prototype.onMarkersSignal = function(event) {
-  var state = anychart.ConsistencyState.AXES_CHART_AXES_MARKERS;
+  // Invalidate chart series because need to recalculate label position dropped in calculate method call.
+  var state = anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SERIES_CHART_SERIES;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
     state |= anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES;
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
@@ -1408,6 +1412,8 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
       item = this.xAxes_[i];
       if (item) {
+        item.invalidate(item.ALL_VISUAL_STATES);
+        item.dropBoundsCache();
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
         //Scale uid check fixes DVF-3678

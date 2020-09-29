@@ -5,11 +5,6 @@ goog.require('anychart.utils');
 
 /**
  * @typedef {{
- *   highQueue: !anychart.stockModule.math.CycledQueue,
- *   lowQueue: !anychart.stockModule.math.CycledQueue,
- *   closeQueue: !anychart.stockModule.math.CycledQueue,
- *   volumeQueue: !anychart.stockModule.math.CycledQueue,
- *   period: number,
  *   prevResult: number,
  *   dispose: Function
  * }}
@@ -22,22 +17,12 @@ anychart.stockModule.math.adl.Context;
  * @return {anychart.stockModule.math.adl.Context}
  */
 anychart.stockModule.math.adl.initContext = function() {
-  var period = 1;
   return {
-    highQueue: anychart.math.cycledQueue(period),
-    lowQueue: anychart.math.cycledQueue(period),
-    closeQueue: anychart.math.cycledQueue(period),
-    volumeQueue: anychart.math.cycledQueue(period),
-    period: period,
-    prevResult: NaN,
+    prevResult: 0,
     /**
      * @this {anychart.stockModule.math.adl.Context}
      */
     'dispose': function() {
-      this.highQueue.clear();
-      this.lowQueue.clear();
-      this.closeQueue.clear();
-      this.volumeQueue.clear();
     }
   };
 };
@@ -49,11 +34,7 @@ anychart.stockModule.math.adl.initContext = function() {
  * @this {anychart.stockModule.math.adl.Context}
  */
 anychart.stockModule.math.adl.startFunction = function(context) {
-  context.highQueue.clear();
-  context.lowQueue.clear();
-  context.closeQueue.clear();
-  context.volumeQueue.clear();
-  context.prevResult = NaN;
+  context.prevResult = 0;
 };
 
 
@@ -70,34 +51,14 @@ anychart.stockModule.math.adl.calculate = function(context, close, high, low, vo
   if (isNaN(high) || isNaN(low) || isNaN(close) || isNaN(volume)) {
     return NaN;
   } else {
-    context.highQueue.enqueue(high);
-    context.lowQueue.enqueue(low);
-    context.closeQueue.enqueue(close);
-    context.volumeQueue.enqueue(volume);
-    var h, l, c, clv, v, result;
-    if (context.closeQueue.getLength() < context.period) {
-      return NaN;
-    } else {
-      h = context.highQueue.get(0);
-      l = context.lowQueue.get(0);
-      c = context.closeQueue.get(0);
-      clv = ((c - l) - (h - c)) / (h - l);
-      v = context.volumeQueue.get(0);
-
-      if (isNaN(context.prevResult)) {
-        // init calculation
-        if (!(h - l))
-          result = 0;
-        else
-          result = clv * v;
-      } else {
-        // process calculation
-        if (h - l)
-          result = context.prevResult + clv * v;
-      }
+    var denominator = high - low;
+    var result = context.prevResult;
+    // if the formula can be calculated with the valid result
+    if (denominator) {
+      result += ((close - low) - (high - close)) / denominator * volume;
+      context.prevResult = result;
     }
   }
-  context.prevResult = result;
   return result;
 };
 

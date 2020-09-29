@@ -76,21 +76,6 @@ anychart.ganttModule.elements.MilestonesElement.prototype.getPointSettingsResolu
 };
 
 
-/** @inheritDoc */
-anychart.ganttModule.elements.MilestonesElement.prototype.getHeight = function(dataItem, opt_periodIndex) {
-  var pointSettings = this.getPointSettings(dataItem, opt_periodIndex);
-
-  if (pointSettings) {
-    var height = pointSettings['height'];
-
-    if (goog.isDefAndNotNull(height))
-      return height;
-  }
-
-  return anychart.ganttModule.elements.MilestonesElement.base(this, 'getHeight', dataItem, opt_periodIndex);
-};
-
-
 //endregion
 //region -- Preview element.
 /**

@@ -624,6 +624,32 @@ anychart.enums.normalizePolarLayout = function(value, opt_default) {
 };
 
 
+/**
+ * Available polar point spread types.
+ *
+ * @enum {string}
+ */
+anychart.enums.PolarValuesSpreadType = {
+  NONE: 'none',
+  VALUE_EQUAL: 'valueEqual',
+  VALUE_50: 'value50'
+};
+
+
+/**
+ * Polar spread values type normalizer.
+ *
+ * @param {*} value - Value need to be normalized.
+ * @param {anychart.enums.PolarValuesSpreadType=} opt_default - Default value.
+ *
+ * @return {anychart.enums.PolarValuesSpreadType} Normalized value.
+ */
+anychart.enums.normalizePolarValueSpreadType = function(value, opt_default) {
+  return /** @type {anychart.enums.PolarValuesSpreadType}*/(anychart.enums.normalize(anychart.enums.PolarValuesSpreadType, value,
+      opt_default || anychart.enums.PolarValuesSpreadType.NONE));
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Orientation.
@@ -1959,6 +1985,7 @@ anychart.enums.StockIndicatorTypes = {
   SMA: 'sma',
   STOCHASTIC: 'stochastic',
   TRIX: 'trix',
+  VWAP: 'vwap',
   VOLUME_MA: 'volume-ma',
   WILLIAMS_R: 'williams-r'
 };
@@ -2672,7 +2699,9 @@ anychart.enums.WarningCode = {
   GRAPH_DATA_HAS_NO_FIELD: 906,
   GRAPH_NO_ID: 907,
 
-  OFFLINE_EXPORT_FAILED: 1000
+  OFFLINE_EXPORT_FAILED: 1000,
+  OFFLINE_AND_SERVER_EXPORT_DISABLED: 1001,
+  OFFLINE_EXPORT_FAILED_SERVER_DISABLED: 1002
 };
 
 
@@ -4874,6 +4903,7 @@ anychart.enums.AnnotationTypes = {
   ELLIPSE: 'ellipse',
   TRIANGLE: 'triangle',
   TREND_CHANNEL: 'trend-channel',
+  FINITE_TREND_CHANNEL: 'finite-trend-channel',
   ANDREWS_PITCHFORK: 'andrews-pitchfork',
   FIBONACCI_FAN: 'fibonacci-fan',
   FIBONACCI_ARC: 'fibonacci-arc',
@@ -5145,7 +5175,8 @@ anychart.enums.Store = {
   DATA_AREA: 'dataarea',
   SANKEY: 'sankey',
   TIMELINE_CHART: 'timelinechart',
-  GRAPH: 'graph'
+  GRAPH: 'graph',
+  WATERFALL: 'waterfall'
 };
 
 
@@ -5163,6 +5194,7 @@ anychart.enums.State = {
   LABELS_ENABLED: 'labelsEnabled',
   LABELS_BOUNDS: 'labelsBounds',
   NODES: 'nodes',
+  SELECTION: 'selection',
   EDGES: 'edges',
   LAYOUT: 'layout',
   TRANSFORM: 'transform',

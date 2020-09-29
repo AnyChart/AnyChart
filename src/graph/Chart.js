@@ -58,6 +58,15 @@ anychart.graphModule.Chart = function(opt_data) {
   this.nodesArray_ = null;
 
   /**
+   * Nodes that must be marked as selected.
+   * Contains nodes ids.
+   *
+   * @type {Array.<string>}
+   * @private
+   */
+  this.nodesForSelect_ = [];
+
+  /**
    * Array with all edges.
    * @type {?Array.<anychart.graphModule.Chart.Edge>}
    * @private
@@ -184,14 +193,15 @@ goog.inherits(anychart.graphModule.Chart, anychart.core.Chart);
 anychart.consistency.supportStates(anychart.graphModule.Chart, anychart.enums.Store.GRAPH, [
   anychart.enums.State.APPEARANCE,
   anychart.enums.State.DATA,
+  anychart.enums.State.EDGES,
   anychart.enums.State.LABELS_BOUNDS,
   anychart.enums.State.LABELS_ENABLED,
   anychart.enums.State.LABELS_STYLE,
   anychart.enums.State.LAYOUT,
-  anychart.enums.State.TRANSFORM,
-  anychart.enums.State.ROTATE,
   anychart.enums.State.NODES,
-  anychart.enums.State.EDGES
+  anychart.enums.State.ROTATE,
+  anychart.enums.State.SELECTION,
+  anychart.enums.State.TRANSFORM
 ]);
 
 
@@ -363,6 +373,20 @@ anychart.graphModule.Chart.prototype.deselectAllElements_ = function() {
     this.updateElementStateById(element.id, anychart.graphModule.Chart.Element.EDGE, anychart.SettingsState.NORMAL);
     delete this.selectedEdges_[i];
   }
+};
+
+
+/**
+ * Mark nodes as selected.
+ *
+ * @private
+ */
+anychart.graphModule.Chart.prototype.markNodesAsSelected_ = function() {
+  goog.array.forEach(this.nodesForSelect_, function(id) {
+    this.updateElementStateById(id, anychart.graphModule.Chart.Element.NODE, anychart.SettingsState.SELECTED);
+  }, this);
+
+  this.nodesForSelect_.length = 0;
 };
 
 
@@ -976,6 +1000,58 @@ anychart.graphModule.Chart.prototype.selectByRect = function(event) {
 };
 
 
+/**
+ * Select all nodes with id from passed array.
+ * If no values passed select all nodes.
+ *
+ * @param {(string|Array.<string>)=} opt_ids - Array with nodes ids.
+ */
+anychart.graphModule.Chart.prototype.select = function(opt_ids) {
+  if (!goog.isDef(opt_ids)) {
+    opt_ids = goog.object.getKeys(this.nodesMap_);
+  } else if (!goog.isArray(opt_ids)) {
+    opt_ids = [opt_ids];
+  }
+
+  goog.array.forEach(opt_ids, function(id) {
+    if (id in this.nodesMap_) {
+      this.nodesForSelect_.push(id);
+    }
+  }, this);
+
+  goog.array.forEach(goog.object.getKeys(this.selectedNodes_), function(id) {
+    if (!goog.array.contains(this.nodesForSelect_, id)) {
+      this.nodesForSelect_.push(id);
+    }
+  }, this);
+
+  this.invalidateState(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Deselect all nodes with ids from passed array.
+ * If no values passed deselect all nodes.
+ *
+ * @param {string|Array.<string>=} opt_ids - Array with nodes ids.
+ *
+ * @suppress {checkTypes}
+ */
+anychart.graphModule.Chart.prototype.unselect = function(opt_ids) {
+  if (!goog.isDef(opt_ids)) {
+    opt_ids = goog.object.getKeys(this.selectedNodes_);
+  } else if (!goog.isArray(opt_ids)) {
+    opt_ids = [opt_ids];
+  }
+
+  goog.array.forEach(goog.object.getKeys(this.selectedNodes_), function(id) {
+    if (!goog.array.contains(opt_ids, id)) {
+      this.nodesForSelect_.push(id);
+    }
+  }, this);
+
+  this.invalidateState(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION, anychart.Signal.NEEDS_REDRAW);
+};
 //endregion
 //region Data manipulation
 /**
@@ -1181,8 +1257,10 @@ anychart.graphModule.Chart.prototype.dropCurrentData_ = function() {
       this.edges_.clear(edge);
     }
   }
-  this.nodes().resetLabelSettings();
-  this.edges().resetLabelSettings();
+
+  this.nodes().dropDataDependent();
+  this.edges().dropDataDependent();
+
   this.nodesMap_ = {};
   this.edgesMap_ = {};
   this.nodesArray_ = null;
@@ -1894,6 +1972,14 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
     this.nodes_.updateAppearance();
     this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE);
   }
+
+  if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION)) {
+    this.deselectAllElements_();
+    this.markNodesAsSelected_();
+
+    this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION);
+  }
+
   if (this.hasMultiStateInvalidation(anychart.enums.Store.GRAPH,
     [
       anychart.enums.State.LABELS_STYLE,
@@ -2295,7 +2381,8 @@ anychart.graphModule.Chart.prototype.disposeInternal = function() {
   proto['fitAll'] = proto.fitAll;
   proto['zoomIn'] = proto.zoomIn;
   proto['zoomOut'] = proto.zoomOut;
-
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
   proto['move'] = proto.move;
   proto['getType'] = proto.getType;
   proto['group'] = proto.group;

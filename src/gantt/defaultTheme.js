@@ -486,7 +486,6 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'rowStroke': '#cecece',
     'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
     'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
-    // 'editing': false,
     'edit': {
       'fill': {
         'color': '#4285F4',
@@ -522,6 +521,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'timeline': {
       'isStandalone': false,
+      'cropLabels': false,
       'labels': {
         'padding': [0, 4, 0, 4]
       }

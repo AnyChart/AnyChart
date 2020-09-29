@@ -852,11 +852,14 @@ anychart.ganttModule.Chart.prototype.rowMouseMove = function(event) {
     this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
     var tooltip;
-    var item = event['item'];
-    if (event['elementType'] == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
-      // https://anychart.atlassian.net/browse/DVF-4356
-      item = event['originalEvent']['domTarget'].tag.item;
-    }
+    /*
+      Item is saved in the tooltipItem field for milestone previews, including
+      cases when milestone preview label is hovered. This is to avoid mouse
+      click interactivity on previews, while having separate tooltip for them.
+      https://anychart.atlassian.net/browse/DVF-4356
+     */
+    var item = event['tooltipItem'] ? event['tooltipItem'] : event['item'];
+
     tooltip = /** @type {anychart.core.ui.Tooltip} */(target.getTooltipInternal(void 0, item, event['periodIndex']));
 
     if (anychart.utils.instanceOf(target, anychart.ganttModule.DataGrid)) {
@@ -894,7 +897,7 @@ anychart.ganttModule.Chart.prototype.rowMouseOver = function(event) {
 anychart.ganttModule.Chart.prototype.rowMouseOut = function(event) {
   this.highlight();
   this.dg_.getTooltipInternal().hide();
-  this.tl_.getTooltipInternal(void 0, event['item']).hide();
+  this.tl_.getTooltipInternal(void 0, event['item'], event['periodIndex']).hide();
 };
 
 
@@ -1005,6 +1008,21 @@ anychart.ganttModule.Chart.prototype.rowMouseUp = function(event) {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.ganttModule.Chart.prototype.patchContextMenuContext = function(context) {
+  var event = context['event'];
+  var target = context['target'];
+
+  if (anychart.utils.instanceOf(target, anychart.ganttModule.BaseGrid)) {
+    context['interactivityEvent'] = target.getInteractivityEvent(event);
+  }
+
+  return context;
+};
+
+
 //region -- Edit.
 /**
  * @inheritDoc
@@ -1051,22 +1069,6 @@ anychart.ganttModule.Chart.prototype.edit = function(opt_value) {
 
 
 //endregion
-/**
- * Enables/disables live edit mode.
- * @param {boolean=} opt_value - Value to be set.
- * @deprecated since 8.3.0 use chart.edit() instead. DVF-3623
- * @return {anychart.ganttModule.IInteractiveGrid|boolean} - Itself for method chaining or current value.
- */
-anychart.ganttModule.Chart.prototype.editing = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.editing()', 'chart.edit()'], true);
-  if (goog.isDef(opt_value)) {
-    this.edit()['enabled'](opt_value);
-    return this;
-  }
-  return /** @type {boolean} */ (this.edit().getOption('enabled'));
-};
-
-
 /** @inheritDoc */
 anychart.ganttModule.Chart.prototype.deleteKeyHandler = function(e) {
   this.dg_.deleteKeyHandler(e);
@@ -1323,7 +1325,6 @@ anychart.ganttModule.Chart.prototype.setupByJSON = function(config, opt_default)
 
   anychart.core.settings.deserialize(this, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS, config, opt_default);
   this.defaultRowHeight(config['defaultRowHeight']);
-  // this.editing(config['editing']);
   if ('edit' in config)
     this.edit().setupInternal(!!opt_default, config['edit']);
 
@@ -1377,7 +1378,6 @@ anychart.ganttModule.Chart.prototype.disposeInternal = function() {
   proto['expandTask'] = proto.expandTask;
   proto['collapseTask'] = proto.collapseTask;
   proto['getType'] = proto.getType;
-  proto['editing'] = proto.editing;
   proto['edit'] = proto.edit;
   proto['toCsv'] = proto.toCsv;
   proto['xScale'] = proto.xScale;

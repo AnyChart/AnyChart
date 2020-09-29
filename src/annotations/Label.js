@@ -41,7 +41,7 @@ goog.inherits(anychart.annotationsModule.Label, anychart.annotationsModule.Base)
 anychart.core.settings.populate(anychart.annotationsModule.Label, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Label, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Label, anychart.annotationsModule.LABEL_DESCRIPTORS);
-anychart.core.settings.populateAliases(anychart.annotationsModule.Label, ['fontFamily', 'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontColor', 'fontOpacity', 'fontDecoration'], 'normal');
+anychart.core.settings.populateAliases(anychart.annotationsModule.Label, ['fontFamily', 'fontStyle', 'fontVariant', 'fontWeight', 'fontSize', 'fontColor', 'fontOpacity', 'fontDecoration', 'textShadow'], 'normal');
 anychart.annotationsModule.AnnotationTypes[anychart.enums.AnnotationTypes.LABEL] = anychart.annotationsModule.Label;
 
 
@@ -380,6 +380,7 @@ anychart.annotationsModule.Label.prototype.applyTextSettings = function(state) {
   this.textElement_.fontWeight(/** @type {number|string} */ (this.resolveOption('fontWeight', state, null)));
   this.textElement_.fontSize(/** @type {number|string} */ (this.resolveOption('fontSize', state, null)));
   this.textElement_.decoration(/** @type {string} */ (this.resolveOption('fontDecoration', state, null)));
+  this.textElement_.textShadow(/** @type {string} */ (this.resolveOption('textShadow', state, null)));
 
   this.textElement_.direction(/** @type {string} */ (this.getOption('textDirection')));
   this.textElement_.wordBreak(/** @type {string} */ (this.getOption('wordBreak')));
@@ -387,7 +388,6 @@ anychart.annotationsModule.Label.prototype.applyTextSettings = function(state) {
   this.textElement_.letterSpacing(/** @type {number|string} */ (this.getOption('letterSpacing')));
   this.textElement_.lineHeight(/** @type {number|string} */ (this.getOption('lineHeight')));
   this.textElement_.textIndent(/** @type {number} */ (this.getOption('textIndent')));
-  this.textElement_.textShadow(/** @type {string} */ (this.getOption('textShadow')));
   this.textElement_.vAlign(/** @type {string} */ (this.getOption('vAlign')));
   this.textElement_.hAlign(/** @type {string} */ (this.getOption('hAlign')));
   this.textElement_.textOverflow(/** @type {string} */ (this.getOption('textOverflow')));
@@ -544,6 +544,7 @@ anychart.annotationsModule.Label.prototype.drawOnePointShape = function(x, y) {
 anychart.annotationsModule.Label.prototype.colorize = function(state) {
   anychart.annotationsModule.Label.base(this, 'colorize', state);
   this.textElement_.color(this.resolveOption('fontColor', state, null));
+  this.textElement_.textShadow(this.resolveOption('textShadow', state, null));
   this.textElement_.opacity(this.resolveOption('fontOpacity', state, null));
 };
 

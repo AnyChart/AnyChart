@@ -50,15 +50,21 @@ anychart.exportsModule.Exports = function() {
    * @private
    */
   this.pinterest_ = {};
+
   /**
    * Dependencies names.
    * @type {Object}
    * @private
    */
-  this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
+  this.externalDependencies_ = [
+    'svg2pdf.min.js',
+    'jspdf.min.js',
+    'canvg.min.js',
+    'xlsx.core.min.js' // Offline xlsx export.
+  ];
 
   /**
-   *
+   * This flag is set to true when all external dependencies are loaded.
    * @type {boolean}
    */
   this.isExternLoaded = false;
@@ -68,11 +74,7 @@ anychart.exportsModule.Exports = function() {
    * @type {anychart.exportsModule.Exports.ClientsideConfig}
    * @private
    */
-  this.clientsideConfig_ = {
-    'path': 'https://cdn.anychart.com/3rd/',
-    'enabled': true,
-    'fallback': true
-  };
+  this.clientsideConfig_ = {};
 };
 
 
@@ -106,9 +108,9 @@ anychart.exportsModule.Exports.prototype.isClientsideEnabled = function() {
 
 /**
  * @typedef {{
- *    path: string,
- *    enabled: boolean,
- *    fallback: boolean
+ *   fallback: (boolean|undefined),
+ *   path: (string|undefined),
+ *   enabled: (boolean|undefined)
  * }}
  */
 anychart.exportsModule.Exports.ClientsideConfig;
@@ -246,19 +248,24 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 /**
  * Loads dependencies needed for offline export to work.
+ * @param {anychart.core.VisualBase|acgraph.vector.Stage} target - Export target.
  * @return {goog.Promise}
  */
-anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
+anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(target) {
   var exports = goog.global['anychart']['exports'];
-  if (exports && exports.isExternLoaded)
-    this.isExternLoaded = true;
 
-  if (this.isExternLoaded) {
+  if (exports.isExternLoaded) {
     return goog.Promise.resolve();
   } else {
     var deps = this.externalDependencies_;
-    var depsUrl = this.getClientsidePath();
-    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+
+    /*
+      Clientside settings should be resolved to take target settings into account.
+      In case target is stage - just falls back to global clientside settings.
+     */
+    var depsUrl = exports.getFinalSettings(target, 'clientside')['path'];
+    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; // Append slash if not present, to assemble correct path.
+
     var proms = [];
     for (var i = 0; i < deps.length; i++) {
       var p = new goog.Promise(function(resolve, reject) {
@@ -280,7 +287,10 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
       });
       proms.push(p);
     }
-    return goog.Promise.all(proms);
+    return goog.Promise.all(proms)
+      .then(function () {
+        exports.isExternLoaded = true;
+      });
   }
 };
 
@@ -324,6 +334,12 @@ anychart.exportsModule.Exports.prototype.applyDefaults = function() {
     'description': undefined,
     'width': 1200,
     'height': 800
+  };
+
+  this.clientsideConfig_ = {
+    'path': 'https://cdn.anychart.com/3rd/',
+    'enabled': true,
+    'fallback': true
   };
 };
 

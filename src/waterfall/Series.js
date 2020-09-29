@@ -40,6 +40,34 @@ anychart.waterfallModule.Series.prototype.TOKEN_ALIASES = (function() {
 
 
 /** @inheritDoc */
+anychart.waterfallModule.Series.prototype.resolveAutoAnchor = function(position, rotation) {
+  if (position == 'auto') {
+    if (this.chart.getSeriesCount() > 1) {
+      return anychart.enums.Anchor.CENTER;
+    } else {
+      position = 'value';
+    }
+  }
+
+  return anychart.waterfallModule.Series.base(this, 'resolveAutoAnchor', position, rotation);
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Series.prototype.createPositionProvider = function(position, opt_shift3D) {
+  if (position == 'auto') {
+    if (this.chart.getSeriesCount() > 1) {
+      position = anychart.enums.Position.CENTER;
+    } else {
+      position = 'value';
+    }
+  }
+
+  return anychart.waterfallModule.Series.base(this, 'createPositionProvider', position, opt_shift3D);
+};
+
+
+/** @inheritDoc */
 anychart.waterfallModule.Series.prototype.getContextProviderValues = function(provider, rowInfo) {
   var values = anychart.waterfallModule.Series.base(this, 'getContextProviderValues', provider, rowInfo);
 

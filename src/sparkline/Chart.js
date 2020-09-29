@@ -711,6 +711,7 @@ anychart.sparklineModule.Chart.prototype.lineMarker = function(opt_indexOrValue,
     lineMarker = new anychart.core.axisMarkers.Line();
     this.setupCreated('lineMarker', lineMarker);
     this.lineAxesMarkers_[index] = lineMarker;
+    lineMarker.setParentEventTarget(this);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -744,6 +745,7 @@ anychart.sparklineModule.Chart.prototype.rangeMarker = function(opt_indexOrValue
   if (!rangeMarker) {
     rangeMarker = new anychart.core.axisMarkers.Range();
     this.rangeAxesMarkers_[index] = rangeMarker;
+    rangeMarker.setParentEventTarget(this);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -778,6 +780,7 @@ anychart.sparklineModule.Chart.prototype.textMarker = function(opt_indexOrValue,
     textMarker = new anychart.core.axisMarkers.Text();
     this.setupCreated('textMarker', textMarker);
     this.textAxesMarkers_[index] = textMarker;
+    textMarker.setParentEventTarget(this);
     textMarker.listenSignals(this.onMarkersSignal_, this);
     this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }

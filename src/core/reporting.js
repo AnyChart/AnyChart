@@ -312,6 +312,10 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'Nodes data must has "id" field';
     case anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED:
       return 'Offline export failed. Using server export fallback.';
+    case anychart.enums.WarningCode.OFFLINE_AND_SERVER_EXPORT_DISABLED:
+      return 'Both client side export and export server fallback are disabled. Nothing will be exported.';
+    case anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED_SERVER_DISABLED:
+      return 'Offline export failed. Fallback to server disabled.';
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

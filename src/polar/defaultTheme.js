@@ -42,6 +42,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'scale': 1
     },
     'startAngle': 0,
+    'spreadValues': 'none',
     'innerRadius': 0,
     'sortPointsByX': false,
     'xGrids': [{}],

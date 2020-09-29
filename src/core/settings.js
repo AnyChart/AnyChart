@@ -179,6 +179,7 @@ anychart.core.settings.createTextPropertiesDescriptorsTemplate = function() {
   return [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'minFontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxFontSize', anychart.core.settings.numberOrStringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxLength', anychart.core.settings.numberOrNullNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'adjustFontSize', anychart.core.settings.adjustFontSizeNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontSize', anychart.core.settings.numberOrStringNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontFamily', anychart.core.settings.stringNormalizer],
@@ -220,6 +221,7 @@ anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, inval
   anychart.core.settings.createDescriptorsMeta(map, [
     ['minFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['maxFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
+    ['maxLength', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['adjustFontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['fontSize', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
     ['fontFamily', invalidateBoundsState, boundsChangedSignal, void 0, opt_boundsStateBeforeInvalidationHook],
@@ -933,6 +935,7 @@ anychart.core.settings.descriptors = (function() {
   map.FONT_SIZE = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontSize', anychart.core.settings.numberOrPercentOrNullOrFunctionNormalizer];
   // other text settings
   map.FONT_COLOR = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontColor', anychart.core.settings.stringOrNullNormalizer];
+  map.TEXT_SHADOW = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'textShadow', acgraph.vector.normalizeTextShadow];
   map.FONT_OPACITY = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontOpacity', anychart.core.settings.numberNormalizer];
   map.FONT_DECORATION = [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'fontDecoration', anychart.enums.normalizeFontDecoration];
   // pert tasks
