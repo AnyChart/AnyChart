@@ -1,9 +1,9 @@
 /*!
  * AnyChart is lightweight robust charting library with great API and Docs, that works with your stack and has tons of chart types and features.
- * Version: 2019-12-17
+ * Version: 2020-09-29
  * License: https://www.anychart.com/buy/
  * Contact: sales@anychart.com
- * Copyright: AnyChart.com 2019. All rights reserved.
+ * Copyright: AnyChart.com 2020. All rights reserved.
  */
 .anychart-ui-support {
  border-style: hidden;
@@ -186,7 +186,7 @@
  padding: 0;
  font-family: Arial, sans-serif;
  color: #000000;
- background: #dddddd url("//ssl.gstatic.com/editor/button-bg.png") repeat-x top left;
+ background: #dddddd url("https://cdn.anychart.com/ACDVF/button-bg.png") repeat-x top left;
  text-decoration: none;
  list-style: none;
  vertical-align: middle;
@@ -748,7 +748,7 @@
  top: -1px;
 }
 .anychart-menu-button {
- background: #dddddd url("//ssl.gstatic.com/editor/button-bg.png") repeat-x top left;
+ background: #dddddd url("https://cdn.anychart.com/ACDVF/button-bg.png") repeat-x top left;
  border: 0;
  color: #000000;
  cursor: pointer;
@@ -843,7 +843,7 @@
 .anychart-menu-button-dropdown {
  height: 15px;
  width: 7px;
- background: url("//ssl.gstatic.com/editor/editortoolbar.png") no-repeat -388px 0;
+ background: url("https://cdn.anychart.com/ACDVF/editortoolbar.png") no-repeat -388px 0;
  vertical-align: top;
 }
 .anychart-menu-button-collapse-right,
@@ -1302,6 +1302,19 @@
  right: 0;
  top: 9px;
  padding: 0 2px;
+}
+.anychart-menuitem-content {
+ margin-right: 1rem;
+}
+.anychart-option[role='menuitemradio'] {
+ padding-left: 1.5rem;
+}
+.anychart-option-selected .anychart-menuitem-checkbox:before {
+ content: '\2713';
+ display: block;
+ width: 100%;
+ height: 100%;
+ text-align: center;
 }
 .anychart-range-picker {
  font-family: Arial, sans-serif;
