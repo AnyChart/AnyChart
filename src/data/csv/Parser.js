@@ -546,8 +546,11 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           if (++i < this.contentLen_) // check if the next symbol presents and in the same time move a current symbol's pointer on the next symbol
             nextChar = this.content_.charAt(i);
           else { // else: stop the processing (simulate we've ended a string with a quote as well as data is ended too)
-            len = i - this.currPos_ - 1;
-            this.processItem_(currFieldIndex, len > 0 ? this.content_.substr(this.currPos_, len) : null);
+
+            // DVF-4512, don't forget previously parsed parts
+            str += this.content_.substr(this.currPos_, i - this.currPos_ - 1);
+
+            this.processItem_(currFieldIndex, str.length ? str : null);
             this.currPos_ = i;
             this.finished_ = true;
             return true;//result;
