@@ -375,8 +375,8 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForStackedLabel = func
  */
 anychart.waterfallModule.Chart.prototype.resolvePositionForStackLabel = function(position, index) {
   if (position == 'auto') {
-    var stackSum = this.getStackSum(index);
-    return stackSum >= 0 ? anychart.enums.Position.CENTER_TOP : anychart.enums.Position.CENTER_BOTTOM;
+    var stackDiff = this.getStackDiff(index);
+    return stackDiff >= 0 ? anychart.enums.Position.CENTER_TOP : anychart.enums.Position.CENTER_BOTTOM;
   }
 
   return position;
@@ -395,9 +395,9 @@ anychart.waterfallModule.Chart.prototype.resolvePositionForStackLabel = function
 anychart.waterfallModule.Chart.prototype.resolveAnchorForStackLabel = function(anchor, position, index) {
   if (anchor == anychart.enums.Anchor.AUTO) {
     if (position == 'auto') {
-      var stackSum = this.getStackSum(index);
+      var stackDiff = this.getStackDiff(index);
 
-      anchor = stackSum >= 0 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP;
+      anchor = stackDiff >= 0 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP;
     } else if (position == anychart.enums.Position.CENTER) {
       anchor = anychart.enums.Anchor.CENTER;
     } else {
@@ -717,19 +717,21 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
 
 
 /**
- * Returns sum of stack values.
+ * Returns sum of diff values for specific stack.
  *
  * @param {number} index - Stack index.
  *
  * @return {number}
  */
-anychart.waterfallModule.Chart.prototype.getStackSum = function(index) {
+anychart.waterfallModule.Chart.prototype.getStackDiff = function(index) {
   return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
     if (currentSeries.enabled()) {
       var iterator = currentSeries.getIterator();
       iterator.select(index);
 
-      var value = iterator.get('value') || 0;
+      if (iterator.meta('missing')) return sum;
+
+      var value = iterator.meta('diff');
 
       return sum + value;
     }
@@ -752,7 +754,9 @@ anychart.waterfallModule.Chart.prototype.getStackAbsolutesSum = function(index) 
       var iterator = currentSeries.getIterator();
       iterator.select(index);
 
-      var absolute = iterator.meta('absolute') || 0;
+      if (iterator.meta('missing')) return sum;
+
+      var absolute = iterator.meta('absolute');
 
       return sum + absolute;
     }
@@ -791,8 +795,10 @@ anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
 
       iterator.select(index);
 
-      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
-      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
+      if (iterator.meta('missing')) return top;
+
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
 
       return Math.max(top, stackedValue, stackedZero);
     }
@@ -815,8 +821,10 @@ anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
 
       iterator.select(index);
 
-      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue')) || 0;
-      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero')) || 0;
+      if (iterator.meta('missing')) return bottom;
+
+      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
+      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
 
       return Math.min(stackedValue, stackedZero, bottom);
     }
