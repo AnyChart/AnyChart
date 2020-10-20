@@ -154,6 +154,30 @@ anychart.waterfallModule.Chart.prototype.drawContent = function(contentBounds) {
 };
 
 
+/**
+ * Returns connector x coordinate.
+ * @param {number} pointMiddleX - Point middle x value.
+ * @param {number} pointHalfWidth - Half point width, positive for left point and negative
+ *  for right point.
+ * @return {number} - Connector x coordinate.
+ */
+anychart.waterfallModule.Chart.prototype.getConnectorXCoordinate = function(pointMiddleX, pointHalfWidth) {
+  var isVertical = this.isVertical();
+  var isXScaleInverted = this.xScale().inverted();
+
+  /*
+    Direction is normal when first point middleX value is less than
+    the second point middleX. It happens when chart is vertical and has
+    inverted xScale or is horizontal and has non-inverted xScale.
+    If direction is not normal, half width must be inverted to get
+    correct connector coordinate.
+   */
+  var isDirectionNormal = !(isVertical ^ isXScaleInverted);
+
+  return pointMiddleX + (isDirectionNormal ? pointHalfWidth : -pointHalfWidth);
+};
+
+
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
   anychart.waterfallModule.Chart.base(this, 'afterSeriesDraw');
@@ -189,7 +213,7 @@ anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
       pointWidth = drawingPlan.series.pointWidthCache;
     }
     leftY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[0]), thickness);
-    leftX = meta['valueX'] + pointWidth / 2;
+    leftX = this.getConnectorXCoordinate(meta['valueX'], pointWidth / 2);
   }
 
   for (var i = firstIndex + 1; i <= lastIndex; i++) {
@@ -205,7 +229,7 @@ anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
         pointWidth = drawingPlan.series.pointWidthCache;
       }
       rightY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[i - firstIndex - 1]), thickness);
-      rightX = meta['valueX'] - pointWidth / 2;
+      rightX = this.getConnectorXCoordinate(meta['valueX'], -(pointWidth / 2));
     }
     if (!isNaN(leftX) && !isNaN(leftY)) {
       if (!isNaN(rightX) && !isNaN(rightY)) {
@@ -227,7 +251,7 @@ anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
         pointWidth = drawingPlan.series.pointWidthCache;
       }
       leftY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[i - firstIndex]), thickness);
-      leftX = meta['valueX'] + pointWidth / 2;
+      leftX = this.getConnectorXCoordinate(meta['valueX'], pointWidth / 2);
     }
   }
 };
