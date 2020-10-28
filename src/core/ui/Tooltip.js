@@ -816,7 +816,7 @@ anychart.core.ui.Tooltip.prototype.limitPosition_ = function(tooltip, x, y, stag
         global stage has bounds of screen.
        */
       pixelBounds = tooltip.getPixelBounds();
-      var windowBox = goog.dom.getViewportSize();
+      var windowBox = goog.dom.getViewportSize(anychart.window);
 
       if (pixelBounds.left - offsetX + addOffsetX < 0) {
         x -= pixelBounds.left - offsetX + addOffsetX;

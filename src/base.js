@@ -3,6 +3,8 @@
  */
 
 goog.provide('anychart.base');
+
+goog.require('acgraph');
 // temporary, for modules compatibility
 goog.require('goog.labs.userAgent.device');
 
@@ -52,11 +54,17 @@ anychart.DEFAULT_THEME = 'defaultTheme';
 anychart.PERFORMANCE_MONITORING = true;
 
 
-/**
- * Global object
- * @type {Window}
- */
-anychart.window = goog.global;
+if (goog.global['IS_ANYCHART_AMD']) {
+  anychart.module = goog.global;
+  anychart.window = window;
+} else {
+  anychart.window = goog.global;
+  anychart.window['anychart'] = anychart.window['anychart'] || {};
+  anychart.module = anychart.window['anychart'];
+}
+
+acgraph.module['anychart'] = anychart.module;  // for stage#useAnychartExporting.
+
 
 
 /**

@@ -962,7 +962,7 @@ anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
 anychart.core.Chart.prototype.contextMenu = function(opt_value) {
   if (!this.contextMenu_) {
     // suppress NO_FEATURE_IN_MODULE warning
-    this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
+    this.contextMenu_ = anychart.module['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
     if (this.contextMenu_) {
       this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
     }
@@ -1007,7 +1007,7 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
   var isPointContext = isSeries || (parentEventTarget && parentEventTarget['seriesType']);
 
   var items = {};
-  if (anychart.window['anychart']['exports']) {
+  if (anychart.module['exports']) {
     goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap['exporting'])));
   }
   if (goog.dom.fullscreen.isSupported() && context['menuParent'])
@@ -3137,7 +3137,7 @@ anychart.core.Chart.prototype.irDrawingMouseDownHandler_ = function(e) {
 
     if (!this.irDragger_)
       this.irDragger_ = new anychart.core.Chart.IRDragger(this.interactivityRect);
-    this.irDragger_.setScrollTarget(window);
+    this.irDragger_.setScrollTarget(anychart.window);
 
     rect = rect.clone();
     rect.left -= this.irStartX_;
@@ -3824,7 +3824,7 @@ anychart.core.Chart.prototype.toA11yTable = function(opt_title, opt_asString) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var xml = /** @type {string} */(this.toXml(false));
     exports.saveAsXml(this, xml, opt_filename);
@@ -3839,7 +3839,7 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var json = /** @type {string} */(this.toJson(true));
     exports.saveAsJson(this, json, opt_filename);
@@ -3856,7 +3856,7 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_csvSettings, opt_filename) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
     exports.saveAsCsv(this, csv, opt_filename);
@@ -3873,7 +3873,7 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
  * @param {{headers:Function}=} opt_exportOptions - Additional export options.
  */
 anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename, opt_exportOptions) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var csvOptions = {
       'rowsSeparator': '\n',

@@ -64,6 +64,8 @@ CHECKS_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources','checks.flags')
 COMMON_FLAGS = os.path.join(PROJECT_PATH, 'bin', 'sources','common.flags')
 BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_wrapper_start.txt')
 BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_wrapper_end.txt')
+AMD_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources','amd_wrapper_start.txt')
+AMD_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources','amd_wrapper_end.txt')
 GIT_CONTRIBUTORS_URL = 'https://api.github.com/repos/anychart/anychart/contributors?anon=1%s'
 GIT_COMPARE_URL_TEMPLATE = 'https://api.github.com/repos/AnyChart/AnyChart/compare/master...%s%s'
 
@@ -682,7 +684,7 @@ def __make_manifest(module_name, files, theme_name='none', gen_manifest=False, a
 
 @stopwatch()
 def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_edition=False, perf_mon=False,
-                 gen_manifest=False, debug_files=False, output=OUT_PATH):
+                 gen_manifest=False, debug_files=False, output=OUT_PATH, is_amd=False):
     modules_parts_output = os.path.join(output, 'parts')
     __create_dir_if_not_exists(modules_parts_output)
     print '\nBuilding manifests for target "%s" (%s parts) to %s' % (build_name, len(modules), modules_parts_output)
@@ -742,10 +744,12 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
 
 @stopwatch()
 def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug_files=False, gzip=False, stat=False,
-                  output=OUT_PATH):
+                  output=OUT_PATH, is_amd=False):
     print ''
     modules_parts_output = os.path.join(output, 'parts')
-    file_name = os.path.join(output, '%s.min.js' % bundle_name)
+    postfix = '.amd' if is_amd else ''
+    output = os.path.join(output, 'amd') if is_amd else output
+    file_name = os.path.join(output, '%s%s.min.js' % (bundle_name, postfix))
 
     if not stat:
         print 'Assembling module "%s"' \
@@ -758,7 +762,7 @@ def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug
                                                   str(dev_edition).lower(),
                                                   str(perf_mon).lower())
 
-    wrapper = __get_bundle_wrapper(bundle_name, modules, file_name, perf_mon, debug_files, stat)
+    wrapper = __get_bundle_wrapper(bundle_name, modules, file_name, perf_mon, debug_files, stat, is_amd)
     with open(file_name, 'w') as output:
         output.write(wrapper[0])
         for module_name in modules:
@@ -772,7 +776,7 @@ def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug
 
 
 def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitoring=False, debug_files=False,
-                         stat=False):
+                         stat=False, is_amd=False):
     if stat:
         return '', ''
     perf_start = ''
@@ -788,11 +792,13 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
                    "delete window.%s_init_start;" % (camel_case_bundle_name, camel_case_bundle_name, camel_case_bundle_name)
     source_mapping = ('//# sourceMappingURL=%s.map' % file_name) if debug_files else ''
 
-    f = open(BINARIES_WRAPPER_START, 'r')
+    wrapper_start = AMD_WRAPPER_START if is_amd else BINARIES_WRAPPER_START
+    f = open(wrapper_start, 'r')
     start = f.read()
     f.close()
 
-    f = open(BINARIES_WRAPPER_END, 'r')
+    wrapper_end = AMD_WRAPPER_END if is_amd else BINARIES_WRAPPER_END
+    f = open(wrapper_end, 'r')
     end = f.read()
     f.close()
 
@@ -943,14 +949,20 @@ def __compile_project(*args, **kwargs):
 
     __create_dir_if_not_exists(output)
 
+    module = 'Default'
+    if kwargs['is_amd']:
+        __create_dir_if_not_exists(os.path.join(output, 'amd'))
+        module = 'AMD'
+
+
     builds = kwargs['build'] or ['bundle']
-    print '\n%s AnyChart\nVersion: %s' % ('Checking' if checks else 'Building', __get_build_version())
+    print '\n%s AnyChart\nVersion: %s\nModule: %s' % ('Checking' if checks else 'Building', __get_build_version(), module)
     compile_errors = ''
     for build_name, build in __get_builds().iteritems():
         if build_name in builds:
             compile_errors += __make_build(build_name, build, checks, kwargs['theme'], kwargs['develop'],
                                            kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'],
-                                           output=output)
+                                           output=output, is_amd=kwargs['is_amd'])
 
     if not checks:
         print '\nBuilding bundles\n'
@@ -960,17 +972,18 @@ def __compile_project(*args, **kwargs):
         for bundle_name, bundle in bundles.iteritems():
             if all(map(lambda module_name: __get_build_name(module_configs[module_name]) in builds, bundle['parts'])):
                 __make_bundle(bundle_name, bundle['parts'], kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'], output=output)
+                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'])
                 built_bundles[bundle_name] = bundle['parts']
             else:
                 print 'Skipping bundle "%s"' % bundle_name
         for build_name, build in __get_builds().iteritems():
             if build_name in builds:
                 __make_bundle('anychart-' + build_name, build, kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'], output=output)
+                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'])
                 built_bundles['anychart-' + build_name] = build
 
         modules_json = {'parts': {}, 'modules': {}}
+
         for part, part_config in module_configs.iteritems():
             modules_json['parts'][part] = {'deps': part_config.get('deps', [])}
         for bundle, parts in built_bundles.iteritems():
@@ -981,8 +994,13 @@ def __compile_project(*args, **kwargs):
                 if 'icon' in bundles[bundle]: modules_json['modules'][bundle]['icon'] = bundles[bundle]['icon']
                 if 'docs' in bundles[bundle]: modules_json['modules'][bundle]['docs'] = bundles[bundle]['docs']
                 if 'desc' in bundles[bundle]: modules_json['modules'][bundle]['desc'] = bundles[bundle]['desc']
-                modules_json['modules'][bundle]['size'] = __get_gzip_file_size(
-                    os.path.join(output, bundle + '.min.js'))
+
+                if kwargs['is_amd']:
+                    bundle_path = os.path.join(output, 'amd', bundle + '.amd.min.js')
+                else:
+                    bundle_path = os.path.join(output, bundle + '.min.js')
+
+                modules_json['modules'][bundle]['size'] = __get_gzip_file_size(bundle_path)
             elif bundle == 'anychart-bundle':
                 modules_json['modules'][bundle]['name'] = 'AnyChart Bundle'
                 modules_json['modules'][bundle]['type'] = 'bundle'
@@ -1261,7 +1279,8 @@ def __exec_main_script():
                                 theme='defaultTheme',
                                 check_only=False,
                                 manifest=False,
-                                build=None)
+                                build=None,
+                                is_amd=False)
     # compile_parser.add_argument('-s', '--sources',
     #                             action='store_true',
     #                             help='build project sources file (not minimized).')
@@ -1295,6 +1314,9 @@ def __exec_main_script():
                                 dest='output',
                                 action='store',
                                 help='Output directory')
+    compile_parser.add_argument('-amd', '--is_amd',
+                                action='store_true',
+                                help='Whether to compile as AMD-module')
 
     # compile_parser.add_argument('-m', '--module',
     #                             metavar='',

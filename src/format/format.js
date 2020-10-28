@@ -429,7 +429,7 @@ anychart.format.dateTimeSymbolsCache_ = {};
 anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
     locale = String(locale);
-    locale = anychart.format.mergedLocales[locale] || anychart.window['anychart']['format']['locales'][locale];
+    locale = anychart.format.mergedLocales[locale] || anychart.module['format']['locales'][locale];
   }
   return locale || null;
 };
@@ -530,7 +530,7 @@ anychart.format.merge = function(value, opt_name) {
   var loc = anychart.format.getLocale(value);
   if (loc) {
     var isObject = (goog.typeOf(value) == 'object');
-    var locales = anychart.window['anychart']['format']['locales'];
+    var locales = anychart.module['format']['locales'];
     var name = /** @type {string} */ (isObject ? opt_name : value);
 
     /*

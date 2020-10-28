@@ -61,7 +61,9 @@ anychart.exports.getFinalSettings = function(target, name) {
  @param {string=} opt_address Export server script URL.
  @return {string} Export server script URL.
  */
-anychart.exports.server = anychart.window['acgraph']['server'];
+anychart.exports.server = goog.global['IS_ANYCHART_AMD'] ?
+    anychart.module['acgraph']['server'] : // Takes acgraph from amd module.
+    anychart.window['acgraph']['server'];
 
 
 /**

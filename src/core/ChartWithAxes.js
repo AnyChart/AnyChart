@@ -97,7 +97,7 @@ anychart.core.ChartWithAxes = function(joinData) {
    * @type {{ChartController:Function, PlotController:Function}|undefined}
    * @private
    */
-  this.annotationsModule_ = anychart.window['anychart']['annotations'];
+  this.annotationsModule_ = anychart.module['annotations'];
 };
 goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithOrthogonalScales);
 

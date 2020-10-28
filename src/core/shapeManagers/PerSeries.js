@@ -82,7 +82,7 @@ anychart.core.shapeManagers.PerSeries.prototype.colorize_ = function(descriptor,
         - anychart.themes.defaultTheme.chart.defaultSeriesSettings.base.hovered.fill
         - ...
        */
-        var defaultColorer = anychart.window['anychart']['themes'][anychart.DEFAULT_THEME]['chart']['defaultSeriesSettings']['base'][stateName][colorerName];
+        var defaultColorer = anychart.module['themes'][anychart.DEFAULT_THEME]['chart']['defaultSeriesSettings']['base'][stateName][colorerName];
 
         if (seriesColorer == defaultColorer && !colorScale) {
           var ctx = {'sourceColor': this.series.getOption('color')};

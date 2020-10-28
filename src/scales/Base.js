@@ -430,13 +430,13 @@ anychart.scales.Base.createOfType = function(type, defaultType) {
     anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL] = anychart.scales.ordinal;
     anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.LINEAR_COLOR] = function() {
       var cls;
-      return (cls = anychart.window['anychart']['scales']['linearColor']) ?
+      return (cls = anychart.module['scales']['linearColor']) ?
           cls() :
           anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
     };
     anychart.scales.Base.constructorsMap_[anychart.scales.Base.ScaleTypes.ORDINAL_COLOR] = function() {
       var cls;
-      return (cls = anychart.window['anychart']['scales']['ordinalColor']) ?
+      return (cls = anychart.module['scales']['ordinalColor']) ?
           cls() :
           anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Color scales']);
     };

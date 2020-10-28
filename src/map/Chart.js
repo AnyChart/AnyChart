@@ -3355,7 +3355,8 @@ anychart.mapModule.Chart.prototype.calculate = function() {
 
     if (goog.isDefAndNotNull(geoData)) {
       geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
-          anychart.window['anychart']['maps'][this.geoData_] : this.geoData_;
+          anychart.module['maps'][this.geoData_] : // TODO (A.Kudryavtsev): Fix for modules.
+          this.geoData_;
 
       if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
         this.parser = anychart.mapModule.utils.GeoSVGParser.getInstance();
@@ -3879,7 +3880,7 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
             this != this.getCurrentScene() ? true : this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START));
 
         if (allowZoom) {
-          if (anychart.window['anychart']['ui']['ContextMenu']) {
+          if (anychart.module['ui']['ContextMenu']) { //TODO (A.Kudryavtsev): Check for modules.
             var contextMenu = this.contextMenu();
             if (contextMenu.isVisible()) contextMenu.hide();
           }
