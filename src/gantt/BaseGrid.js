@@ -1433,9 +1433,9 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
       if (rowType) {
         newEvent['rowType'] = rowType;
       }
+      return newEvent;
     }
 
-    return newEvent;
   }
   return null;
 };

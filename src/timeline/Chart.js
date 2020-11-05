@@ -442,23 +442,11 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
   var axisHeight = this.getAxisHeight();
 
   if (this.getSeriesCount() == 0) {
-    this.scale().reset();
-    this.axis().invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.AXIS_TICKS | anychart.ConsistencyState.AXIS_LABELS);
-
-    this.dateMax = +Infinity;
-    this.dateMin = -Infinity;
+    this.resetScaleAndRanges();
 
     this.momentSeriesList.length = 0;
     this.rangeSeriesList.length = 0;
 
-    this.totalRange = {
-      sX: 0,
-      eX: this.dataBounds.width,
-      sY: -this.dataBounds.height / 2,
-      eY: this.dataBounds.height / 2
-    };
-
-    this.verticalOffsets(0, 0);
     return;
   }
 
@@ -466,6 +454,12 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
     var minMax = this.prepareSeries();
     dateMin = minMax.min;
     dateMax = minMax.max;
+
+    // There are series, but they have no data.
+    if (dateMax === -Infinity && dateMin === Infinity) {
+      this.resetScaleAndRanges();
+      return;
+    }
 
     this.removeDisposedMarkers();
 
@@ -594,6 +588,28 @@ anychart.timelineModule.Chart.prototype.calculateAndArrangeSeriesPoints = functi
       this.verticalOffsets(minOffset, maxOffset);
     }
   }
+};
+
+
+/**
+ * Resets scale, total range and vertical offset.
+ */
+anychart.timelineModule.Chart.prototype.resetScaleAndRanges = function() {
+  this.scale().reset();
+
+  this.dateMax = +Infinity;
+  this.dateMin = -Infinity;
+
+  this.totalRange = {
+    sX: 0,
+    eX: this.dataBounds.width,
+    sY: -this.dataBounds.height / 2,
+    eY: this.dataBounds.height / 2
+  };
+
+  this.axis().invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.AXIS_TICKS | anychart.ConsistencyState.AXIS_LABELS);
+
+  this.verticalOffsets(0, 0);
 };
 
 

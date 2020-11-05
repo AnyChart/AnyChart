@@ -43,7 +43,6 @@ define((function() {
       return Object.prototype.hasOwnProperty.call(e, t)
     }, n.p = "", n(n.s = 0)
   }([function(e, t, n) {
-    "use strict";
     n.r(t);
 
     n.d(t, "anychart", (function() {
@@ -56,6 +55,7 @@ define((function() {
     var _;
     var $_ = this;
     $_.IS_ANYCHART_AMD = true;
+    $_.navigator = window.navigator;
 
     if ($_ && (_ = $_._)) {
         $ = $_.$

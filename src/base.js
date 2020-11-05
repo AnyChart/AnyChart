@@ -5,6 +5,8 @@
 goog.provide('anychart.base');
 
 goog.require('acgraph');
+
+goog.require('goog.Timer');
 // temporary, for modules compatibility
 goog.require('goog.labs.userAgent.device');
 
@@ -65,6 +67,14 @@ if (goog.global['IS_ANYCHART_AMD']) {
 
 acgraph.module['anychart'] = anychart.module;  // for stage#useAnychartExporting.
 
+
+
+/**
+ * This line defines correct defaultTimerObject for goog.Timer used in ACDVF.
+ *
+ * @type {Window|*}
+ */
+goog.Timer.defaultTimerObject = anychart.window || goog.global;
 
 
 /**
