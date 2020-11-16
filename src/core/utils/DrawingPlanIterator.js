@@ -103,6 +103,18 @@ anychart.core.utils.DrawingPlanIterator.prototype.meta = function(name, opt_valu
 };
 
 
+/**
+ * Direct current point internal getter.
+ * Current point object contains 'data' and 'meta' fields.
+ *
+ * @return {{data: Object, meta: Object}} point - Current point.
+ */
+anychart.core.utils.DrawingPlanIterator.prototype.getCurrentPoint = function() {
+  return this.currentPoint_;
+};
+
+
+
 //exports
 (function() {
   var proto = anychart.core.utils.DrawingPlanIterator.prototype;

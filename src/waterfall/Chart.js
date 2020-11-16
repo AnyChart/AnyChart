@@ -354,11 +354,18 @@ anychart.core.settings.populate(anychart.waterfallModule.Chart, anychart.waterfa
 anychart.waterfallModule.Chart.prototype.getFormatProviderForStackedLabel = function(index) {
   var provider = new anychart.format.Context();
 
-  var value = this.getStackAbsolutesSum(index);
+  var total = this.getStackAbsolutesSum(index);
+  var stackDiff = this.getStackDiff(index, true);
 
   var values = {
     'index': {value: index, type: anychart.enums.TokenType.NUMBER},
-    'value': {value: value, type: anychart.enums.TokenType.NUMBER}
+
+    // Left for legacy.
+    'value': {value: total, type: anychart.enums.TokenType.NUMBER},
+
+    // DVF-4527.
+    'total': {value: total, type: anychart.enums.TokenType.NUMBER},
+    'stack': {value: stackDiff, type: anychart.enums.TokenType.NUMBER}
   };
 
   return provider.propagate(values);
@@ -512,7 +519,7 @@ anychart.waterfallModule.Chart.prototype.stackLabelsInvalidated = function() {
  *
  * @param {Object=} opt_value - Labels config.
  *
- * @returns {anychart.waterfallModule.Chart|anychart.core.ui.LabelsFactory} - Chart or labels factory instance.
+ * @return {anychart.waterfallModule.Chart|anychart.core.ui.LabelsFactory} - Chart or labels factory instance.
  */
 anychart.waterfallModule.Chart.prototype.stackLabels = function(opt_value) {
   if (!this.stackLabels_) {
@@ -720,10 +727,12 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
  * Returns sum of diff values for specific stack.
  *
  * @param {number} index - Stack index.
+ * @param {boolean=} opt_treatDiffAsAbsForTotal - Whether to take 'absolute' value instead of 'diff' if
+ *  point is 'total' point.
  *
  * @return {number}
  */
-anychart.waterfallModule.Chart.prototype.getStackDiff = function(index) {
+anychart.waterfallModule.Chart.prototype.getStackDiff = function(index, opt_treatDiffAsAbsForTotal) {
   return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
     if (currentSeries.enabled()) {
       var iterator = currentSeries.getIterator();
@@ -731,13 +740,15 @@ anychart.waterfallModule.Chart.prototype.getStackDiff = function(index) {
 
       if (iterator.meta('missing')) return sum;
 
-      var value = iterator.meta('diff');
+      var value = opt_treatDiffAsAbsForTotal ?
+          this.getPointStackingValue(iterator.getCurrentPoint()) :
+          iterator.meta('diff');
 
       return sum + value;
     }
 
     return sum;
-  }, 0);
+  }, 0, this);
 };
 
 
