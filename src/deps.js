@@ -673,7 +673,8 @@ goog.addDependency('../../../../src/venn/Intersections.js', ['anychart.vennModul
 goog.addDependency('../../../../src/venn/defaultTheme.js', ['anychart.vennModule.defaultTheme'], [], {});
 goog.addDependency('../../../../src/venn/math.js', ['anychart.vennModule.math'], ['goog.array'], {});
 goog.addDependency('../../../../src/venn/venn.module.js', ['anychart.vennModule.entry'], ['anychart.vennModule.Chart'], {});
-goog.addDependency('../../../../src/waterfall/Chart.js', ['anychart.waterfallModule.Chart'], ['anychart.core.CartesianBase', 'anychart.core.settings', 'anychart.core.shapeManagers', 'anychart.core.ui.LabelsFactory', 'anychart.enums', 'anychart.format.Context', 'anychart.waterfallModule.Series'], {});
+goog.addDependency('../../../../src/waterfall/Chart.js', ['anychart.waterfallModule.Chart'], ['anychart.core.CartesianBase', 'anychart.core.settings', 'anychart.core.shapeManagers', 'anychart.core.ui.LabelsFactory', 'anychart.enums', 'anychart.format.Context', 'anychart.waterfallModule.Connectors', 'anychart.waterfallModule.Series'], {});
+goog.addDependency('../../../../src/waterfall/Connectors.js', ['anychart.waterfallModule.Connectors'], ['anychart.core.Base', 'anychart.core.settings.IObjectWithSettings', 'anychart.core.ui.LabelsFactory'], {});
 goog.addDependency('../../../../src/waterfall/Drawer.js', ['anychart.waterfallModule.Drawer'], ['anychart.core.drawers', 'anychart.core.drawers.Column', 'anychart.enums'], {});
 goog.addDependency('../../../../src/waterfall/Series.js', ['anychart.waterfallModule.Series'], ['anychart.core.series.Cartesian', 'anychart.core.settings', 'anychart.enums'], {});
 goog.addDependency('../../../../src/waterfall/defaultTheme.js', ['anychart.waterfallModule.defaultTheme'], ['anychart.core.defaultTheme'], {});

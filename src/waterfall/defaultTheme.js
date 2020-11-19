@@ -79,6 +79,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'enabled': false,
       'format': '{%total}',
       'position': 'auto'
+    },
+    'connectors': {
+      'stroke': '#697474',
+      'labels': {
+        'format': '{%stack}',
+        'position': 'auto',
+        'anchor': 'auto'
+      }
     }
   }
 });

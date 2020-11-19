@@ -8,16 +8,16 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'defaultRangeMarkerSettings': {
       'zIndex': 30.1,
-      'scaleRangeMode': anychart.enums.ScaleRangeMode.CONSIDER
+      'scaleRangeMode': 'consider'
     },
     'defaultLineMarkerSettings': {
       'zIndex': 30.2,
-      'scaleRangeMode': anychart.enums.ScaleRangeMode.CONSIDER
+      'scaleRangeMode': 'consider'
     },
     'defaultTextMarkerSettings': {
       'zIndex': 30.3,
-      'scaleRangeMode': anychart.enums.ScaleRangeMode.CONSIDER,
-      'align': anychart.enums.Align.TOP
+      'scaleRangeMode': 'consider',
+      'align': 'top'
     },
     'legend': {
       'enabled': false
@@ -44,11 +44,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     },
     'defaultSeriesSettings': {
       'base': {
-        'direction': anychart.enums.Direction.AUTO,
+        'direction': 'auto',
         'clip': false
       },
       'moment': {
-        'direction': anychart.enums.Direction.ODD_EVEN,
+        'direction': 'odd-even',
         'connector': {'length': '4%'},
         'normal': {
           /**
@@ -67,7 +67,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
             'fontColor': anychart.core.defaultTheme.fontColorDark,
             'padding': 5,
             'enabled': true,
-            'anchor': anychart.enums.Anchor.LEFT_CENTER,
+            'anchor': 'left-center',
             'width': 120,
             'background': {
               'enabled': true,
@@ -91,13 +91,13 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       },
       'range': {
-        'direction': anychart.enums.Direction.UP,
+        'direction': 'up',
         'zIndex': 34,
         'height': 25,
         'normal': {
           'labels': {
             'enabled': true,
-            'anchor': anychart.enums.Anchor.LEFT_CENTER,
+            'anchor': 'left-center',
             'format': '{%x}',
             'fontColor': '#000'
           },

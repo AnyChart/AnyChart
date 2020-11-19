@@ -9,8 +9,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'fontColor': '#7c868e',
       'disablePointerEvents': true,
       'selectable': false,
-      'anchor': anychart.enums.Anchor.CENTER_TOP,
-      'position': anychart.enums.Position.CENTER_BOTTOM,
+      'anchor': 'center-top',
+      'position': 'center-bottom',
       'padding' : {
         'top' : 0,
         'left' : 0,
