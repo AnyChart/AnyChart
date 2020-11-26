@@ -3785,6 +3785,16 @@ anychart.core.series.Base.prototype.getPostLastPoint = function() {
 };
 
 
+/**
+ * Returns point value.
+ * @param {anychart.data.IRowInfo} point - Point.
+ * @return {*}
+ */
+anychart.core.series.Base.prototype.getPointValue = function(point) {
+  return point.get('value');
+};
+
+
 //endregion
 //region --- Data to Pixels transformation
 /**
@@ -3906,8 +3916,10 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
 
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
-    var rawVal = rowInfo.get('value');
-    var val = Number(rowInfo.get('value'));
+
+    var rawVal = this.getPointValue(rowInfo);
+    var val = Number(rawVal);
+
     //Condition below also fixes XML restoration.
     var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);
@@ -3975,8 +3987,10 @@ anychart.core.series.Base.prototype.makeMinPointLengthUnstackedMeta = function(r
   if (!rowInfo.meta('missing')) {
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
-    var rawVal = rowInfo.get('value');
-    var val = Number(rowInfo.get('value'));
+
+    var rawVal = this.getPointValue(rowInfo);
+    var val = Number(rawVal);
+
     //Condition below also fixes XML restoration.
     var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);

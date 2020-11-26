@@ -135,4 +135,10 @@ anychart.waterfallModule.Series.prototype.checkDirectionIsPositive = function(po
 };
 
 
+/** @inheritDoc */
+anychart.waterfallModule.Series.prototype.getPointValue = function(rowInfo) {
+  return rowInfo.meta('isTotal') ? rowInfo.get('value') : rowInfo.meta('diff');
+};
+
+
 //endregion
