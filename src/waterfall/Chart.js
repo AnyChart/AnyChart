@@ -6,6 +6,7 @@ goog.require('anychart.core.shapeManagers');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.enums');
 goog.require('anychart.format.Context');
+goog.require('anychart.waterfallModule.ArrowsController');
 goog.require('anychart.waterfallModule.Connectors');
 goog.require('anychart.waterfallModule.Series');
 
@@ -82,7 +83,8 @@ anychart.waterfallModule.Chart.ZINDEX_CONNECTORS_LABELS = anychart.core.ChartWit
  */
 anychart.waterfallModule.Chart.SUPPORTED_STATES = {
   STACK_LABELS: 'stackLabels',
-  CONNECTORS_LABELS: 'connectorsLabels'
+  CONNECTORS_LABELS: 'connectorsLabels',
+  ARROWS: 'arrows'
 };
 
 
@@ -91,7 +93,8 @@ anychart.consistency.supportStates(
     anychart.enums.Store.WATERFALL,
     [
      anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
-     anychart.waterfallModule.Chart.SUPPORTED_STATES.CONNECTORS_LABELS
+     anychart.waterfallModule.Chart.SUPPORTED_STATES.CONNECTORS_LABELS,
+     anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
     ]
 );
 
@@ -193,6 +196,8 @@ anychart.waterfallModule.Chart.prototype.drawContent = function(contentBounds) {
   anychart.waterfallModule.Chart.base(this, 'drawContent', contentBounds);
 
   this.drawLabels();
+
+  this.drawArrows();
 };
 
 
@@ -616,6 +621,40 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForConnectorLabel = fu
 
 
 /**
+ * Returns format provider for connector.
+ *
+ * @param {number} toIndex - Index of the point connector goes to.
+ * @param {number} fromIndex - Index of the point connector goes out of.
+ *
+ * @return {anychart.core.BaseContext}
+ */
+anychart.waterfallModule.Chart.prototype.getFormatProviderForArrow = function(toIndex, fromIndex) {
+  var provider = this.getContext_();
+
+  provider.statisticsSources([this]);
+
+  var from = this.getStackSum(fromIndex, 'absolute');
+  var to = this.getStackSum(toIndex, 'absolute');
+
+  var diff = to - from;
+
+  var values = {
+    'value': {value: diff, type: anychart.enums.TokenType.NUMBER},
+    'absolute': {
+      value: diff,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'percent': {
+      value: from == 0 ? '-' : diff / Math.abs(from),
+      type: from == 0 ? anychart.enums.TokenType.STRING : anychart.enums.TokenType.PERCENT
+    }
+  };
+
+  return provider.propagate(values);
+};
+
+
+/**
  * Draws connectors labels.
  */
 anychart.waterfallModule.Chart.prototype.updateConnectorsLabels = function() {
@@ -805,7 +844,14 @@ anychart.waterfallModule.Chart.prototype.drawLabels = function() {
  * Stack labels invalidation function.
  */
 anychart.waterfallModule.Chart.prototype.stackLabelsInvalidated = function() {
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidateMultiState(
+      anychart.enums.Store.WATERFALL,
+      [
+        anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+        anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
+      ],
+      anychart.Signal.NEEDS_REDRAW
+  );
 };
 
 
@@ -1019,6 +1065,16 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
 
 
 /**
+ * Returns number of stacks, including excluded/invisible once.
+ *
+ * @return {number} - Number of stacks on waterfall chart.
+ */
+anychart.waterfallModule.Chart.prototype.getStacksCount = function() {
+  return this.drawingPlans.length ? this.drawingPlans[0].data.length : 0;
+};
+
+
+/**
  * Returns sum of stack values with given meta field name.
  *
  * @param {number} index - Stack index.
@@ -1119,7 +1175,13 @@ anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
 //region --- Series
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS);
+  this.invalidateMultiState(
+      anychart.enums.Store.WATERFALL,
+      [
+        anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+        anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
+      ]
+  );
 
   anychart.waterfallModule.Chart.base(this, 'seriesInvalidated', event);
 };
@@ -1219,6 +1281,123 @@ anychart.waterfallModule.Chart.prototype.getConnectorBounds = function(index) {
 
 
 //endregion
+//region --- Arrows
+/**
+ * Draws waterfall arrows.
+ */
+anychart.waterfallModule.Chart.prototype.drawArrows = function() {
+  var arrowsController = this.arrowsController();
+
+  if (!this.arrowsLayer_) {
+    this.arrowsLayer_ = this.rootElement.layer();
+    this.arrowsLayer_.zIndex(anychart.waterfallModule.ArrowsController.ARROWS_ZINDEX);
+    arrowsController.container(this.arrowsLayer_);
+  }
+
+  var arrowsInvalidated = this.hasStateInvalidation(
+      anychart.enums.Store.WATERFALL,
+      anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
+      );
+
+  var boundsInvalidated = this.hasInvalidationState(anychart.ConsistencyState.BOUNDS);
+
+  if (boundsInvalidated) {
+    arrowsController.invalidate(anychart.ConsistencyState.BOUNDS);
+  }
+
+  if (arrowsInvalidated || boundsInvalidated) {
+    arrowsController.draw();
+    this.markStateConsistent(
+        anychart.enums.Store.WATERFALL,
+        anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
+    );
+  }
+};
+
+
+/**
+ * Returns arrows controller.
+ *
+ * @return {anychart.waterfallModule.ArrowsController}
+ */
+anychart.waterfallModule.Chart.prototype.arrowsController = function() {
+  if (!goog.isDef(this.arrowsController_)) {
+    this.arrowsController_ = new anychart.waterfallModule.ArrowsController(this);
+    this.arrowsController_.listenSignals(this.arrowsInvalidationHandler_, this);
+  }
+  return this.arrowsController_;
+};
+
+
+/**
+ * Handles arrows invalidation signals.
+ *
+ * @private
+ */
+anychart.waterfallModule.Chart.prototype.arrowsInvalidationHandler_ = function() {
+  this.invalidateState(
+      anychart.enums.Store.WATERFALL,
+      anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS,
+      anychart.Signal.NEEDS_REDRAW
+  );
+};
+
+
+/**
+ * Creates new arrow with given settings.
+ *
+ * @param {Object=} opt_settings - Arrow settings.
+ * @return {anychart.waterfallModule.Arrow}
+ */
+anychart.waterfallModule.Chart.prototype.addArrow = function(opt_settings) {
+  return this.arrowsController().addArrow(opt_settings);
+};
+
+
+/**
+ * Returns arrow with given index.
+ *
+ * @param {number} index - Arrow index.
+ * @return {anychart.waterfallModule.Arrow}
+ */
+anychart.waterfallModule.Chart.prototype.getArrow = function(index) {
+  return this.arrowsController().getArrow(index);
+};
+
+
+/**
+ * Removes arrow with given index.
+ *
+ * @param {number} index - Arrow index to remove.
+ * @return {boolean} - Whether arrow removed or not.
+ */
+anychart.waterfallModule.Chart.prototype.removeArrowAt = function(index) {
+  return this.arrowsController().removeArrowAt(index);
+};
+
+
+/**
+ * Removes arrow instance.
+ *
+ * @param {anychart.waterfallModule.Arrow} arrow - Arrow instance.
+ * @return {boolean} - Whether arrow removed or not.
+ */
+anychart.waterfallModule.Chart.prototype.removeArrow = function(arrow) {
+  return this.arrowsController().removeArrow(arrow);
+};
+
+
+/**
+ * Returns array with all instances of arrows.
+ *
+ * @return {Array.<anychart.waterfallModule.Arrow>} - Array of arrow instances.
+ */
+anychart.waterfallModule.Chart.prototype.getAllArrows = function() {
+  return this.arrowsController().getAllArrows();
+};
+
+
+//endregion
 //region --- setup/dispose
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.serialize = function() {
@@ -1226,6 +1405,7 @@ anychart.waterfallModule.Chart.prototype.serialize = function() {
   anychart.core.settings.serialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, json['chart']);
   json['chart']['stackLabels'] = this.stackLabels().serialize();
   json['chart']['connectors'] = this.connectors().serialize();
+  json['chart']['arrows'] = this.arrowsController().serialize();
 
   return json;
 };
@@ -1238,6 +1418,10 @@ anychart.waterfallModule.Chart.prototype.setupByJSON = function(config, opt_defa
   var stackLabelsConfig = config['stackLabels'];
   if (stackLabelsConfig) {
     this.stackLabels().setupInternal(!!opt_default, stackLabelsConfig);
+  }
+
+  if (config['arrows']) {
+    this.arrowsController().setupInternal(!!opt_default, config['arrows']);
   }
 
   var connectorsConfig = config['connectors'];
@@ -1261,7 +1445,8 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
       this.stackLabelsLayer_,
       this.connectorPath_,
       this.connectorsLabelsLayer_,
-      this.connectors_
+      this.connectors_,
+      this.arrowsController_
   );
   anychart.waterfallModule.Chart.base(this, 'disposeInternal');
 };
@@ -1315,6 +1500,11 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
   proto['getYScales'] = proto.getYScales;
   proto['data'] = proto.data;
   proto['connectors'] = proto.connectors;
+  proto['addArrow'] = proto.addArrow;
+  proto['getArrow'] = proto.getArrow;
+  proto['removeArrowAt'] = proto.removeArrowAt;
+  proto['removeArrow'] = proto.removeArrow;
+  proto['getAllArrows'] = proto.getAllArrows;
   // deprecated
   proto['connectorStroke'] = proto.connectorStroke;
 })();

@@ -87,6 +87,16 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'position': 'auto',
         'anchor': 'auto'
       }
+    },
+    'arrow': {
+      'connector': {
+        'stroke': '#697474'
+      },
+      'label': {
+        'fontSize': '12px',
+        'position': 'center',
+        'anchor': 'center-top'
+      }
     }
   }
 });
