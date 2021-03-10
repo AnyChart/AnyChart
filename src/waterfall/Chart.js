@@ -1187,6 +1187,13 @@ anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
 };
 
 
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.invalidateSeriesOfScaleInternal = function() {
+  anychart.waterfallModule.Chart.base(this, 'invalidateSeriesOfScaleInternal');
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS);
+};
+
+
 //endregion
 //region --- Connectors
 /**

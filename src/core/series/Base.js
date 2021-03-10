@@ -4050,7 +4050,7 @@ anychart.core.series.Base.prototype.makeMinPointLengthRangedMeta = function(rowI
 anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
   var yScale = /** @type {anychart.scales.Base} */(this.yScale());
   var map = {
-    'value': yScale.transform(rowInfo.meta('stackedValue'), 0.5),
+    'value': goog.math.clamp(yScale.transform(rowInfo.meta('stackedValue'), 0.5), 0, 1),
     'zero': goog.math.clamp(yScale.transform(rowInfo.meta('stackedZero'), 0.5), 0, 1),
     'prevValue': yScale.transform(rowInfo.meta('stackedValuePrev'), 0.5),
     'prevZero': yScale.transform(rowInfo.meta('stackedZeroPrev'), 0.5),
