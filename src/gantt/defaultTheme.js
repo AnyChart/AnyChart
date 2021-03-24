@@ -375,6 +375,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'depth': null,
+        'drawOnCollapsedOnly': false,
         'position': 'left-top',
         'markerType': 'diamond'
       },

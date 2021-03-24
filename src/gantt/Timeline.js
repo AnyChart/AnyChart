@@ -3225,8 +3225,8 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
  * info to the interactivity event.
  * Alters interactivityEvent in the process.
  *
- * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent 
- * @param {Object} interactivityEvent 
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent
+ * @param {Object} interactivityEvent
  */
 anychart.ganttModule.TimeLine.prototype.patchInteractivityEvent = function(originalEvent, interactivityEvent) {
   // Find period tag by the label.
@@ -3871,7 +3871,20 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
   if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask || info.isLoadable)) {
-    if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
+    var preview = this.milestones().preview();
+    var isCollapsed = dataItem.meta(anychart.enums.GanttDataFields.COLLAPSED);
+    var drawOnCollapsedOnly = preview.getOption('drawOnCollapsedOnly');
+
+    /*
+      drawOnCollapsedOnly isCollapsed shouldDraw
+      0 0 1
+      0 1 1
+      1 0 0
+      1 1 1
+    */
+
+    var shouldDrawPreview = !drawOnCollapsedOnly || isCollapsed;
+    if (preview.getOption('enabled') && preview.getOption('depth') != 0 && shouldDrawPreview)
       this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
 
     var actualStart = info.start;
@@ -5319,14 +5332,14 @@ anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) 
   if (!goog.isArray(this.sortedTags_[tag.row])) {
     this.sortedTags_[tag.row] = [];
   }
-  
+
   var isResourcePeriodOrMilestone =
     (tag.type === anychart.enums.TLElementTypes.PERIODS) ||
     (tag.type === anychart.enums.TLElementTypes.MILESTONES);
-  
+
   var isProjectMilestonePreview =
     (tag.type === anychart.enums.TLElementTypes.MILESTONES_PREVIEW);
-  
+
   var isResource = this.controller.isResources();
 
   var suits1 = (isResource && isResourcePeriodOrMilestone);
