@@ -479,15 +479,12 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
       // the value that we should subtract and plus should be less then exp number
       // we take minimum data range exponential notation
       var exponentialNotation = min.toExponential(); // example "1e-6"
-      // we split it by '-' to get the exponential number
-      var splitArr = exponentialNotation.split('-');
-      if (splitArr.length == 1) {
-        splitArr = exponentialNotation.split('+');
-      }
-      // convert it to number
-      var currentExp = +splitArr[splitArr.length - 1];
+
+      var power = exponentialNotation.split('e')[1];
+      var absPower = Math.abs(power);
+      
       // we increment it by 1, to make smaller, and calculate delta
-      d = +('1e-' + Math.max(currentExp + 1, 5));
+      d = +('1e-' + Math.max(absPower + 1, 5));
     }
     if (cannotChangeMax) {
       min -= d * 2;
