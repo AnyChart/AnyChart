@@ -63,11 +63,15 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
    */
   this.maxFontSize = NaN;
 
-  var descriptorsOverride = [anychart.core.settings.descriptors.FILL_FUNCTION_SIMPLE];
+  var descriptorsOverride = [
+    anychart.core.settings.descriptors.FILL_FUNCTION_SIMPLE,
+    anychart.core.settings.descriptors.STROKE_FUNCTION_SIMPLE
+  ];
 
   var normalDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
     ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
+    ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW],
     ['fontFamily', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['fontStyle', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['fontVariant', anychart.ConsistencyState.TAG_CLOUD_TAGS | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
@@ -78,6 +82,7 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
   var hoveredSelectedDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(hoveredSelectedDescriptorsMeta, [
     ['fill', 0, 0],
+    ['stroke', 0, 0],
     ['fontFamily', 0, 0],
     ['fontStyle', 0, 0],
     ['fontVariant', 0, 0],
@@ -125,7 +130,7 @@ anychart.tagCloudModule.Chart = function(opt_data, opt_settings) {
 };
 goog.inherits(anychart.tagCloudModule.Chart, anychart.core.SeparateChart);
 anychart.core.settings.populateAliases(anychart.tagCloudModule.Chart, [
-  'fill', 'fontFamily', 'fontStyle', 'fontVariant', 'fontWeight', 'fontSize'], 'normal');
+  'fill', 'stroke', 'fontFamily', 'fontStyle', 'fontVariant', 'fontWeight', 'fontSize'], 'normal');
 
 
 /**
@@ -158,6 +163,7 @@ anychart.tagCloudModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   rotate: number,
  *   sizeRatio: number,
  *   fill: acgraph.vector.Fill,
+ *   stroke: acgraph.vector.Stroke,
  *   size: number,
  *   sprite: Array,
  *   x: number,
@@ -449,6 +455,24 @@ anychart.tagCloudModule.Chart.prototype.applyFill = function(element, fill) {
 
 
 /**
+ * Applying stroke.
+ * @param {acgraph.vector.Element} element .
+ * @param {string|acgraph.vector.Stroke} stroke .
+ */
+anychart.tagCloudModule.Chart.prototype.applyStroke = function(element, stroke) {
+  if (goog.isString(stroke)) {
+    element.attr('stroke', stroke);
+    element.attr('stroke-opacity', 1);
+    element.attr('stroke-width', 1);
+  } else {
+    element.attr('stroke', stroke['color']);
+    element.attr('stroke-opacity', stroke['opacity'] || 1);
+    element.attr('stroke-width', stroke['thickness'] || 1);
+  }
+};
+
+
+/**
  * Returns user color scale otherwise auto color scale.
  * @return {anychart.colorScalesModule.Ordinal|anychart.colorScalesModule.Linear}
  */
@@ -528,6 +552,7 @@ anychart.tagCloudModule.Chart.prototype.applyAppearanceToPoint = function(pointS
   var state = anychart.core.utils.InteractivityState.clarifyState(pointState);
 
   var fill = acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(this.resolveProperty('fill', state)));
+  var stroke = acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(this.resolveProperty('stroke', state)));
   var fontFamily = this.resolveProperty('fontFamily', state);
   var fontStyle = this.resolveProperty('fontStyle', state);
   var fontVariant = this.resolveProperty('fontVariant', state);
@@ -539,6 +564,7 @@ anychart.tagCloudModule.Chart.prototype.applyAppearanceToPoint = function(pointS
   if (manualSuspend) stage.suspend();
 
   this.applyFill(item.textEl, fill);
+  this.applyStroke(item.textEl, stroke);
   item.textEl.attr('font-family', fontFamily);
   item.textEl.attr('font-style', fontStyle);
   item.textEl.attr('font-variant', fontVariant);
@@ -604,6 +630,9 @@ anychart.tagCloudModule.Chart.prototype.getItemProp = function(item, propName) {
     case 'fill':
       itemValue = item.fill;
       break;
+    case 'stroke':
+      itemValue = item.stroke;
+      break;
     case 'fontStyle':
       itemValue = item.style;
       break;
@@ -646,7 +675,7 @@ anychart.tagCloudModule.Chart.prototype.resolveProperty = function(propName, sta
   if (!goog.isDefAndNotNull(normalProp) || isPercent) {
     normalProp = this.getItemProp(item, propName);
   } else if (goog.isFunction(normalProp)) {
-    if (propName == 'fill') {
+    if (propName == 'fill' || propName == 'stroke') {
       ctx = this.getColorResolutionContext();
     } else {
       ctx = this.createFormatProvider();
@@ -660,7 +689,7 @@ anychart.tagCloudModule.Chart.prototype.resolveProperty = function(propName, sta
     if (statePropIsPercent)
       return (/** @type {number} */(normalProp)) * parseFloat(stateProp) / 100;
     else {
-      if (propName == 'fill') {
+      if (propName == 'fill' || propName == 'stroke') {
         ctx = this.getColorResolutionContext(/** @type {string} */(normalProp));
       } else {
         ctx = this.createFormatProvider();
@@ -1866,12 +1895,14 @@ anychart.tagCloudModule.Chart.prototype.calculate = function() {
       var fontVariant = this.resolveProperty('fontVariant', state);
       var fontWeight = this.resolveProperty('fontWeight', state);
       var fill = acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(this.resolveProperty('fill', state)));
+      var stroke = acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(this.resolveProperty('stroke', state)));
 
       t.font = /** @type {string} */(fontFamily);
       t.style = /** @type {string} */(fontStyle);
       t.variant = /** @type {string} */(fontVariant);
       t.weight = /** @type {number|string} */(fontWeight);
       t.fill = fill;
+      t.stroke = stroke;
 
       t.rotate = arrAngles[(i + zeroAngleIndex + anglesCount) % anglesCount];
 
@@ -1927,13 +1958,13 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
         this.archimedeanSpiral :
         this.rectangularSpiral();
 
-    var n = this.normalizedData.length,
-        topTag = this.normalizedData[0],
-        i = -1,
-        cloudBounds = null,
-        contextAndRatio = this.getContext(this.cloudCanvas()),
-        board = this.zeroArray((this.w >> 5) * this.h),
-        maxDelta = Math.sqrt(this.w * this.w + this.h * this.h);
+    var n = this.normalizedData.length;
+    var topTag = this.normalizedData[0];
+    var i = -1;
+    var cloudBounds = null;
+    var contextAndRatio = this.getContext(this.cloudCanvas());
+    var board = this.zeroArray((this.w >> 5) * this.h);
+    var maxDelta = Math.sqrt(this.w * this.w + this.h * this.h);
 
     this.calculateMaxFontSize(topTag);
 
@@ -1945,6 +1976,7 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
       var fontSize = this.resolveProperty('fontSize', state);
       var ratio = goog.math.clamp(scale.transform(d.value), 0, 1);
 
+      // double bitwise not operator used as alternative to Math.floor here
       var autoFontSize = ~~(this.minFontSize + ratio * (this.maxFontSize - this.minFontSize));
       d.size = /** @type {number} */(goog.isDefAndNotNull(fontSize) ? anychart.utils.isPercent(fontSize) ? autoFontSize * parseFloat(fontSize) / 100 : fontSize : autoFontSize);
     }, this);
@@ -1955,8 +1987,20 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
       d.y = this.h >> 1;
       this.cloudSprite(contextAndRatio, d, this.normalizedData, i);
       if (d.hasText && this.place(board, d, cloudBounds, maxDelta)) {
-        if (cloudBounds) this.cloudBounds(cloudBounds, d);
-        else cloudBounds = [{x: d.x + d.x0, y: d.y + d.y0}, {x: d.x + d.x1, y: d.y + d.y1}];
+        if (cloudBounds) {
+          this.cloudBounds(cloudBounds, d);
+        } else {
+          cloudBounds = [
+            {
+              x: d.x + d.x0,
+              y: d.y + d.y0
+            },
+            {
+              x: d.x + d.x1,
+              y: d.y + d.y1
+            }
+          ];
+        }
         d.x -= this.w >> 1;
         d.y -= this.h >> 1;
       }
@@ -2037,6 +2081,7 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
       this.getIterator().select(t.rowIndex);
 
       var fill = acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(this.resolveProperty('fill', state)));
+      var stroke = acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(this.resolveProperty('stroke', state)));
       var fontFamily = this.resolveProperty('fontFamily', state);
       var fontStyle = this.resolveProperty('fontStyle', state);
       var fontVariant = this.resolveProperty('fontVariant', state);
@@ -2044,6 +2089,7 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
       var fontSize = this.resolveProperty('fontSize', state);
 
       this.applyFill(t.textEl, fill);
+      this.applyStroke(t.textEl, stroke);
       t.textEl.attr('font-family', fontFamily);
       t.textEl.attr('font-style', fontStyle);
       t.textEl.attr('font-variant', fontVariant);
@@ -2080,8 +2126,10 @@ anychart.tagCloudModule.Chart.prototype.drawContent = function(bounds) {
     this.normalizedData.forEach(function(t) {
       var state = anychart.core.utils.InteractivityState.clarifyState(this.state.getPointStateByIndex(t.rowIndex));
       iterator.select(t.rowIndex);
-      if (t.drawed && t.textEl)
+      if (t.drawed && t.textEl) {
         this.applyFill(t.textEl, acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(this.resolveProperty('fill', state))));
+        this.applyStroke(t.textEl, acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(this.resolveProperty('stroke', state))));
+      }
     }, this);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
