@@ -150,7 +150,7 @@ anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = fu
 anychart.core.ChartWithAxes.prototype.isVertical = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = !!opt_value;
-    if (this.isVerticalInternal != opt_value) {
+    if (!!this.isVerticalInternal != opt_value) {
       this.isVerticalInternal = opt_value;
 
       for (var i = this.seriesList.length; i--;) {
