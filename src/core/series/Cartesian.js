@@ -369,6 +369,14 @@ anychart.core.series.Cartesian.prototype.drawLabelsFactory = function(factory) {
 };
 
 
+/** @inheritDoc */
+anychart.core.series.Cartesian.prototype.draw = function() {
+  anychart.core.series.Cartesian.base(this, 'draw');
+  this.hasDrawn(true);
+  return this;
+};
+
+
 //endregion
 //region --- Path manager interface methods
 /** @inheritDoc */
@@ -1321,8 +1329,29 @@ anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, t
 //  Interactivity
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Kinda indicator of first draw.
+ * Used to avoid error for interactivity state application via API before draw.
+ * See DVF-4509.
+ * TODO(anton.kagakin): Should be in interface IInteractiveSeries and implemented
+ * TODO(anton.kagakin): through all implementors of this interface.
+ *
+ * @param {boolean=} opt_value
+ * @returns {boolean|anychart.core.series.Cartesian}
+ */
+anychart.core.series.Cartesian.prototype.hasDrawn = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.seriesHasDrawn = !!opt_value;
+    return this;
+  }
+  return this.seriesHasDrawn || false;
+};
+
+
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(pointState, opt_value) {
+  if (!this.hasDrawn())
+    return;
   var iterator = this.getIterator();
   if (iterator.meta('missing') === anychart.core.series.PointAbsenceReason.OUT_OF_RANGE)
     return opt_value;
@@ -1355,6 +1384,8 @@ anychart.core.series.Cartesian.prototype.finalizePointAppearance = goog.nullFunc
  * @param {anychart.PointState|number} pointState .
  */
 anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(pointState) {
+  if (!this.hasDrawn())
+    return;
   var iterator = this.getIterator();
   var shapes = /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes'));
   this.shapeManager.updateColors(pointState, shapes);
