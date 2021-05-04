@@ -1190,6 +1190,11 @@ anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_co
     this.contentInternal()['text'](this.getFormattedContent_(opt_contextProvider));
   }
 
+  var isHtml = this.getOption('useHtml');
+  if (isHtml && !this.tooltipInUse_.htmlTooltip.container()) {
+    this.tooltipInUse_.invalidate(anychart.ConsistencyState.CONTAINER);
+  }
+
   this.setContainerToTooltip_(this);
   this.setPositionForSingle_(this, clientX, clientY);
   this.showForPosition_(clientX, clientY);
