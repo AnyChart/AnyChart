@@ -55,6 +55,11 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       }
     },
     'edges': {
+      'arrows': {
+        'enabled': false,
+        'size': 10,
+        'position': '100%'
+      },
       'stroke': anychart.core.defaultTheme.returnLightenSourceColor,
       'hovered': {
         'stroke': anychart.core.defaultTheme.returnDarkenSourceColor
