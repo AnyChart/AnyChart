@@ -37,6 +37,14 @@
         "core"
       ]
     },
+    "circle-packing-part": {
+      "entry": "anychart.circlePackingModule.entry",
+      "deps": [
+        "core",
+        "tree-data",
+        "color-scales"
+      ]
+    },
     "color-scales": {
       "entry": "anychart.colorScalesModule.entry",
       "deps": [
@@ -301,6 +309,13 @@
         "theme-core"
       ]
     },
+    "theme-circle-packing": {
+      "entry": "anychart.circlePackingModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
     "theme-color-scales": {
       "entry": "anychart.colorScalesModule.defaultTheme",
       "deps": [
@@ -526,6 +541,7 @@
         "theme-cartesian",
         "theme-cartesian-3d",
         "theme-circular-gauge",
+        "theme-circle-packing",
         "theme-gantt",
         "theme-heatmap",
         "theme-linear-gauge",
@@ -770,6 +786,20 @@
         "theme-color-scales",
         "cartesian",
         "theme-cartesian"
+      ]
+    },
+    "anychart-circle-packing": {
+      "type": "chart-type",
+      "name": "Circle Packing",
+      "desc": "Circle Packing charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Circle_Packing",
+      "icon": "/_design/img/upload/charts/types/circle-packing.svg",
+      "parts": [
+        "tree-data",
+        "color-scales",
+        "theme-color-scales",
+        "circle-packing-part",
+        "theme-circle-packing"
       ]
     },
     "anychart-scatter": {

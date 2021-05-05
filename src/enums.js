@@ -29,6 +29,7 @@ anychart.enums.ChartTypes = {
   CANDLESTICK: 'candlestick',
   CARTESIAN: 'cartesian',
   CARTESIAN_3D: 'cartesian-3d',
+  CIRCLE_PACKING: 'circle-packing',
   COLUMN: 'column',
   COLUMN_3D: 'column-3d',
   FINANCIAL: 'financial',

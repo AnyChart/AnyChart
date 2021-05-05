@@ -3,6 +3,7 @@ goog.require('anychart.annotationsModule.defaultTheme');
 goog.require('anychart.bulletModule.defaultTheme');
 goog.require('anychart.cartesian3dModule.defaultTheme');
 goog.require('anychart.cartesianModule.defaultTheme');
+goog.require('anychart.circlePackingModule.defaultTheme');
 goog.require('anychart.circularGaugeModule.defaultTheme');
 goog.require('anychart.colorScalesModule.defaultTheme');
 goog.require('anychart.core.defaultTheme');

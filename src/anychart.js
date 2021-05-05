@@ -917,6 +917,7 @@ goog.exportSymbol('anychart.ganttProject', anychart.getFeatureOrError('anychart.
 goog.exportSymbol('anychart.ganttResource', anychart.getFeatureOrError('anychart.ganttResource', 'Gantt Resource chart'));
 goog.exportSymbol('anychart.stock', anychart.getFeatureOrError('anychart.stock', 'Stock chart'));
 goog.exportSymbol('anychart.treeMap', anychart.getFeatureOrError('anychart.treeMap', 'TreeMap chart'));
+goog.exportSymbol('anychart.circlePacking', anychart.getFeatureOrError('anychart.circlePacking', 'CirclePacking chart'));
 goog.exportSymbol('anychart.pareto', anychart.getFeatureOrError('anychart.pareto', 'Pareto chart'));
 goog.exportSymbol('anychart.resource', anychart.getFeatureOrError('anychart.resource', 'Resource chart'));
 goog.exportSymbol('anychart.quadrant', anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart'));

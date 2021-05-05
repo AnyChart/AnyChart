@@ -3051,11 +3051,11 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
  * DOM-debug util method, gives 'data-ac-name' attribute to acgraph.vector.Element.
  *
  * @param {acgraph.vector.Element} element - Element to get DOM-debug name.
- * @param {string} name - 'data-ac-name' attribute value.
+ * @param {string} name - 'data-acName' attribute value.
  */
 anychart.utils.nameElement = function(element, name) {
   if (anychart.DEVELOP && element && name) {
-    element.attr('data-ac-name', name);
+    element.attr('data-acName', name);
   }
 };
 

@@ -1,6 +1,5 @@
 goog.provide('anychart.circularGaugeModule.defaultTheme');
 
-
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   // merge with chart
   'circularGauge': {
