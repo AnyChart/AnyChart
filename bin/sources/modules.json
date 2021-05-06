@@ -18,6 +18,13 @@
         "core"
       ]
     },
+    "calendar": {
+      "entry": "anychart.calendarModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
     "cartesian": {
       "entry": "anychart.cartesianModule.entry",
       "deps": [
@@ -288,6 +295,13 @@
         "theme-core"
       ]
     },
+    "theme-calendar": {
+      "entry": "anychart.calendarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
     "theme-cartesian": {
       "entry": "anychart.cartesianModule.defaultTheme",
       "deps": [
@@ -538,6 +552,7 @@
         "theme-core",
         "theme-annotations",
         "theme-bullet",
+        "theme-calendar",
         "theme-cartesian",
         "theme-cartesian-3d",
         "theme-circular-gauge",
@@ -647,6 +662,17 @@
       "parts": [
         "bullet",
         "theme-bullet"
+      ]
+    },
+    "anychart-calendar": {
+      "type": "chart-type",
+      "name": "Calendar",
+      "desc": "Calendar charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Calendar_Chart",
+      "icon": "/_design/img/upload/charts/types/calendar-chart.svg",
+      "parts": [
+        "calendar",
+        "theme-calendar"
       ]
     },
     "anychart-cartesian-3d": {

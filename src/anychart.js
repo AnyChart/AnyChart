@@ -876,6 +876,7 @@ goog.exportSymbol('anychart.vertical', anychart.getFeatureOrError('anychart.vert
 goog.exportSymbol('anychart.bar3d', anychart.getFeatureOrError('anychart.bar3d', '3D Bar chart'));
 goog.exportSymbol('anychart.bubble', anychart.getFeatureOrError('anychart.bubble', 'Bubble chart'));
 goog.exportSymbol('anychart.bullet', anychart.getFeatureOrError('anychart.bullet', 'Bullet chart'));
+goog.exportSymbol('anychart.calendar', anychart.getFeatureOrError('anychart.calendar', 'Calendar chart'));
 goog.exportSymbol('anychart.cartesian', anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart'));
 goog.exportSymbol('anychart.cartesian3d', anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart'));
 goog.exportSymbol('anychart.scatter', anychart.getFeatureOrError('anychart.scatter', 'Scatter chart'));

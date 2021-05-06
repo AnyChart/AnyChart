@@ -7,6 +7,7 @@ goog.require('acgraph.vector.vml');
 goog.require('anychart.annotationsModule.entry');
 goog.require('anychart.bindingModule.entry');
 goog.require('anychart.bulletModule.entry');
+goog.require('anychart.calendarModule.entry');
 goog.require('anychart.cartesian3dModule.entry');
 goog.require('anychart.cartesianModule.entry');
 goog.require('anychart.circlePackingModule.entry');

@@ -1,6 +1,7 @@
 goog.provide('anychart.themes.defaultTheme.entry');
 goog.require('anychart.annotationsModule.defaultTheme');
 goog.require('anychart.bulletModule.defaultTheme');
+goog.require('anychart.calendarModule.defaultTheme');
 goog.require('anychart.cartesian3dModule.defaultTheme');
 goog.require('anychart.cartesianModule.defaultTheme');
 goog.require('anychart.circlePackingModule.defaultTheme');

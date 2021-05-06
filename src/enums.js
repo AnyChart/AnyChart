@@ -26,6 +26,7 @@ anychart.enums.ChartTypes = {
   BOX: 'box',
   BUBBLE: 'bubble',
   BULLET: 'bullet',
+  CALENDAR: 'calendar',
   CANDLESTICK: 'candlestick',
   CARTESIAN: 'cartesian',
   CARTESIAN_3D: 'cartesian-3d',
@@ -5184,7 +5185,8 @@ anychart.enums.Store = {
   SANKEY: 'sankey',
   TIMELINE_CHART: 'timelinechart',
   GRAPH: 'graph',
-  WATERFALL: 'waterfall'
+  WATERFALL: 'waterfall',
+  CALENDAR_CHART: 'calendarchart'
 };
 
 
