@@ -667,6 +667,8 @@ anychart.waterfallModule.Chart.prototype.updateConnectorsLabels = function() {
 
     connectorsLabels.container(this.connectorsLabelsLayer_);
   }
+  // DVF-4566
+  this.connectorsLabelsLayer_.clip(this.dataBounds);
 
   var labelsAnchor = /** @type {anychart.enums.Anchor} */(connectorsLabels.getOption('anchor'));
   var labelsPosition = /** @type {anychart.enums.Position} */(connectorsLabels.getOption('position'));
@@ -758,6 +760,8 @@ anychart.waterfallModule.Chart.prototype.updateStackLabels = function() {
 
     this.stackLabels_.container(this.stackLabelsLayer_);
   }
+  // DVF-4566
+  this.stackLabelsLayer_.clip(this.dataBounds);
 
   var series = this.getSeriesAt(0);
 
@@ -1190,7 +1194,14 @@ anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.invalidateSeriesOfScaleInternal = function() {
   anychart.waterfallModule.Chart.base(this, 'invalidateSeriesOfScaleInternal');
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS);
+  // DVF-4566
+  this.invalidateMultiState(
+    anychart.enums.Store.WATERFALL,
+    [
+      anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+      anychart.waterfallModule.Chart.SUPPORTED_STATES.CONNECTORS_LABELS
+    ]
+  );
 };
 
 

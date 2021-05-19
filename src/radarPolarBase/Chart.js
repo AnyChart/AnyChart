@@ -533,13 +533,13 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     var xScale = /** @type {anychart.scales.Base} */(this.xScale());
     var yScale = /** @type {anychart.scales.Base} */(this.yScale());
 
-    if (!xAxis.scale() || (xAxis.scale() !== xScale)) {
-      xAxis.scale(xScale);
+    if (!xAxis.scale() || xAxis.scale().isChartScale) {
+      xAxis.scaleInternal(xScale, true);
     }
     xAxis.dropLabelCallsCache();
 
-    if (!yAxis.scale() || (yAxis.scale() !== yScale)) {
-      yAxis.scale(yScale);
+    if (!yAxis.scale() || yAxis.scale().isChartScale) {
+      yAxis.scaleInternal(yScale, true);
     }
     yAxis.dropLabelCallsCache();
 

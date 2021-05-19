@@ -233,7 +233,8 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
     this.palette_.listenSignals(this.paletteInvalidated_, this);
 
     if (doDispatch) {
-      this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+      // TODO Think of invalidating states like anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
   }
 };
@@ -247,7 +248,8 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
  */
  anychart.circlePackingModule.Chart.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+    // TODO Think of invalidating states like anychart.ConsistencyState.SERIES_CHART_PALETTE | anychart.ConsistencyState.CHART_LEGEND
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -546,10 +548,10 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
  */
  anychart.circlePackingModule.Chart.prototype.drawLabels_ = function(modelItem) {
   var labels = this.labels();
-  if (labels.enabled()) {
-    labels.suspendSignalsDispatching();
-    labels.clear();
+  labels.clear();
+  labels.suspendSignalsDispatching();
 
+  if (labels.enabled()) {
     if (modelItem) {
       var children = modelItem.children || [];      
       children = modelItem.isRoot ? children : goog.array.concat(modelItem, children);
@@ -565,10 +567,10 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
         label.draw();
       }
     }
-    
-    labels.resumeSignalsDispatching(true);
-    labels.draw();
   }
+
+  labels.resumeSignalsDispatching(true);
+  labels.draw();
 };
 
 

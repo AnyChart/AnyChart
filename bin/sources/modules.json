@@ -18,7 +18,7 @@
         "core"
       ]
     },
-    "calendar": {
+    "calendar-part": {
       "entry": "anychart.calendarModule.entry",
       "deps": [
         "core",
@@ -671,7 +671,9 @@
       "docs": "https://docs.anychart.com/Basic_Charts/Calendar_Chart",
       "icon": "/_design/img/upload/charts/types/calendar-chart.svg",
       "parts": [
-        "calendar",
+        "color-scales",
+        "theme-color-scales",
+        "calendar-part",
         "theme-calendar"
       ]
     },

@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.9.0
+// Type definitions for AnyChart JavaScript Charting Library, v8.10.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -16,10 +16,12 @@ declare namespace anychart {
     function bubble(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Scatter;
     function bubbleMap(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Map;
     function bullet(data?: anychart.data.View | anychart.data.Set | Array<any> | string): anychart.charts.Bullet;
+    function calendar(data?: anychart.data.View | anychart.data.Set | Array<any> | string): anychart.charts.Calendar;
     function candlestick(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function cartesian(): anychart.charts.Cartesian;
     function cartesian3d(): anychart.charts.Cartesian3d;
     function choropleth(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Map;
+    function circlePacking(data?: anychart.data.Tree | anychart.data.TreeView | Array<Object>, fillMethod?: string): anychart.charts.CirclePacking;
     function circularGauge(data?: anychart.data.View | anychart.data.Set | Array<any> | string, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.CircularGauge;
     function column(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian;
     function column3d(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): anychart.charts.Cartesian3d;
@@ -343,6 +345,8 @@ declare namespace anychart.charts {
         margin(): anychart.core.utils.Margin;
         margin(margin?: Array<number|string> | Object): anychart.charts.Surface;
         margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Surface;
+        markers(): anychart.core.surface.markers.Controller;
+        markers(config: anychart.core.surface.markers.Config): anychart.charts.Surface;
         maxHeight(): number | string;
         maxHeight(maxHeight?: number | string): anychart.charts.Surface;
         maxWidth(): number | string;
@@ -1157,6 +1161,280 @@ declare namespace anychart.charts {
         parentBounds(): anychart.math.Rect;
         parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Bullet;
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Bullet;
+    }
+    interface CirclePacking extends anychart.core.SeparateChart {
+        data(): anychart.data.Tree | anychart.data.TreeView;
+        data(data?: anychart.data.Tree | anychart.data.TreeView | Array<Object>, fillMethod?: string): anychart.charts.CirclePacking;
+        hovered(): anychart.core.StateSettings;
+        hovered(settings?: Object): anychart.charts.CirclePacking;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.charts.CirclePacking;
+        palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
+        palette(settings?: anychart.palettes.RangeColors | anychart.palettes.DistinctColors | Object | Array<string>): anychart.charts.CirclePacking;
+        selected(): anychart.core.StateSettings;
+        selected(settings?: Object): anychart.charts.CirclePacking;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(settings?: Object | boolean): anychart.charts.CirclePacking;
+        a11y(): anychart.core.utils.ChartA11y;
+        a11y(settings?: boolean | Object): anychart.charts.CirclePacking;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.CirclePacking;
+        animation(enabled: boolean, duration: number): anychart.charts.CirclePacking;
+        autoRedraw(): boolean;
+        autoRedraw(enabled?: boolean): anychart.charts.CirclePacking;
+        background(): anychart.core.ui.Background;
+        background(settings?: Object): anychart.charts.CirclePacking;
+        bottom(): number | string;
+        bottom(bottom?: number | string): anychart.charts.CirclePacking;
+        bounds(): anychart.core.utils.Bounds;
+        bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.CirclePacking;
+        bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.CirclePacking;
+        cancelMarquee(): anychart.charts.CirclePacking;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.CirclePacking;
+        contextMenu(): anychart.ui.ContextMenu;
+        contextMenu(settings?: Object | boolean): anychart.charts.CirclePacking;
+        credits(): anychart.core.ui.ChartCredits;
+        credits(value?: Object | boolean): anychart.charts.CirclePacking;
+        draw(async?: boolean): anychart.charts.CirclePacking;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.charts.CirclePacking;
+        exports(): anychart.core.utils.Exports;
+        exports(settings?: Object): anychart.charts.CirclePacking;
+        fullScreen(): boolean;
+        fullScreen(enabled?: boolean): anychart.charts.CirclePacking;
+        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
+        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
+        getPixelBounds(): anychart.math.Rect;
+        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
+        getSelectedPoints(): Array<anychart.core.Point>;
+        getStat(key?: string): any;
+        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
+        globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
+        height(): number | string;
+        height(height?: number | string): anychart.charts.CirclePacking;
+        id(): string;
+        id(id?: string): anychart.charts.CirclePacking;
+        inMarquee(): boolean;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string | boolean): anychart.charts.CirclePacking;
+        isFullScreenAvailable(): boolean;
+        label(index?: string | number): anychart.core.ui.Label;
+        label(settings?: boolean | Object | string): anychart.charts.CirclePacking;
+        label(index?: string | number, settings?: boolean | Object | string): anychart.charts.CirclePacking;
+        left(): number | string;
+        left(left?: number | string): anychart.charts.CirclePacking;
+        legend(): anychart.core.ui.Legend;
+        legend(settings?: Object | boolean): anychart.charts.CirclePacking;
+        localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
+        margin(): anychart.core.utils.Margin;
+        margin(margin?: Array<number|string> | Object): anychart.charts.CirclePacking;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.CirclePacking;
+        maxHeight(): number | string;
+        maxHeight(height?: number | string): anychart.charts.CirclePacking;
+        maxWidth(): number | string;
+        maxWidth(width?: number | string): anychart.charts.CirclePacking;
+        minHeight(): number | string;
+        minHeight(height?: number | string): anychart.charts.CirclePacking;
+        minWidth(): number | string;
+        minWidth(width?: number | string): anychart.charts.CirclePacking;
+        noData(): anychart.core.NoDataSettings;
+        noData(settings?: Object): anychart.charts.CirclePacking;
+        padding(): anychart.core.utils.Padding;
+        padding(padding?: Array<number|string> | Object): anychart.charts.CirclePacking;
+        padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.CirclePacking;
+        right(): number | string;
+        right(right?: number | string): anychart.charts.CirclePacking;
+        saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
+        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJson(filename?: string): void;
+        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
+        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
+        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsSvg(width?: number, height?: number): void;
+        saveAsXlsx(chartDataExportMode?: string, filename?: string, exportOptions?: {[prop:string]:((name:any,value:any)=>void)}): void;
+        saveAsXml(filename?: string): void;
+        selectRectangleMarqueeFill(): anychart.graphics.vector.Fill;
+        selectRectangleMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.CirclePacking;
+        selectRectangleMarqueeFill(color: string, opacity?: number): anychart.charts.CirclePacking;
+        selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.CirclePacking;
+        selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.CirclePacking;
+        selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.CirclePacking;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.CirclePacking;
+        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
+        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
+        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
+        shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
+        shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
+        shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
+        shareWithTwitter(): void;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.charts.CirclePacking;
+        toA11yTable(title?: string, asString?: boolean): Element | string;
+        toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
+        toHtmlTable(title?: string, asString?: boolean): Element | string;
+        toJson(stringify?: boolean): Object | string;
+        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(width?: number, height?: number): string;
+        toXml(asXmlNode?: boolean): string | Node;
+        top(): number | string;
+        top(top?: number | string): anychart.charts.CirclePacking;
+        width(): number | string;
+        width(width?: number | string): anychart.charts.CirclePacking;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.charts.CirclePacking;
+        dispose(): void;
+        startSelectRectangleMarquee(repeat?: boolean): anychart.charts.CirclePacking;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.CirclePacking;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.CirclePacking;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface Calendar extends anychart.core.SeparateChart {
+        colorRange(): anychart.core.ui.ColorRange;
+        colorRange(settings?: Object): anychart.charts.Calendar;
+        colorScale(): anychart.scales.OrdinalColor | anychart.scales.LinearColor;
+        colorScale(settings?: anychart.scales.OrdinalColor | anychart.scales.LinearColor | Object | string): anychart.charts.Calendar;
+        data(): anychart.data.View;
+        data(data?: anychart.data.View | anychart.data.Mapping | anychart.data.Set | Array<any> | string | anychart.data.DataSettings, csvSettings?: string | anychart.data.TextParsingSettings): anychart.charts.Calendar;
+        days(): anychart.core.calendar.settings.Days;
+        days(settings?: Object): anychart.charts.Calendar;
+        months(): anychart.core.calendar.settings.Months;
+        months(settings?: Object): anychart.charts.Calendar;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(settings?: Object | boolean): anychart.charts.Calendar;
+        weeks(): anychart.core.calendar.settings.Weeks;
+        weeks(settings?: Object): anychart.charts.Calendar;
+        years(): anychart.core.calendar.settings.Years;
+        years(settings?: Object): anychart.charts.Calendar;
+        a11y(): anychart.core.utils.ChartA11y;
+        a11y(settings?: boolean | Object): anychart.charts.Calendar;
+        animation(): anychart.core.utils.Animation;
+        animation(settings?: boolean | Object): anychart.charts.Calendar;
+        animation(enabled: boolean, duration: number): anychart.charts.Calendar;
+        autoRedraw(): boolean;
+        autoRedraw(enabled?: boolean): anychart.charts.Calendar;
+        background(): anychart.core.ui.Background;
+        background(settings?: Object): anychart.charts.Calendar;
+        bottom(): number | string;
+        bottom(bottom?: number | string): anychart.charts.Calendar;
+        bounds(): anychart.core.utils.Bounds;
+        bounds(bounds?: anychart.utils.RectObj | anychart.math.Rect | anychart.core.utils.Bounds): anychart.charts.Calendar;
+        bounds(x?: number | string, y?: number | string, width?: number | string, height?: number | string): anychart.charts.Calendar;
+        cancelMarquee(): anychart.charts.Calendar;
+        container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
+        container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Calendar;
+        contextMenu(): anychart.ui.ContextMenu;
+        contextMenu(settings?: Object | boolean): anychart.charts.Calendar;
+        credits(): anychart.core.ui.ChartCredits;
+        credits(value?: Object | boolean): anychart.charts.Calendar;
+        draw(async?: boolean): anychart.charts.Calendar;
+        enabled(): boolean;
+        enabled(enabled?: boolean): anychart.charts.Calendar;
+        exports(): anychart.core.utils.Exports;
+        exports(settings?: Object): anychart.charts.Calendar;
+        fullScreen(): boolean;
+        fullScreen(enabled?: boolean): anychart.charts.Calendar;
+        getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
+        getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
+        getPixelBounds(): anychart.math.Rect;
+        getPngBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number): void;
+        getSelectedPoints(): Array<anychart.core.Point>;
+        getStat(key?: string): any;
+        getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
+        globalToLocal(xCoord: number, yCoord: number): {[prop:string]:number};
+        height(): number | string;
+        height(height?: number | string): anychart.charts.Calendar;
+        id(): string;
+        id(id?: string): anychart.charts.Calendar;
+        inMarquee(): boolean;
+        interactivity(): anychart.core.utils.Interactivity;
+        interactivity(settings?: Object | string | boolean): anychart.charts.Calendar;
+        isFullScreenAvailable(): boolean;
+        label(index?: string | number): anychart.core.ui.Label;
+        label(settings?: boolean | Object | string): anychart.charts.Calendar;
+        label(index?: string | number, settings?: boolean | Object | string): anychart.charts.Calendar;
+        left(): number | string;
+        left(left?: number | string): anychart.charts.Calendar;
+        legend(): anychart.core.ui.Legend;
+        legend(settings?: Object | boolean): anychart.charts.Calendar;
+        localToGlobal(xCoord: number, yCoord: number): {[prop:string]:number};
+        margin(): anychart.core.utils.Margin;
+        margin(margin?: Array<number|string> | Object): anychart.charts.Calendar;
+        margin(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Calendar;
+        maxHeight(): number | string;
+        maxHeight(height?: number | string): anychart.charts.Calendar;
+        maxWidth(): number | string;
+        maxWidth(width?: number | string): anychart.charts.Calendar;
+        minHeight(): number | string;
+        minHeight(height?: number | string): anychart.charts.Calendar;
+        minWidth(): number | string;
+        minWidth(width?: number | string): anychart.charts.Calendar;
+        noData(): anychart.core.NoDataSettings;
+        noData(settings?: Object): anychart.charts.Calendar;
+        padding(): anychart.core.utils.Padding;
+        padding(padding?: Array<number|string> | Object): anychart.charts.Calendar;
+        padding(value1?: string | number, value2?: string | number, value3?: string | number, value4?: string | number): anychart.charts.Calendar;
+        right(): number | string;
+        right(right?: number | string): anychart.charts.Calendar;
+        saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
+        saveAsJpg(width?: number | Object, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        saveAsJson(filename?: string): void;
+        saveAsPdf(paperSizeOrWidthOrOptions?: number | string | Object, landscape?: boolean, x?: number, y?: number, filename?: string): void;
+        saveAsPng(width?: number | Object, height?: number, quality?: number, filename?: string): void;
+        saveAsSvg(paperSize?: string | Object, landscape?: boolean, filename?: string): void;
+        saveAsSvg(width?: number, height?: number): void;
+        saveAsXlsx(chartDataExportMode?: string, filename?: string, exportOptions?: {[prop:string]:((name:any,value:any)=>void)}): void;
+        saveAsXml(filename?: string): void;
+        selectRectangleMarqueeFill(): anychart.graphics.vector.Fill;
+        selectRectangleMarqueeFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.charts.Calendar;
+        selectRectangleMarqueeFill(color: string, opacity?: number): anychart.charts.Calendar;
+        selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.charts.Calendar;
+        selectRectangleMarqueeFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.charts.Calendar;
+        selectRectangleMarqueeFill(imageSettings: anychart.graphics.vector.Fill): anychart.charts.Calendar;
+        selectRectangleMarqueeStroke(): anychart.graphics.vector.Stroke;
+        selectRectangleMarqueeStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.charts.Calendar;
+        shareAsJpg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean, filename?: string): void;
+        shareAsPdf(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number, filename?: string): void;
+        shareAsPng(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, width?: number, height?: number, quality?: number, filename?: string): void;
+        shareAsSvg(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), asBase64?: boolean, paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string, filename?: string): void;
+        shareWithFacebook(captionOrOptions?: string | Object, link?: string, name?: string, description?: string): void;
+        shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
+        shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
+        shareWithTwitter(): void;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.charts.Calendar;
+        toA11yTable(title?: string, asString?: boolean): Element | string;
+        toCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)|Object}): string;
+        toHtmlTable(title?: string, asString?: boolean): Element | string;
+        toJson(stringify?: boolean): Object | string;
+        toSvg(paperSize?: string | Object, landscape?: boolean): string;
+        toSvg(width?: number, height?: number): string;
+        toXml(asXmlNode?: boolean): string | Node;
+        top(): number | string;
+        top(top?: number | string): anychart.charts.Calendar;
+        width(): number | string;
+        width(width?: number | string): anychart.charts.Calendar;
+        zIndex(): number;
+        zIndex(zIndex?: number): anychart.charts.Calendar;
+        dispose(): void;
+        startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Calendar;
+        parentBounds(): anychart.math.Rect;
+        parentBounds(bounds?: anychart.math.Rect | Object | number): anychart.charts.Calendar;
+        parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.charts.Calendar;
+        print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
     }
     interface Polar extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
@@ -2111,6 +2389,7 @@ declare namespace anychart.charts {
     interface Waterfall extends anychart.core.SeparateChart {
         a11y(): anychart.core.utils.ChartA11y;
         a11y(settings?: boolean | Object): anychart.charts.Waterfall;
+        addArrow(settings?: Object): anychart.core.waterfall.Arrow;
         addSeries(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): Array<anychart.core.cartesian.series.Base>;
         annotations(): anychart.core.annotations.PlotController;
         annotations(annotationsList?: Array<any>): anychart.charts.Waterfall;
@@ -2131,6 +2410,8 @@ declare namespace anychart.charts {
         connectorStroke(): anychart.graphics.vector.Stroke;
         connectorStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: anychart.graphics.vector.StrokeLineJoin, lineCap?: anychart.graphics.vector.StrokeLineCap): anychart.charts.Waterfall;
         connectorStroke(settings?: Object): anychart.charts.Waterfall;
+        connectors(): anychart.core.waterfall.Connectors;
+        connectors(settings?: Object): anychart.charts.Waterfall;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.charts.Waterfall;
         contextMenu(): anychart.ui.ContextMenu;
@@ -2153,6 +2434,8 @@ declare namespace anychart.charts {
         exports(settings?: Object): anychart.charts.Waterfall;
         fullScreen(): boolean;
         fullScreen(enabled?: boolean): anychart.charts.Waterfall;
+        getAllArrows(): Array<anychart.core.waterfall.Arrow>;
+        getArrow(settings?: number): anychart.core.waterfall.Arrow;
         getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
         getPixelBounds(): anychart.math.Rect;
@@ -2235,6 +2518,8 @@ declare namespace anychart.charts {
         rangeMarker(index?: number, settings?: Object | boolean): anychart.charts.Waterfall;
         removeAllListeners(type?: string): number;
         removeAllSeries(): anychart.charts.Waterfall;
+        removeArrow(Arrow: anychart.core.waterfall.Arrow): boolean;
+        removeArrowAt(Arrow: number): boolean;
         removeSeries(id: number | string): anychart.charts.Waterfall;
         removeSeriesAt(index: number): anychart.charts.Waterfall;
         right(): number | string;
@@ -9296,6 +9581,102 @@ declare namespace anychart.core.axisMarkers {
     }
 }
 
+declare namespace anychart.core.calendar {
+}
+
+declare namespace anychart.core.calendar.settings {
+    interface Months extends anychart.core.Base {
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.calendar.settings.Months;
+        noDataStroke(): anychart.graphics.vector.Stroke;
+        noDataStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.calendar.settings.Months;
+        noDataStroke(settings?: Object): anychart.core.calendar.settings.Months;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.calendar.settings.Months;
+        stroke(settings?: Object): anychart.core.calendar.settings.Months;
+        underSpace(): number;
+        underSpace(value: number): anychart.core.calendar.settings.Months;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface Weeks extends anychart.core.Base {
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.calendar.settings.Weeks;
+        rightSpace(): number;
+        rightSpace(value: number): anychart.core.calendar.settings.Weeks;
+        showWeekends(): boolean;
+        showWeekends(value: boolean): anychart.core.calendar.settings.Weeks;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface Years extends anychart.core.Base {
+        background(): anychart.core.ui.Background;
+        background(settings?: Object): anychart.core.calendar.settings.Years;
+        inverted(): boolean;
+        inverted(value: boolean): anychart.core.calendar.settings.Years;
+        title(): anychart.core.ui.Title;
+        title(settings?: boolean | Object | string): anychart.core.calendar.settings.Years;
+        underSpace(): number;
+        underSpace(value: number): anychart.core.calendar.settings.Years;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface Days extends anychart.core.Base {
+        fill(): anychart.graphics.vector.Fill;
+        fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.calendar.settings.Days;
+        fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.calendar.settings.Days;
+        fill(color: string, opacity?: number): anychart.core.calendar.settings.Days;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.calendar.settings.Days;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.calendar.settings.Days;
+        fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.calendar.settings.Days;
+        hatchFill(): anychart.graphics.vector.PatternFill | anychart.graphics.vector.HatchFill | (() => void);
+        hatchFill(type?: anychart.graphics.vector.HatchFill.HatchFillType | string, color?: string, thickness?: number, size?: number): anychart.core.calendar.settings.Days;
+        hatchFill(hatchFillFunction?: (() => void)): anychart.core.calendar.settings.Days;
+        hatchFill(patternFill?: anychart.graphics.vector.PatternFill): anychart.core.calendar.settings.Days;
+        hatchFill(settings?: anychart.graphics.vector.HatchFill): anychart.core.calendar.settings.Days;
+        hatchFill(enabled?: boolean): anychart.core.calendar.settings.Days;
+        hovered(): anychart.core.StateSettings;
+        hovered(settings?: Object): anychart.core.calendar.settings.Days;
+        noDataFill(): anychart.graphics.vector.Fill;
+        noDataFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.calendar.settings.Days;
+        noDataFill(color: string, opacity?: number): anychart.core.calendar.settings.Days;
+        noDataFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.calendar.settings.Days;
+        noDataFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.calendar.settings.Days;
+        noDataFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.calendar.settings.Days;
+        noDataHatchFill(): anychart.graphics.vector.PatternFill | anychart.graphics.vector.HatchFill | (() => void);
+        noDataHatchFill(type?: anychart.graphics.vector.HatchFill.HatchFillType | string, color?: string, thickness?: number, size?: number): anychart.core.calendar.settings.Days;
+        noDataHatchFill(hatchFillFunction?: (() => void)): anychart.core.calendar.settings.Days;
+        noDataHatchFill(patternFill?: anychart.graphics.vector.PatternFill): anychart.core.calendar.settings.Days;
+        noDataHatchFill(settings?: anychart.graphics.vector.HatchFill): anychart.core.calendar.settings.Days;
+        noDataHatchFill(enabled?: boolean): anychart.core.calendar.settings.Days;
+        noDataStroke(): anychart.graphics.vector.Stroke;
+        noDataStroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.calendar.settings.Days;
+        noDataStroke(settings?: Object): anychart.core.calendar.settings.Days;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.core.calendar.settings.Days;
+        spacing(): number;
+        spacing(value: number): anychart.core.calendar.settings.Days;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.calendar.settings.Days;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.calendar.settings.Days;
+        stroke(settings?: Object): anychart.core.calendar.settings.Days;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+}
+
 declare namespace anychart.core.cartesian {
 }
 
@@ -13985,6 +14366,8 @@ declare namespace anychart.core.gantt.elements {
         anchor(anchor?: string): anychart.core.gantt.elements.MilestonesPreviewElement;
         depth(): number;
         depth(value: number): anychart.core.gantt.elements.MilestonesPreviewElement;
+        drawOnCollapsedOnly(): boolean;
+        drawOnCollapsedOnly(value: boolean): anychart.core.gantt.elements.MilestonesPreviewElement;
         edit(): anychart.core.gantt.edit.ElementEdit;
         edit(settings?: Object | boolean): anychart.core.gantt.elements.MilestonesPreviewElement;
         enabled(): boolean;
@@ -14711,6 +15094,8 @@ declare namespace anychart.core.graph.elements {
         width(value: number): void;
     }
     interface Edge {
+        arrows(): anychart.core.graph.elements.edges.arrows.Controller;
+        arrows(config: anychart.core.graph.elements.edges.arrows.Controller.Config): anychart.core.graph.elements.Edge;
         hovered(): anychart.core.StateSettings;
         hovered(settings?: Object): anychart.core.graph.elements.Edge;
         labels(): anychart.core.ui.LabelsFactory;
@@ -14725,6 +15110,27 @@ declare namespace anychart.core.graph.elements {
         stroke(settings?: Object): anychart.core.graph.elements.Edge;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(tooltipConfig: object | boolean): anychart.core.graph.elements.Edge;
+    }
+}
+
+declare namespace anychart.core.graph.elements.edges {
+}
+
+declare namespace anychart.core.graph.elements.edges.arrows {
+    interface Controller {
+        enabled(): boolean;
+        enabled(enabled: boolean): anychart.core.graph.elements.edges.arrows.Controller;
+        position(): string | number;
+        position(position: string | number): anychart.core.graph.elements.edges.arrows.Controller;
+        size(): number;
+        size(size: number): anychart.core.graph.elements.edges.arrows.Controller;
+    }
+    namespace Controller {
+    type Config = {
+        enabled: boolean;
+        position: string | number;
+        size: string;
+    }
     }
 }
 
@@ -23548,6 +23954,62 @@ declare namespace anychart.core.sunburst {
     }
 }
 
+declare namespace anychart.core.surface {
+}
+
+declare namespace anychart.core.surface.markers {
+    type Config = {
+        data: Object;
+        droplines: anychart.core.surface.markers.droplines.Config;
+        enabled: boolean;
+        fill: anychart.graphics.vector.Fill;
+        size: number;
+        stroke: anychart.graphics.vector.Stroke;
+        type: string;
+    }
+    interface Controller extends anychart.core.Base {
+        data(): anychart.data.View;
+        data(data?: anychart.data.Set | Array<Array<number>> | string): anychart.core.surface.markers.Controller;
+        droplines(): anychart.core.surface.markers.droplines.Controller;
+        droplines(value: anychart.core.surface.markers.droplines.Config): anychart.core.surface.markers.Controller;
+        enabled(): boolean;
+        enabled(value: boolean): anychart.core.surface.markers.Controller;
+        fill(): anychart.graphics.vector.Fill;
+        fill(value: anychart.graphics.vector.Fill): anychart.core.surface.markers.Controller;
+        size(): number;
+        size(value: number): anychart.core.surface.markers.Controller;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(value: anychart.graphics.vector.Stroke): void;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(value: object): anychart.core.surface.markers.Controller;
+        type(value: string): anychart.core.surface.markers.Controller;
+        type(): anychart.core.surface.markers.Controller;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+}
+
+declare namespace anychart.core.surface.markers.droplines {
+    type Config = {
+        enabled: boolean;
+        stroke: anychart.graphics.vector.Stroke;
+    }
+    interface Controller extends anychart.core.Base {
+        enabled(): boolean;
+        enabled(value: boolean): anychart.core.surface.markers.Controller;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(value: anychart.graphics.vector.Stroke): anychart.core.surface.markers.droplines.Controller;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+}
+
 declare namespace anychart.core.timeline {
 }
 
@@ -26836,6 +27298,28 @@ declare namespace anychart.core.venn {
 }
 
 declare namespace anychart.core.waterfall {
+    interface ArrowConnector {
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.waterfall.ArrowConnector;
+        stroke(settings?: Object): anychart.core.waterfall.ArrowConnector;
+    }
+    interface Connectors {
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings: Object): anychart.core.waterfall.Connectors;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.waterfall.Connectors;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(settings?: Object): anychart.core.waterfall.Connectors;
+    }
+    interface Arrow {
+        connector(settings?: Object): anychart.core.waterfall.Arrow;
+        connector(): anychart.core.waterfall.ArrowConnector;
+        from(value: string): anychart.core.waterfall.Arrow;
+        from(): string;
+        label(): anychart.core.ui.LabelsFactory;
+        label(settings: Object): anychart.core.waterfall.Arrow;
+        to(value: string): anychart.core.waterfall.Arrow;
+        to(): string;
+    }
 }
 
 declare namespace anychart.core.waterfall.series {

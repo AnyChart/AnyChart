@@ -2479,7 +2479,7 @@ anychart.core.series.Base.prototype.resolveAutoAnchorForPosition = function(posi
 anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, rotation) {
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
   var result;
-  if (normalizedPosition) {
+  if (normalizedPosition && normalizedPosition !== 'auto') {
     result = this.resolveAutoAnchorForPosition(normalizedPosition);
   } else {
     var positive = this.checkDirectionIsPositive(/** @type {string} */(position));
