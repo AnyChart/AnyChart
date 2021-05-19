@@ -260,7 +260,7 @@ anychart.ui.RangeSelector.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      anychart.window['anychart']['format']['getMessage'](this.zoomLabelText_));
+      anychart.module['format']['getMessage'](this.zoomLabelText_));
   goog.dom.appendChild(element, this.zoomLabel_);
 };
 
@@ -327,7 +327,7 @@ anychart.ui.RangeSelector.prototype.zoomLabelText = function(opt_value) {
     if (this.zoomLabelText_ != opt_value) {
       this.zoomLabelText_ = opt_value;
       if (this.zoomLabel_)
-        goog.dom.setTextContent(this.zoomLabel_, anychart.window['anychart']['format']['getMessage'](this.zoomLabelText_));
+        goog.dom.setTextContent(this.zoomLabel_, anychart.module['format']['getMessage'](this.zoomLabelText_));
     }
     return this;
   }
@@ -470,8 +470,8 @@ anychart.ui.RangeSelector.prototype.handleButtonAction_ = function(e) {
     this.target_['selectRange'](type, true);
 
   } else {
-    var fromParsed = anychart.window['anychart']['format']['parseDateTime'](descriptor['startDate']);
-    var toParsed = anychart.window['anychart']['format']['parseDateTime'](descriptor['endDate']);
+    var fromParsed = anychart.module['format']['parseDateTime'](descriptor['startDate']);
+    var toParsed = anychart.module['format']['parseDateTime'](descriptor['endDate']);
 
     if (fromParsed && toParsed) {
       this.target_['selectRange'](fromParsed, toParsed, true);

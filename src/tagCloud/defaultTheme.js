@@ -24,13 +24,16 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
        */
       'fill': function() {
         return anychart.color.setOpacity(this['scaledColor'] || this['sourceColor'], 0.85, true);
-      }
+      },
+      'stroke': 'none'
     },
     'hovered': {
-      'fill': anychart.core.defaultTheme.returnSourceColor65
+      'fill': anychart.core.defaultTheme.returnSourceColor65,
+      'stroke': 'none'
     },
     'selected': {
-      'fill': anychart.core.defaultTheme.defaultSelectColor
+      'fill': anychart.core.defaultTheme.defaultSelectColor,
+      'stroke': 'none'
     },
     'tooltip': {
       'enabled': true,

@@ -86,7 +86,7 @@ anychart.graphModule.elements.Base = function(chart) {
   this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME);
   this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME);
 
-  function labelsCallback (labels) {
+  function labelsCallback(labels) {
     labels.setParentEventTarget(/** @type {goog.events.EventTarget} */ (this));
   }
 
@@ -178,21 +178,20 @@ anychart.graphModule.elements.Base.prototype.selected = function(opt_value) {
 //region Settings resolve
 /**
  * Return stroke for element
- * @param {Object} context
  * @param {(anychart.graphModule.Chart.Edge|anychart.graphModule.Chart.Node)=} opt_element
  * @return {acgraph.vector.Stroke}
  */
-anychart.graphModule.elements.Base.prototype.getStroke = function(context, opt_element) {
-  /** @type {acgraph.vector.Stroke|Function} */
+anychart.graphModule.elements.Base.prototype.getStroke = function(opt_element) {
   var stroke;
 
   if (goog.isDef(opt_element)) {
-    stroke = /** @type {acgraph.vector.Stroke|Function} */(this.resolveSettings(opt_element, 'stroke'));
+    stroke = this.resolveSettings(opt_element, 'stroke');
   } else {
-    stroke = /** @type {acgraph.vector.Stroke|Function} */(this.normal_.getOption('stroke'));
+    stroke = this.normal_.getOption('stroke');
   }
 
   if (goog.isFunction(stroke)) {
+    var context = this.getColorResolutionContext(opt_element);
     stroke = stroke.call(context, context);
   }
   return /** @type {acgraph.vector.Stroke} */(stroke);
@@ -202,13 +201,13 @@ anychart.graphModule.elements.Base.prototype.getStroke = function(context, opt_e
 /**
  * Return fill for element
  * @param {(anychart.graphModule.Chart.Edge|anychart.graphModule.Chart.Node)} element
- * @param {Object} context
  * @return {acgraph.vector.Fill}
  */
-anychart.graphModule.elements.Base.prototype.getFill = function(element, context) {
+anychart.graphModule.elements.Base.prototype.getFill = function(element) {
   var fill = /** @type {acgraph.vector.Fill} */(this.resolveSettings(element, 'fill'));
 
   if (goog.isFunction(fill)) {
+    var context = this.getColorResolutionContext(element);
     fill = fill.call(context, context);
   }
   return fill;

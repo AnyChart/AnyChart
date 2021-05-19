@@ -14,7 +14,7 @@ goog.require('goog.dom');
 goog.require('goog.net.XhrIo');
 
 
-if (!anychart.window['anychart']['exports']) {
+if (!anychart.module['exports']) {
   anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Exporting']);
 }
 
@@ -401,7 +401,7 @@ anychart.dataAdapterModule.entry.processAsJson_ = function(xhr) {
  */
 anychart.dataAdapterModule.entry.processAsXml_ = function(xhr) {
   var xml = xhr.getResponseXml();
-  var json = anychart.window['anychart']['utils']['xml2json'](xml);
+  var json = anychart.module['utils']['xml2json'](xml);
   return [json['data']];
 };
 

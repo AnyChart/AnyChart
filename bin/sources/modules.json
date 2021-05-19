@@ -18,6 +18,13 @@
         "core"
       ]
     },
+    "calendar-part": {
+      "entry": "anychart.calendarModule.entry",
+      "deps": [
+        "core",
+        "color-scales"
+      ]
+    },
     "cartesian": {
       "entry": "anychart.cartesianModule.entry",
       "deps": [
@@ -35,6 +42,14 @@
       "entry": "anychart.circularGaugeModule.entry",
       "deps": [
         "core"
+      ]
+    },
+    "circle-packing-part": {
+      "entry": "anychart.circlePackingModule.entry",
+      "deps": [
+        "core",
+        "tree-data",
+        "color-scales"
       ]
     },
     "color-scales": {
@@ -280,6 +295,13 @@
         "theme-core"
       ]
     },
+    "theme-calendar": {
+      "entry": "anychart.calendarModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
     "theme-cartesian": {
       "entry": "anychart.cartesianModule.defaultTheme",
       "deps": [
@@ -296,6 +318,13 @@
     },
     "theme-circular-gauge": {
       "entry": "anychart.circularGaugeModule.defaultTheme",
+      "deps": [
+        "core",
+        "theme-core"
+      ]
+    },
+    "theme-circle-packing": {
+      "entry": "anychart.circlePackingModule.defaultTheme",
       "deps": [
         "core",
         "theme-core"
@@ -523,9 +552,11 @@
         "theme-core",
         "theme-annotations",
         "theme-bullet",
+        "theme-calendar",
         "theme-cartesian",
         "theme-cartesian-3d",
         "theme-circular-gauge",
+        "theme-circle-packing",
         "theme-gantt",
         "theme-heatmap",
         "theme-linear-gauge",
@@ -631,6 +662,19 @@
       "parts": [
         "bullet",
         "theme-bullet"
+      ]
+    },
+    "anychart-calendar": {
+      "type": "chart-type",
+      "name": "Calendar",
+      "desc": "Calendar charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Calendar_Chart",
+      "icon": "/_design/img/upload/charts/types/calendar-chart.svg",
+      "parts": [
+        "color-scales",
+        "theme-color-scales",
+        "calendar-part",
+        "theme-calendar"
       ]
     },
     "anychart-cartesian-3d": {
@@ -770,6 +814,20 @@
         "theme-color-scales",
         "cartesian",
         "theme-cartesian"
+      ]
+    },
+    "anychart-circle-packing": {
+      "type": "chart-type",
+      "name": "Circle Packing",
+      "desc": "Circle Packing charts module.",
+      "docs": "https://docs.anychart.com/Basic_Charts/Circle_Packing",
+      "icon": "/_design/img/upload/charts/types/circle-packing.svg",
+      "parts": [
+        "tree-data",
+        "color-scales",
+        "theme-color-scales",
+        "circle-packing-part",
+        "theme-circle-packing"
       ]
     },
     "anychart-scatter": {

@@ -375,8 +375,17 @@ anychart.core.ChartWithOrthogonalScales.prototype.invalidateSeriesOfScale = func
       foundOne |= series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
     }
   }
-  if (foundOne)
-    this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
+  if (foundOne) {
+    this.invalidateSeriesOfScaleInternal();
+  }
+};
+
+
+/**
+ * Do necessary invalidation in case of founded series for invalidation.
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.invalidateSeriesOfScaleInternal = function() {
+  this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
 };
 
 

@@ -258,15 +258,17 @@ anychart.radarModule.Axis.prototype.ticksInvalidated_ = function(event) {
 
 /**
  * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
+ * @param {boolean=} opt_isChartScale - Whether axis uses the chart's scale.
  * @return {anychart.scales.Base|!anychart.radarModule.Axis} Axis scale or itself for method chaining.
  */
-anychart.radarModule.Axis.prototype.scale = function(opt_value) {
+ anychart.radarModule.Axis.prototype.scaleInternal = function(opt_value, opt_isChartScale) {
   if (goog.isDef(opt_value)) {
     var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
         anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
     if (val) {
       var dispatch = this.scale_ == val;
       this.scale_ = /** @type {anychart.scales.Linear} */(val);
+      this.scale_.isChartScale = !!opt_isChartScale;
       this.scale_.resumeSignalsDispatching(dispatch);
       if (!dispatch) {
         this.dropBoundsCache_();
@@ -277,6 +279,31 @@ anychart.radarModule.Axis.prototype.scale = function(opt_value) {
   } else {
     return this.scale_;
   }
+};
+
+
+/**
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
+ * @return {anychart.scales.Base|!anychart.radarModule.Axis} Axis scale or itself for method chaining.
+ */
+anychart.radarModule.Axis.prototype.scale = function(opt_value) {
+  return this.scaleInternal(opt_value);
+  // if (goog.isDef(opt_value)) {
+  //   var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
+  //       anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
+  //   if (val) {
+  //     var dispatch = this.scale_ == val;
+  //     this.scale_ = /** @type {anychart.scales.Linear} */(val);
+  //     this.scale_.resumeSignalsDispatching(dispatch);
+  //     if (!dispatch) {
+  //       this.dropBoundsCache_();
+  //       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  //     }
+  //   }
+  //   return this;
+  // } else {
+  //   return this.scale_;
+  // }
 };
 
 

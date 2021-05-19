@@ -15,10 +15,32 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'colorRange': {
       'marker': {
         'enabled': false,
-        'type': anychart.enums.MarkerType.TRIANGLE_DOWN
+        'type': 'triangle-down'
       },
       'labels': {
         'useHtml': true
+      }
+    },
+    'markers': {
+      'enabled': false,
+      'type': 'circle',
+      'size': 4,
+      'fill': anychart.core.defaultTheme.returnSourceColor,
+      'stroke': anychart.core.defaultTheme.returnDarkenSourceColor,
+      'tooltip': {
+        'enabled': true,
+        'format': 'x: {%x}\ny: {%y}\nz: {%z}',
+        'titleFormat': 'Marker: {%index}',
+        'separator': {
+          'enabled': false
+        },
+        'title': {
+          'enabled': false
+        }
+      },
+      'droplines': {
+        'enabled': false,
+        'stroke': '#CECECE'
       }
     },
     'xAxis': {

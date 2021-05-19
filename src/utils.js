@@ -1094,6 +1094,60 @@ anychart.utils.getIncreasedIntervalValue = function(unit, count) {
 
 
 /**
+ * Number of days in each month.
+ * @type {Array.<number>}
+ */
+anychart.utils.DAYS_IN_MONTH = [
+  31,
+  28,
+  31,
+  30,
+  31,
+  30,
+  31,
+  31,
+  30,
+  31,
+  30,
+  31
+];
+
+
+/**
+ * Number of days in each month if case of leap year.
+ * @type {Array.<number>}
+ */
+anychart.utils.DAYS_IN_LEAP_MONTH = [
+  31,
+  29,
+  31,
+  30,
+  31,
+  30,
+  31,
+  31,
+  30,
+  31,
+  30,
+  31
+];
+
+
+/**
+ * Whether year is leap year.
+ *
+ * @param {number} year - Year to check.
+ * @return {boolean} - True in case of leap year.
+ */
+anychart.utils.isLeapYear = function(year) {
+  return (
+    year % 400 == 0 ||
+    (year % 4 == 0 && year % 100 != 0)
+  );
+};
+
+
+/**
  * Returns closest aligned pixel.
  * @param {number} value
  * @param {number|boolean} thickness
@@ -1737,7 +1791,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.9.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.10.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -3051,11 +3105,11 @@ anychart.utils.getFadeGradient = function(ratio, opacity, fontColor, opt_fadeSte
  * DOM-debug util method, gives 'data-ac-name' attribute to acgraph.vector.Element.
  *
  * @param {acgraph.vector.Element} element - Element to get DOM-debug name.
- * @param {string} name - 'data-ac-name' attribute value.
+ * @param {string} name - 'data-acName' attribute value.
  */
 anychart.utils.nameElement = function(element, name) {
   if (anychart.DEVELOP && element && name) {
-    element.attr('data-ac-name', name);
+    element.attr('data-acName', name);
   }
 };
 
@@ -3095,6 +3149,17 @@ anychart.utils.dispatchDetachedEvent = function(dispatcher, event) {
       dispatcher.dispatchEvent(event);
     clearTimeout(timeout);
   }, 0);
+};
+
+
+/**
+ * Calculate text height depending by font size.
+ *
+ * @param {number} fontSize - Font size to get height for.
+ * @return {number} - Text height by font size.
+ */
+anychart.utils.getHeightByFontSize = function(fontSize) {
+  return fontSize < 24 ? fontSize + 3 : Math.round(fontSize * 1.2);
 };
 
 

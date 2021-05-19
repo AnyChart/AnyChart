@@ -3,6 +3,10 @@
  */
 
 goog.provide('anychart.base');
+
+goog.require('acgraph');
+
+goog.require('goog.Timer');
 // temporary, for modules compatibility
 goog.require('goog.labs.userAgent.device');
 
@@ -52,11 +56,25 @@ anychart.DEFAULT_THEME = 'defaultTheme';
 anychart.PERFORMANCE_MONITORING = true;
 
 
+if (goog.global['IS_ANYCHART_AMD']) {
+  anychart.module = goog.global;
+  anychart.window = window;
+} else {
+  anychart.window = goog.global;
+  anychart.window['anychart'] = anychart.window['anychart'] || {};
+  anychart.module = anychart.window['anychart'];
+}
+
+acgraph.module['anychart'] = anychart.module;  // for stage#useAnychartExporting.
+
+
+
 /**
- * Global object
- * @type {Window}
+ * This line defines correct defaultTimerObject for goog.Timer used in ACDVF.
+ *
+ * @type {Window|*}
  */
-anychart.window = goog.global;
+goog.Timer.defaultTimerObject = anychart.window || goog.global;
 
 
 /**

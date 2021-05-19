@@ -2479,7 +2479,7 @@ anychart.core.series.Base.prototype.resolveAutoAnchorForPosition = function(posi
 anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, rotation) {
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
   var result;
-  if (normalizedPosition) {
+  if (normalizedPosition && normalizedPosition !== 'auto') {
     result = this.resolveAutoAnchorForPosition(normalizedPosition);
   } else {
     var positive = this.checkDirectionIsPositive(/** @type {string} */(position));
@@ -3785,6 +3785,16 @@ anychart.core.series.Base.prototype.getPostLastPoint = function() {
 };
 
 
+/**
+ * Returns point value.
+ * @param {anychart.data.IRowInfo} point - Point.
+ * @return {*}
+ */
+anychart.core.series.Base.prototype.getPointValue = function(point) {
+  return point.get('value');
+};
+
+
 //endregion
 //region --- Data to Pixels transformation
 /**
@@ -3906,8 +3916,10 @@ anychart.core.series.Base.prototype.makeMinPointLengthStackedMeta = function(row
 
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
-    var rawVal = rowInfo.get('value');
-    var val = Number(rowInfo.get('value'));
+
+    var rawVal = this.getPointValue(rowInfo);
+    var val = Number(rawVal);
+
     //Condition below also fixes XML restoration.
     var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);
@@ -3975,8 +3987,10 @@ anychart.core.series.Base.prototype.makeMinPointLengthUnstackedMeta = function(r
   if (!rowInfo.meta('missing')) {
     var y = /** @type {number} */ (rowInfo.meta('value'));
     var zero = /** @type {number} */ (rowInfo.meta('zero'));
-    var rawVal = rowInfo.get('value');
-    var val = Number(rowInfo.get('value'));
+
+    var rawVal = this.getPointValue(rowInfo);
+    var val = Number(rawVal);
+
     //Condition below also fixes XML restoration.
     var isZero = goog.isNull(rawVal) ? false : (!isNaN(val) && val == 0); //Draw zero to positive side. Considers closure compiler obfuscation.
     var diff = Math.abs(y - zero);
@@ -4036,7 +4050,7 @@ anychart.core.series.Base.prototype.makeMinPointLengthRangedMeta = function(rowI
 anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
   var yScale = /** @type {anychart.scales.Base} */(this.yScale());
   var map = {
-    'value': yScale.transform(rowInfo.meta('stackedValue'), 0.5),
+    'value': goog.math.clamp(yScale.transform(rowInfo.meta('stackedValue'), 0.5), 0, 1),
     'zero': goog.math.clamp(yScale.transform(rowInfo.meta('stackedZero'), 0.5), 0, 1),
     'prevValue': yScale.transform(rowInfo.meta('stackedValuePrev'), 0.5),
     'prevZero': yScale.transform(rowInfo.meta('stackedZeroPrev'), 0.5),

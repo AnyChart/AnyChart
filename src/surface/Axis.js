@@ -125,7 +125,7 @@ anychart.surfaceModule.Axis.prototype.drawTitle = function() {
   if (title) {
     var lineBounds = this.getLine().getBounds().clone();
     var parentBounds = this.parentBounds();
-    switch(this.getOption('orientation')) {
+    switch (this.getOption('orientation')) {
       case anychart.enums.Orientation.LEFT:
         title.defaultOrientation(anychart.enums.Orientation.LEFT);
         break;
@@ -479,7 +479,7 @@ anychart.surfaceModule.Axis.prototype.getLabelPositionXY = function(bounds, rati
       else
         zIndex = this.zIndex() - 2;
       var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([point, nextPoint], bounds);
-    
+
       startX = convertedPoints[0][1];
       startY = convertedPoints[0][2];
       endX = convertedPoints[1][1];
@@ -496,7 +496,7 @@ anychart.surfaceModule.Axis.prototype.getLabelPositionXY = function(bounds, rati
       zIndex = this.zIndex() + 2 - anychart.surfaceModule.math.distanceToPath(/** @type {number} */(this.rotationY_), [leftPoint, leftUpper]);
 
       var convertedPoints = anychart.surfaceModule.math.pointsToScreenCoordinates([leftPoint, leftUpper], bounds);
-    
+
       startX = convertedPoints[0][1];
       startY = convertedPoints[0][2];
       endX = convertedPoints[1][1];

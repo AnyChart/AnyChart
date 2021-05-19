@@ -2,6 +2,7 @@ goog.provide('anychart.graphModule.elements.Edge');
 
 goog.require('anychart.core.ui.OptimizedText');
 goog.require('anychart.graphModule.elements.Base');
+goog.require('anychart.graphModule.elements.arrows.Controller');
 goog.require('anychart.reflow.IMeasurementsTargetProvider');
 goog.require('goog.math.Coordinate');
 
@@ -326,6 +327,117 @@ anychart.graphModule.elements.Edge.prototype.updateLabel = function(edge) {
 
 
 //endregion
+//region --- Arrows
+/**
+ * Arrow signal handler.
+ *
+ * @private
+ */
+anychart.graphModule.elements.Edge.prototype.onArrowsSignal_ = function() {
+  this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
+};
+
+
+/**
+ * Returns arrow controller.
+ *
+ * @param {Object=} opt_config - Configuration object.
+ * @return {anychart.graphModule.elements.Edge|!anychart.graphModule.elements.arrows.Controller}
+ */
+anychart.graphModule.elements.Edge.prototype.arrows = function(opt_config) {
+  if (!this.arrowsController_) {
+    this.arrowsController_ = new anychart.graphModule.elements.arrows.Controller(this);
+    this.setupCreated('arrows', this.arrowsController_);
+    this.arrowsController_.container(this.layerForEdges_);
+    this.arrowsController_.listenSignals(this.onArrowsSignal_, this);
+  }
+
+  if (goog.isDef(opt_config)) {
+    this.arrowsController_.setup(opt_config);
+
+    return this;
+  }
+
+  return this.arrowsController_;
+};
+
+
+/**
+ * Return arrow stroke color.
+ * @param {anychart.graphModule.elements.arrows.Arrow} arrow
+ * @return {acgraph.vector.Stroke}
+ */
+anychart.graphModule.elements.Edge.prototype.getArrowStroke = function(arrow) {
+  var edge = arrow.edge();
+  return this.getStroke(edge);
+};
+
+
+/**
+ * Return arrow pointer position.
+ *
+ * @param {anychart.graphModule.elements.arrows.Arrow} arrow
+ *
+ * @return {!goog.math.Coordinate}
+ */
+anychart.graphModule.elements.Edge.prototype.getArrowPointerPosition = function(arrow) {
+  var angle = this.getArrowRotation(arrow);
+  var edge = arrow.edge();
+  var positionRatio = 1 - this.arrows().getArrowPositionRatio(arrow);
+
+  var to = this.chart_.getNodeById(edge.to);
+  var from = this.chart_.getNodeById(edge.from);
+
+  var toNodeWidth = this.chart_.nodes().getWidth(to) + anychart.utils.extractThickness(this.chart_.nodes().getStroke(to));
+  var fromNodeWidth = this.chart_.nodes().getWidth(from) + anychart.utils.extractThickness(this.chart_.nodes().getStroke(from));
+
+  var toNodeIntersectionPoint = new goog.math.Coordinate(to.position.x + toNodeWidth / 2, to.position.y);
+  var fromNodeIntersectionPoint = new goog.math.Coordinate(
+    from.position.x + fromNodeWidth / 2 + this.arrows().getArrowSize(arrow), // Do not allow node and arrow intersections.
+    from.position.y
+  );
+
+  fromNodeIntersectionPoint.rotateDegrees(angle, new goog.math.Coordinate(from.position.x, from.position.y));
+  toNodeIntersectionPoint.rotateDegrees(angle - 180, new goog.math.Coordinate(to.position.x, to.position.y));
+
+  var x = toNodeIntersectionPoint.x - ((toNodeIntersectionPoint.x - fromNodeIntersectionPoint.x) * positionRatio);
+  var y = toNodeIntersectionPoint.y - ((toNodeIntersectionPoint.y - fromNodeIntersectionPoint.y) * positionRatio);
+
+
+  return new goog.math.Coordinate(x, y);
+};
+
+
+/**
+ * Return arrow rotation.
+ *
+ * @param {anychart.graphModule.elements.arrows.Arrow} arrow
+ *
+ * @return {number}
+ */
+anychart.graphModule.elements.Edge.prototype.getArrowRotation = function(arrow) {
+  var edge = arrow.edge();
+  var to = this.chart_.getNodeById(edge.to);
+  var from = this.chart_.getNodeById(edge.from);
+
+  return goog.math.angle(from.position.x, from.position.y, to.position.x, to.position.y);
+};
+
+
+/**
+ * Return arrow fill color.
+ *
+ * @param {anychart.graphModule.elements.arrows.Arrow} arrow
+ * @return {acgraph.vector.Stroke}
+ */
+anychart.graphModule.elements.Edge.prototype.getArrowFill = function(arrow) {
+  var edge = arrow.edge();
+  // Todo: Rework it when arrow coloring implemented.
+  return this.getStroke(edge);
+};
+
+
+//endregion
 //region Appearance
 /**
  * Create path element for edge and return it.
@@ -382,9 +494,9 @@ anychart.graphModule.elements.Edge.prototype.getEdgePath = function() {
  * @param {anychart.graphModule.Chart.Edge} edge
  */
 anychart.graphModule.elements.Edge.prototype.updateColors = function(edge) {
-  var context = this.getColorResolutionContext(edge);
-  var stroke = this.getStroke(context, edge);
+  var stroke = this.getStroke(edge);
   edge.path.stroke(stroke);
+  edge.arrow.draw();
 };
 
 
@@ -403,8 +515,7 @@ anychart.graphModule.elements.Edge.prototype.updateAppearance = function(opt_edg
         this.updateColors(edge);
       }
     } else {
-      var context = this.getColorResolutionContext();
-      var stroke = this.getStroke(context);
+      var stroke = this.getStroke();
       this.path_.stroke(stroke);
     }
   }
@@ -519,11 +630,23 @@ anychart.graphModule.elements.Edge.prototype.onInteractivitySignal = function(ev
  * @return {number}
  */
 anychart.graphModule.elements.Edge.prototype.getEdgeThickness = function(edge) {
-  var context = this.getColorResolutionContext(edge);
-  var stroke = this.getStroke(context, edge);
+  var stroke = this.getStroke(edge);
   var thickness = anychart.utils.extractThickness(stroke);
 
   return thickness;
+};
+
+
+/**
+ * Return position of node by node id.
+ * @param {string} nodeId
+ *
+ * @return {{x:number, y:number}}
+ */
+anychart.graphModule.elements.Edge.prototype.getNodePosition = function(nodeId) {
+  var node = this.chart_.getNodeById(nodeId);
+
+  return node.position;
 };
 
 
@@ -547,6 +670,8 @@ anychart.graphModule.elements.Edge.prototype.appendEdgeOnLayer = function(edge) 
 
   path.parent(this.layerForEdges_);
   hoverPath.parent(this.layerForEdges_);
+
+  edge.arrow.draw();
 };
 
 
@@ -585,6 +710,9 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(opt_edge) {
     var y2 = to.position.y;
 
     edge.path.clear().moveTo(x1, y1).lineTo(x2, y2);
+
+    edge.arrow.draw();
+
     edge.hoverPath.clear().moveTo(x1, y1).lineTo(x2, y2);
   } else {
     if (this.chart_.interactivity().getOption('edges')) {
@@ -655,6 +783,7 @@ anychart.graphModule.elements.Edge.prototype.disposeInternal = function() {
   for (var i = 0; i < edges.length; i++) {
     var edge = edges[i];
     this.clear(edge);
+    goog.dispose(edge.arrow);
   }
   //Dispose all elements in pools and dispose all label settings.
   anychart.graphModule.elements.Edge.base(this, 'disposeInternal');
@@ -665,6 +794,7 @@ anychart.graphModule.elements.Edge.prototype.disposeInternal = function() {
 //region Exports
 (function() {
   var proto = anychart.graphModule.elements.Edge.prototype;
+  proto['arrows'] = proto.arrows;
   proto['tooltip'] = proto.tooltip;
 })();
 //endregion

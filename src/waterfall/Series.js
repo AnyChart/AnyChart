@@ -41,7 +41,7 @@ anychart.waterfallModule.Series.prototype.TOKEN_ALIASES = (function() {
 
 /** @inheritDoc */
 anychart.waterfallModule.Series.prototype.resolveAutoAnchor = function(position, rotation) {
-  if (position == 'auto') {
+  if (position == anychart.enums.Position.AUTO) {
     if (this.chart.getSeriesCount() > 1) {
       return anychart.enums.Anchor.CENTER;
     } else {
@@ -55,7 +55,7 @@ anychart.waterfallModule.Series.prototype.resolveAutoAnchor = function(position,
 
 /** @inheritDoc */
 anychart.waterfallModule.Series.prototype.createPositionProvider = function(position, opt_shift3D) {
-  if (position == 'auto') {
+  if (position == anychart.enums.Position.AUTO) {
     if (this.chart.getSeriesCount() > 1) {
       position = anychart.enums.Position.CENTER;
     } else {
@@ -132,6 +132,12 @@ anychart.waterfallModule.Series.prototype.checkDirectionIsPositive = function(po
   } else
     result = anychart.waterfallModule.Series.base(this, 'checkDirectionIsPositive', position);
   return result;
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Series.prototype.getPointValue = function(rowInfo) {
+  return rowInfo.meta('isTotal') ? rowInfo.get('value') : rowInfo.meta('diff');
 };
 
 

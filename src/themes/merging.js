@@ -1023,6 +1023,7 @@ anychart.themes.merging.mergingMap_ = (function() {
         [[
           'map',
           'treeMap',
+          'calendar',
           'standalones',
           'tagCloud'
         ], '.colorRange']
@@ -1086,7 +1087,8 @@ anychart.themes.merging.mergingMap_ = (function() {
         'mekko',
         'venn',
         'sunburst',
-        'sankey'
+        'sankey',
+        'calendar'
       ]
     },
     {

@@ -79,9 +79,9 @@ anychart.core.settings.createDescriptor = function(map, descriptorOrHandler, pro
 
 
 /**
- * @param {!Object.<anychart.core.settings.PropertyDescriptor>} map
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} map
  * @param {!Array.<Array>} descriptors Descriptors.
- * @return {!Object.<anychart.core.settings.PropertyDescriptor>}
+ * @return {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.settings.createDescriptors = function(map, descriptors) {
   var diff = {};
@@ -258,7 +258,7 @@ anychart.core.settings.createTextPropertiesDescriptorsMeta = function(map, inval
 /**
  * Populates the prototype of passed class constructor with settings from descriptors.
  * @param {!(Function|Object)} target
- * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {boolean=} opt_targetIsInstance If the target is an instance. Treated as a class contructor otherwise.
  */
 anychart.core.settings.populate = function(target, descriptors, opt_targetIsInstance) {
@@ -302,7 +302,7 @@ anychart.core.settings.populateAliases = function(classConstructor, aliases, ali
 /**
  * Deserializes passed config to a target using descriptors.
  * @param {!(anychart.core.settings.IObjectWithSettings|Object|anychart.core.Base)} target
- * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {!Object} config
  * @param {boolean=} opt_default
  */
@@ -324,10 +324,10 @@ anychart.core.settings.deserialize = function(target, descriptors, config, opt_d
 /**
  * Populates passed json object with serialized settings of the target using descriptors.
  * @param {!anychart.core.settings.IObjectWithSettings} target
- * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {!Object} json
  * @param {string=} opt_warningPrefix
- * @param {Object.<anychart.core.settings.PropertyDescriptorMeta>=} opt_descriptorsMeta
+ * @param {Object.<string, anychart.core.settings.PropertyDescriptorMeta>=} opt_descriptorsMeta
  * @param {boolean=} opt_ownOnly
  */
 anychart.core.settings.serialize = function(target, descriptors, json, opt_warningPrefix, opt_descriptorsMeta, opt_ownOnly) {
@@ -373,7 +373,7 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
 /**
  * Copy settings from config to target for descriptors map.
  * @param {!Object} target
- * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} descriptors
  * @param {!Object} config
  */
 anychart.core.settings.copy = function(target, descriptors, config) {

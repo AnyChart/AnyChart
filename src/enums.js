@@ -26,9 +26,11 @@ anychart.enums.ChartTypes = {
   BOX: 'box',
   BUBBLE: 'bubble',
   BULLET: 'bullet',
+  CALENDAR: 'calendar',
   CANDLESTICK: 'candlestick',
   CARTESIAN: 'cartesian',
   CARTESIAN_3D: 'cartesian-3d',
+  CIRCLE_PACKING: 'circle-packing',
   COLUMN: 'column',
   COLUMN_3D: 'column-3d',
   FINANCIAL: 'financial',
@@ -382,7 +384,7 @@ anychart.enums.normalizeAnchor = function(value, opt_default) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Position enum. Defines 9 items. Similar to Anchor. Distinct by meaning.
+ * Position enum. Defines 10 items. Similar to Anchor. Distinct by meaning.
  * @illustration <t>simple</t>
  * var orange = '1 orange 1';
  * var star = stage.star5(stage.width()/2, stage.height()/3, stage.height()/4).fill('yellow', 0.5);
@@ -439,7 +441,14 @@ anychart.enums.Position = {
   RIGHT_CENTER: 'right-center',
 
   /** The right-bottom position of the element. */
-  RIGHT_BOTTOM: 'right-bottom'
+  RIGHT_BOTTOM: 'right-bottom',
+
+  /**
+   * Position is calculated automatically, used in waterfall
+   * for stack and connectors labels and for labels
+   * of continious series.
+   */
+  AUTO: 'auto'
 };
 
 
@@ -5176,7 +5185,8 @@ anychart.enums.Store = {
   SANKEY: 'sankey',
   TIMELINE_CHART: 'timelinechart',
   GRAPH: 'graph',
-  WATERFALL: 'waterfall'
+  WATERFALL: 'waterfall',
+  CALENDAR_CHART: 'calendarchart'
 };
 
 

@@ -66,7 +66,7 @@ anychart.graphModule.elements.Layout.OWN_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  function layoutNormalizer (value) {
+  function layoutNormalizer(value) {
     return anychart.enums.normalize(anychart.enums.LayoutType, value, anychart.enums.LayoutType.FORCED);
   }
 

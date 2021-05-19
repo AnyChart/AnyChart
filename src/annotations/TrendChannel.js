@@ -282,19 +282,13 @@ anychart.annotationsModule.TrendChannel.prototype.colorize = function(state) {
 
 /** @inheritDoc */
 anychart.annotationsModule.TrendChannel.prototype.checkVisible = function() {
-  var res = anychart.annotationsModule.TrendChannel.base(this, 'checkVisible');
-  if (!res && this.anchorsAvailable == anychart.annotationsModule.AnchorSupport.THREE_POINTS) {
-    var x1 = this.coords['xAnchor'];
-    var x2 = this.coords['secondXAnchor'];
-    var x3 = this.coords['thirdXAnchor'];
-    if (x1 != x2) { // in other case we can just check by anchors, that is already done
-      var sx = x2 > x1 ? Math.min(x1, x3) : Math.max(x1, x3);
-      var ex = x2;
-      res = !((sx < this.pixelBoundsCache.left && ex > sx) ||
-          (sx > this.pixelBoundsCache.getRight() && ex < sx));
-    }
+  if (this.anchorsAvailable == anychart.annotationsModule.AnchorSupport.THREE_POINTS) {
+    var isInsideBounds = anychart.annotationsModule.TrendChannel.base(this, 'checkVisible');
+    var isNotPerpendicularToX = this.coords['secondXAnchor'] != this.coords['xAnchor'];
+    return isInsideBounds || isNotPerpendicularToX;
   }
-  return res;
+
+  return false;
 };
 
 

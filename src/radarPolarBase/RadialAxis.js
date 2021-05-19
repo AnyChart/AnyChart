@@ -389,17 +389,19 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.minorTicksInvalidated_ = func
 
 
 /**
- * Getter/setter for scale.
+ * Internal getter/setter for scale.
  * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
+ * @param {boolean=} opt_isChartScale - Whether axis uses the chart's scale.
  * @return {anychart.scales.Base|!anychart.radarPolarBaseModule.RadialAxis} Axis scale or itself for method chaining.
  */
-anychart.radarPolarBaseModule.RadialAxis.prototype.scale = function(opt_value) {
+anychart.radarPolarBaseModule.RadialAxis.prototype.scaleInternal = function(opt_value, opt_isChartScale) {
   if (goog.isDef(opt_value)) {
     var val = anychart.scales.Base.setupScale(this.scale_, opt_value, null,
         anychart.scales.Base.ScaleTypes.ALL_DEFAULT, null, this.scaleInvalidated_, this);
     if (val) {
       var dispatch = this.scale_ == val;
       this.scale_ = /** @type {anychart.scales.Linear} */(val);
+      this.scale_.isChartScale = !!opt_isChartScale;
       this.scale_.resumeSignalsDispatching(dispatch);
       if (!dispatch) {
         this.dropBoundsCache_();
@@ -410,6 +412,15 @@ anychart.radarPolarBaseModule.RadialAxis.prototype.scale = function(opt_value) {
   } else {
     return this.scale_;
   }
+};
+
+/**
+ * Getter/setter for scale.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes|Object)=} opt_value Scale.
+ * @return {anychart.scales.Base|!anychart.radarPolarBaseModule.RadialAxis} Axis scale or itself for method chaining.
+ */
+anychart.radarPolarBaseModule.RadialAxis.prototype.scale = function(opt_value) {
+  return this.scaleInternal(opt_value);
 };
 
 

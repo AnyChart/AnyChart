@@ -145,7 +145,8 @@ anychart.ganttModule.elements.MilestonesElement.Preview = function(timeline) {
   anychart.ganttModule.elements.MilestonesElement.Preview.base(this, 'constructor', timeline);
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['depth', 0, anychart.Signal.NEEDS_REDRAW]
+    ['depth', 0, anychart.Signal.NEEDS_REDRAW],
+    ['drawOnCollapsedOnly', 0, anychart.Signal.NEEDS_REDRAW]
   ]);
 };
 goog.inherits(anychart.ganttModule.elements.MilestonesElement.Preview, anychart.ganttModule.elements.MilestonesElement);
@@ -161,11 +162,10 @@ anychart.ganttModule.elements.MilestonesElement.Preview.DESCRIPTORS = (function(
   /** @type {!Object.<anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  anychart.core.settings.createDescriptor(
-      map,
-      anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'depth',
-      anychart.core.settings.numberOrNullNormalizer);
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'depth', anychart.core.settings.numberOrNullNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drawOnCollapsedOnly', anychart.core.settings.booleanNormalizer]
+  ]);
 
   return map;
 })();

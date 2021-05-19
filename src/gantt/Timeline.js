@@ -3225,8 +3225,8 @@ anychart.ganttModule.TimeLine.prototype.getInteractivityEvent = function(event) 
  * info to the interactivity event.
  * Alters interactivityEvent in the process.
  *
- * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent 
- * @param {Object} interactivityEvent 
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} originalEvent
+ * @param {Object} interactivityEvent
  */
 anychart.ganttModule.TimeLine.prototype.patchInteractivityEvent = function(originalEvent, interactivityEvent) {
   // Find period tag by the label.
@@ -3664,6 +3664,33 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
 
 
 /**
+ * Whether we should draw milestone preview consider drawOnCollapsed mode.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Tree data item.
+ * @return {boolean}
+ * @private
+ */
+anychart.ganttModule.TimeLine.prototype.shouldDrawPreviewMilestone_ = function(dataItem) {
+  var preview = this.milestones().preview();
+  var previewEnabled = /** @type {boolean} */ (preview.getOption('enabled'));
+  var previewDepthNotZero = /** @type {number} */ (preview.getOption('depth')) != 0;
+  var isCollapsed = /** @type {boolean} */ (dataItem.meta(anychart.enums.GanttDataFields.COLLAPSED));
+  var drawOnCollapsedOnly = /** @type {boolean} */ (preview.getOption('drawOnCollapsedOnly'));
+
+  /*
+    drawOnCollapsedOnly isCollapsed shouldDraw
+    0 0 1
+    0 1 1
+    1 0 0
+    1 1 1
+  */
+  var shouldDrawMilestone = !drawOnCollapsedOnly || isCollapsed;
+
+  return (previewEnabled && previewDepthNotZero && shouldDrawMilestone);
+};
+
+
+/**
  * Draws data item as baseline.
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
@@ -3746,9 +3773,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
       actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
       var tag = this.createTag(dataItem, element, actualBounds);
 
-      if (isParent) {
-        if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
-          this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
+      if (isParent && this.shouldDrawPreviewMilestone_(dataItem)) {
+        this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
       }
       this.setRelatedBounds_(dataItem, actualBounds);
 
@@ -3871,7 +3897,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
 
   if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask || info.isLoadable)) {
-    if (this.milestones().preview().getOption('enabled') && this.milestones().preview().getOption('depth') != 0)
+    if (this.shouldDrawPreviewMilestone_(dataItem))
       this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem));
 
     var actualStart = info.start;
@@ -5319,14 +5345,14 @@ anychart.ganttModule.TimeLine.prototype.insertTagForCropLabels_ = function(tag) 
   if (!goog.isArray(this.sortedTags_[tag.row])) {
     this.sortedTags_[tag.row] = [];
   }
-  
+
   var isResourcePeriodOrMilestone =
     (tag.type === anychart.enums.TLElementTypes.PERIODS) ||
     (tag.type === anychart.enums.TLElementTypes.MILESTONES);
-  
+
   var isProjectMilestonePreview =
     (tag.type === anychart.enums.TLElementTypes.MILESTONES_PREVIEW);
-  
+
   var isResource = this.controller.isResources();
 
   var suits1 = (isResource && isResourcePeriodOrMilestone);

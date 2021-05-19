@@ -146,7 +146,7 @@ anychart.stockModule.Chart = function(opt_allowPointSettings) {
    * Annotations module exports, if it is included. Also used in Plots.
    * @type {{ChartController:Function, PlotController:Function}|undefined}
    */
-  this.annotationsModule = anychart.window['anychart']['annotations'];
+  this.annotationsModule = anychart.module['annotations'];
 
   /**
    * Default annotation settings.

@@ -84,22 +84,54 @@ anychart.polarModule.Grid.prototype.drawInterlaceCircuit = function(ratio, prevR
 
 
 /**
- * Draw angle line.
- * @param {number} angle .
- * @param {number} sweep .
- * @param {number} x .
- * @param {number} y .
- * @param {number} prevX .
- * @param {number} prevY .
- * @param {acgraph.vector.Path} element Path element to draw interlace .
+ * Draw polar grid sector.
+ *
+ * @param {number} angle - Sector start angle in degrees.
+ * @param {number} sweep - Sector central angle in degrees.
+ * @param {number} x - Unused.
+ * @param {number} y - Unused.
+ * @param {number} prevX - Previous point x.
+ * @param {number} prevY - Prefious point y.
+ * @param {acgraph.vector.Path} element - Path element to draw sector.
  * @protected
  */
 anychart.polarModule.Grid.prototype.drawInterlaceRadial = function(angle, sweep, x, y, prevX, prevY, element) {
   if (!(isNaN(prevX) && isNaN(prevY))) {
-    element.circularArc(this.cx_, this.cy_, this.radius_, this.radius_, angle, -sweep);
+    var isXScaleInverted = this.xScale().inverted();
+    /*
+      When xScale is not inverted - outer arc of the sector is drawn in
+      counterclockwise direction.
+      If xScale is inverted - outer arc is drawn in clockwise direction.
+     */
+    var outerArcSweep = isXScaleInverted ? sweep : -sweep;
+
+    element.circularArc(
+        this.cx_,
+        this.cy_,
+        this.radius_,
+        this.radius_,
+        angle,
+        outerArcSweep
+    );
+    // Inner radius is set, so there is second arc.
     if (this.iRadius_) {
-      element.lineTo(this.cx_ + this.iRadius_ * Math.cos(angle), this.cy_ + this.iRadius_ * Math.sin(angle));
-      element.circularArc(this.cx_, this.cy_, this.iRadius_, this.iRadius_, angle - sweep, sweep);
+      var innerStartAngle = angle + outerArcSweep;
+
+      // Move path from the outer arc to the inner arc.
+      element.lineTo(
+          this.cx_ + goog.math.angleDx(innerStartAngle, this.iRadius_),
+          this.cy_ + goog.math.angleDy(innerStartAngle, this.iRadius_)
+      );
+
+      // Inner arc is always drawn in the opposite direction to the outer arc.
+      element.circularArc(
+          this.cx_,
+          this.cy_,
+          this.iRadius_,
+          this.iRadius_,
+          innerStartAngle,
+          -outerArcSweep
+      );
     } else {
       element.lineTo(this.cx_, this.cy_);
     }
@@ -116,7 +148,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
   this.clearFillElements();
   this.lineElement().clear();
 
-  var isOrdinal, ticks, ticksArray, ticksArrLen;
+  var ticksArray;
   /** @type {acgraph.vector.Path} */
   var path;
 
@@ -133,27 +165,22 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
   var startAngle = /** @type {number} */(this.getOption('startAngle')) - 90;
 
   if (this.isRadial()) {
-    isOrdinal = anychart.utils.instanceOf(xScale, anychart.scales.Ordinal);
-    ticks = (this.getOption('isMinor') && !isOrdinal) ? xScale.minorTicks() : xScale.ticks();
-    ticksArray = ticks.get();
-    ticksArrLen = ticksArray.length;
-    if (!isOrdinal && xScale.transform(xScale.ticks().get()[0]) == 0 && xScale.transform(ticksArray[ticksArrLen - 1]) == 1) {
-      ticksArrLen--;
-    }
+    ticksArray = this.getTicksArray_(xScale);
+    var sectorsCount = this.getSectorsCount_(ticksArray);
 
-    var sweep = 360 / ticksArrLen;
+    var sweep = 360 / sectorsCount;
     var angleRad, x, y, prevX = NaN, prevY = NaN, xRatio, angle;
 
     var stroke = this.getOption('stroke');
     var lineThickness = stroke['thickness'] ? stroke['thickness'] : 1;
-    var xPixelShift, yPixelShift;
-    for (i = 0; i < ticksArrLen; i++) {
+
+    for (i = 0; i < sectorsCount; i++) {
       xRatio = xScale.transform(ticksArray[i]);
       angle = goog.math.standardAngle(startAngle + 360 * xRatio);
       angleRad = goog.math.toRadians(angle);
 
-      xPixelShift = 0;
-      yPixelShift = 0;
+      var xPixelShift = 0;
+      var yPixelShift = 0;
       if (!angle) {
         yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
       } else if (angle == 90) {
@@ -193,13 +220,12 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
     y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
     this.drawInterlaceRadial(angle, sweep, x, y, prevX, prevY, path);
   } else {
-    isOrdinal = anychart.utils.instanceOf(yScale, anychart.scales.Ordinal);
-    ticks = isOrdinal ? yScale.ticks() : this.getOption('isMinor') ? yScale.minorTicks() : yScale.ticks();
-    ticksArray = ticks.get();
-    ticksArrLen = ticksArray.length;
+    ticksArray = this.getTicksArray_(yScale);
+    var ringsCount = ticksArray.length;
+    var isOrdinal = yScale.getType() == anychart.enums.ScaleTypes.ORDINAL;
 
     var prevRatio = NaN;
-    for (i = 0; i < ticksArrLen; i++) {
+    for (i = 0; i < ringsCount; i++) {
       var tickVal = ticksArray[i];
       var leftTick, rightTick;
       if (goog.isArray(tickVal)) {
@@ -212,7 +238,7 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
 
       if (i != 0)
         path = this.getFillElement(i - 1);
-      if (i == ticksArrLen - 1) {
+      if (i == ringsCount - 1) {
         if (isOrdinal) {
           this.drawInterlaceCircuit(ratio, prevRatio, path);
           path = this.getFillElement(i);
@@ -234,6 +260,53 @@ anychart.polarModule.Grid.prototype.drawInternal = function() {
       prevRatio = ratio;
     }
   }
+};
+
+
+//endregion
+//region --- Private methods
+/**
+ * Returns number of sectors for X grids.
+ *
+ * @param {Array.<number>} ticksArray - Scale ticks array.
+ *
+ * @return {number}
+ *
+ * @private
+ */
+anychart.polarModule.Grid.prototype.getSectorsCount_ = function(ticksArray) {
+  var xScale = this.xScale();
+  var isOrdinal = xScale.getType() == anychart.enums.ScaleTypes.ORDINAL;
+  var ticksCount = ticksArray.length;
+
+  if (!isOrdinal) {
+    var firstTickRatio = xScale.transform(ticksArray[0]);
+    var lastTickRatio = xScale.transform(ticksArray[ticksCount - 1]);
+    var areFirstAndLastTicksSame =
+        (firstTickRatio == 0 && lastTickRatio == 1) ||
+        (firstTickRatio == 1 && lastTickRatio == 0); // Inverted scale case.
+
+    return areFirstAndLastTicksSame ? ticksCount - 1 : ticksCount;
+  }
+
+  return ticksCount;
+};
+
+
+/**
+ * Returns array of ticks.
+ *
+ * @param {anychart.scales.Base} scale - Scale to get ticks array from.
+ *
+ * @return {Array.<number>}
+ *
+ * @private
+ */
+anychart.polarModule.Grid.prototype.getTicksArray_ = function(scale) {
+  var isMinor = this.getOption('isMinor');
+  var isOrdinal = scale.getType() === anychart.enums.ScaleTypes.ORDINAL;
+  var ticks = (isMinor && !isOrdinal) ? scale.minorTicks() : scale.ticks();
+  return ticks.get();
 };
 
 

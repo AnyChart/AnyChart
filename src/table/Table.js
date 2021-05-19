@@ -2547,7 +2547,7 @@ anychart.tableModule.Table.prototype.toCsv = function(opt_csvSettings) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.tableModule.Table.prototype.saveAsXlsx = function(opt_filename) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var csv = this.toCsv({
       'rowsSeparator': '\n',
@@ -2567,7 +2567,7 @@ anychart.tableModule.Table.prototype.saveAsXlsx = function(opt_filename) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.tableModule.Table.prototype.saveAsCsv = function(opt_csvSettings, opt_filename) {
-  var exports = anychart.window['anychart']['exports'];
+  var exports = anychart.module['exports'];
   if (exports) {
     var csv = this.toCsv(opt_csvSettings);
     exports.saveAsCsv(this, csv, opt_filename);
@@ -2619,7 +2619,7 @@ anychart.tableModule.table = function(opt_rowsCount, opt_colsCount) {
 anychart.tableModule.Table.prototype.contextMenu = function(opt_value) {
   if (!this.contextMenu_) {
     // suppress NO_FEATURE_IN_MODULE warning
-    this.contextMenu_ = anychart.window['anychart']['ui']['contextMenu'](true);
+    this.contextMenu_ = anychart.module['ui']['contextMenu'](true);
     if (this.contextMenu_) {
       this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
       this.contextMenu_['attach'](this);
@@ -2657,7 +2657,7 @@ anychart.tableModule.Table.prototype.getVersionHistoryLink = function() {
  */
 anychart.tableModule.Table.prototype.contextMenuItemsProvider = function(context) {
   var items = {};
-  if (anychart.window['anychart']['exports']) {
+  if (anychart.module['exports']) {
     goog.object.extend(items, /** @type {Object} */ (anychart.utils.recursiveClone(anychart.tableModule.Table.contextMenuMap['exporting'])));
   }
   if (goog.dom.fullscreen.isSupported() && context['menuParent'])

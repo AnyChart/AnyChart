@@ -97,7 +97,7 @@ anychart.core.ChartWithAxes = function(joinData) {
    * @type {{ChartController:Function, PlotController:Function}|undefined}
    * @private
    */
-  this.annotationsModule_ = anychart.window['anychart']['annotations'];
+  this.annotationsModule_ = anychart.module['annotations'];
 };
 goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithOrthogonalScales);
 
@@ -150,7 +150,7 @@ anychart.core.ChartWithAxes.prototype.setDefaultScaleForLayoutBasedElements = fu
 anychart.core.ChartWithAxes.prototype.isVertical = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = !!opt_value;
-    if (this.isVerticalInternal != opt_value) {
+    if (!!this.isVerticalInternal != opt_value) {
       this.isVerticalInternal = opt_value;
 
       for (var i = this.seriesList.length; i--;) {

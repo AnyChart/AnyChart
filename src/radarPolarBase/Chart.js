@@ -513,7 +513,7 @@ anychart.radarPolarBaseModule.Chart.prototype.beforeSeriesDraw = function() {
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
 anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
-  var i, count, axis;
+  var i, count;
 
   this.calculate();
 
@@ -521,44 +521,59 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     return;
   }
 
-  anychart.core.Base.suspendSignalsDispatching(this.xAxis_, this.yAxis_);
+  var xAxis = this.xAxis();
+  var yAxis = this.yAxis();
+
+  anychart.core.Base.suspendSignalsDispatching(xAxis, yAxis);
 
   var axisInvalidated = false;
+  var startAngle = /** @type {number} */ (this.getOption('startAngle'));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.AXES_CHART_AXES)) {
-    axis = this.xAxis();
-    if (!axis.scale()) {
-      axis.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+    var xScale = /** @type {anychart.scales.Base} */(this.xScale());
+    var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+
+    if (!xAxis.scale() || xAxis.scale().isChartScale) {
+      xAxis.scaleInternal(xScale, true);
     }
-    axis.dropLabelCallsCache();
+    xAxis.dropLabelCallsCache();
 
-    axis = this.yAxis();
-    if (!axis.scale()) {
-      axis.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+    if (!yAxis.scale() || yAxis.scale().isChartScale) {
+      yAxis.scaleInternal(yScale, true);
     }
-    axis.dropLabelCallsCache();
+    yAxis.dropLabelCallsCache();
 
-    axisInvalidated = true;
-  }
-
-  var startAngle = /** @type {number} */ (this.getOption('startAngle'));
-  // calculate axes space first, the result is data bounds
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    //total bounds of content area
+    // Total bounds of content area.
     var contentAreaBounds = bounds.clone().round();
-    axis = this.xAxis();
-    axis['startAngle'](startAngle);
-    axis.parentBounds(contentAreaBounds);
-    this.dataBounds = axis.getRemainingBounds().round();
+    xAxis['startAngle'](startAngle);
+    xAxis.parentBounds(contentAreaBounds);
 
-    this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES |
-        anychart.ConsistencyState.AXES_CHART_GRIDS |
-        anychart.ConsistencyState.SERIES_CHART_SERIES);
+    // Data bounds are what is left of xAxis.
+    var newDataBounds = xAxis.getRemainingBounds().round();
+
+    /*
+      Scale changes trigger AXES_CHART_AXES state, but leave BOUNDS state unchanged.
+      At the same time changes to the scale sometimes lead to the bounds changes.
+    */
+    var boundsUpdated = !goog.math.Rect.equals(newDataBounds, this.dataBounds);
+    var boundsInvalidated = this.hasInvalidationState(anychart.ConsistencyState.BOUNDS);
+
+    /*
+      Bounds state is triggered on bounds changes and on startAngle/innerRadius.
+      So it is crucial to invalidate axes/grids/series even if data bounds remain same.
+     */
+    if (boundsUpdated || boundsInvalidated) {
+      this.dataBounds = newDataBounds;
+      this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES |
+          anychart.ConsistencyState.AXES_CHART_GRIDS |
+          anychart.ConsistencyState.SERIES_CHART_SERIES);
+    }
 
     axisInvalidated = true;
   }
 
   var innerRadius = /** @type {string|number} */ (this.getOption('innerRadius'));
+
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_GRIDS)) {
     var grids = goog.array.concat(this.xGrids_, this.yGrids_, this.xMinorGrids_, this.yMinorGrids_);
 
@@ -580,29 +595,27 @@ anychart.radarPolarBaseModule.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_GRIDS);
   }
 
-  //draw axes outside of data bounds
-  //only inside axes ticks can intersect data bounds
+  /*
+    Draw axes outside of data bounds.
+    Only inside axes ticks can intersect data bounds.
+   */
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_AXES)) {
-    axis = this.xAxis();
-    axis.container(this.rootElement);
-    // parent bounds and angle were already set for xAxis at BOUNDS
-    // axis.startAngle(startAngle);
-    // axis.parentBounds(bounds.clone().round());
-    axis.draw();
+    xAxis.container(this.rootElement);
+    // Parent bounds and angle were already set for xAxis at BOUNDS.
+    xAxis.draw();
 
-    axis = this.yAxis();
-    axis.container(this.rootElement);
-    axis['startAngle'](startAngle);
-    axis['innerRadius'](innerRadius);
-    axis.parentBounds(this.dataBounds.clone());
-    axis.draw();
+    yAxis.container(this.rootElement);
+    yAxis['startAngle'](startAngle);
+    yAxis['innerRadius'](innerRadius);
+    yAxis.parentBounds(this.dataBounds.clone());
+    yAxis.draw();
 
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_AXES);
   }
 
   this.drawSeries(0, 0, 0, 0);
 
-  anychart.core.Base.resumeSignalsDispatchingFalse(this.xAxis_, this.yAxis_);
+  anychart.core.Base.resumeSignalsDispatchingFalse(xAxis, yAxis);
 };
 
 

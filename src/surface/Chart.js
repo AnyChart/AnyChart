@@ -1,11 +1,14 @@
 //region --- Requiring and Providing
 goog.provide('anychart.surfaceModule.Chart');
+
+goog.require('acgraph.vector.Path');
 goog.require('anychart.colorScalesModule.ui.ColorRange');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.reporting');
 goog.require('anychart.data.Set');
 goog.require('anychart.surfaceModule.Axis');
 goog.require('anychart.surfaceModule.Grid');
+goog.require('anychart.surfaceModule.markers.Controller');
 goog.require('anychart.surfaceModule.math');
 //endregion
 
@@ -378,24 +381,6 @@ anychart.surfaceModule.Chart.prototype.calculate = function() {
     this.markConsistent(anychart.ConsistencyState.SURFACE_DATA);
   }
 
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.SURFACE_COLOR_SCALE)) {
-    if (this.colorScale_) {
-      if (this.colorScale_.needsAutoCalc()) {
-        this.colorScale_.startAutoCalc();
-        this.colorScale_.extendDataRange.apply(this.colorScale_, this.valuesZ_);
-        this.colorScale_.finishAutoCalc();
-      } else {
-        this.colorScale_.resetDataRange();
-        this.colorScale_.extendDataRange.apply(this.colorScale_, this.valuesZ_);
-      }
-      if (anychart.utils.instanceOf(this.colorScale_, anychart.colorScalesModule.Ordinal))
-        this.colorScale_.ticks().markInvalid();
-      this.invalidate(anychart.ConsistencyState.APPEARANCE);
-      this.markConsistent(anychart.ConsistencyState.SURFACE_COLOR_SCALE);
-    }
-  }
-
   var xScale = this.xScale();
   var yScale = this.yScale();
   var zScale = this.zScale();
@@ -405,16 +390,53 @@ anychart.surfaceModule.Chart.prototype.calculate = function() {
   if (xScale.needsAutoCalc()) xScale.startAutoCalc();
   if (yScale.needsAutoCalc()) yScale.startAutoCalc();
   if (zScale.needsAutoCalc()) zScale.startAutoCalc();
-  xScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(xScale), this.valuesX_);
-  yScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(yScale), this.valuesY_);
-  zScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(zScale), this.valuesZ_);
+
+  var markersXValues = [];
+  var markersYValues = [];
+  var markersZValues = [];
+
+  var markersController = this.getCreated('markers');
+  if (markersController) {
+    var markers = markersController.getMarkers();
+    for (var i = 0; i < markers.length; i++) {
+      var marker = markers[i];
+      var data = marker.data();
+
+      markersXValues.push(data[0]);
+      markersYValues.push(data[1]);
+      markersZValues.push(data[2]);
+    }
+  }
+
+
+  xScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(xScale), goog.array.concat(this.valuesX_, markersXValues));
+  yScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(yScale), goog.array.concat(this.valuesY_, markersYValues));
+  zScale.extendDataRange.apply(/** @type {anychart.scales.Base} */(zScale), goog.array.concat(this.valuesZ_, markersZValues));
+
   if (xScale.needsAutoCalc()) scalesChanged |= xScale.finishAutoCalc();
   if (yScale.needsAutoCalc()) scalesChanged |= yScale.finishAutoCalc();
   if (zScale.needsAutoCalc()) scalesChanged |= zScale.finishAutoCalc();
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.SURFACE_COLOR_SCALE)) {
+    if (this.colorScale_) {
+      var zValues = goog.array.concat(this.valuesZ_, markersZValues);
+      if (this.colorScale_.needsAutoCalc()) {
+        this.colorScale_.startAutoCalc();
+        this.colorScale_.extendDataRange.apply(this.colorScale_, zValues);
+        this.colorScale_.finishAutoCalc();
+      } else {
+        this.colorScale_.resetDataRange();
+        this.colorScale_.extendDataRange.apply(this.colorScale_, zValues);
+      }
+      if (anychart.utils.instanceOf(this.colorScale_, anychart.colorScalesModule.Ordinal))
+        this.colorScale_.ticks().markInvalid();
+      this.invalidate(anychart.ConsistencyState.APPEARANCE);
+      this.markConsistent(anychart.ConsistencyState.SURFACE_COLOR_SCALE);
+    }
+  }
+
   if (scalesChanged)
     this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES);
-
 };
 
 
@@ -426,7 +448,7 @@ anychart.surfaceModule.Chart.prototype.createLegendItemsProvider = function(sour
 
   var legendItemsArray = [];
   for (var i = 0; i < ticks.length; i++) {
-    var color = this.colorScale() ? this.colorScale().valueToColor(ticks[i]) : this.palette().itemAt(0);
+    var color = this.resolveColor(ticks[i]);
     var legendItemProvider = {
       'index': 0,
       'text': ticks[i],
@@ -577,8 +599,29 @@ anychart.surfaceModule.Chart.prototype.colorScaleInvalidated_ = function(event) 
 anychart.surfaceModule.Chart.prototype.onScalesSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
 };
+
+
+
 //endregion
 //region --- Color range
+/**
+ * Resolve color for passed value based on coloring type.
+ *
+ * @param {number} value
+ * @return {string}
+ */
+anychart.surfaceModule.Chart.prototype.resolveColor = function(value) {
+  var colorScale = this.colorScale();
+  var color;
+
+  if (colorScale) {
+    color = colorScale.valueToColor(value);
+  } else {
+    var palette = this.palette();
+    color = palette.itemAt(0);
+  }
+  return color;
+};
 
 
 /**
@@ -697,22 +740,22 @@ anychart.surfaceModule.Chart.prototype.drawContent = function(bounds) {
   this.calculate();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
-    if (zAxis && !zAxis.scale()){
+    if (zAxis && !zAxis.scale()) {
       zAxis.scale(this.zScale());
     }
-    if (xAxis && !xAxis.scale()){
+    if (xAxis && !xAxis.scale()) {
       xAxis.scale(this.xScale());
     }
-    if (yAxis && !yAxis.scale()){
+    if (yAxis && !yAxis.scale()) {
       yAxis.scale(this.yScale());
     }
-    if (xGrid){
+    if (xGrid) {
       xGrid.scale(/** @type {anychart.scales.IXScale} */(this.xScale()));
     }
-    if (yGrid){
+    if (yGrid) {
       yGrid.scale(/** @type {anychart.scales.IXScale} */(this.yScale()));
     }
-    if (zGrid){
+    if (zGrid) {
       zGrid.scale(/** @type {anychart.scales.IXScale} */(this.zScale()));
     }
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES);
@@ -782,6 +825,13 @@ anychart.surfaceModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.drawSurface(this.dataBounds_);
+
+    var markersController = this.getCreated('markers');
+
+    if (markersController) {
+      markersController.container(this.rootLayer_);
+      markersController.draw(this.dataBounds_);
+    }
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -836,14 +886,25 @@ anychart.surfaceModule.Chart.prototype.prepareTransformationMatrix = function(ya
 
 
 /**
+ * Distance from camera to point.
+ *
+ * @param {Array.<number>} point - Array with point coordinates.
+ * @return {number} returns zIndex-like distance, where lower value means object is farther away.
+ */
+anychart.surfaceModule.Chart.prototype.calculateZIndexForPoint = function(point) {
+  return anychart.surfaceModule.math.distanceFromPointToPoint(this.cameraPoint_, point);
+};
+
+
+/**
  * Distance from camera to path defined by points. Points should be in range [-0.5, 0.5].
  * @param {Array.<Array.<number>>} points
  * @return {number} returns zIndex-like distance, where lower value means object is farther away.
  */
-anychart.surfaceModule.Chart.prototype.calculateZIndex = function(points) {
+anychart.surfaceModule.Chart.prototype.calculateZIndexForFace = function(points) {
   var distance = 0;
   for (var i = 0; i < points.length; i++) {
-    distance += anychart.surfaceModule.math.distanceFromPointToPoint(this.cameraPoint_, points[i]);
+    distance += this.calculateZIndexForPoint(points[i]);
   }
 
   distance /= points.length;
@@ -951,19 +1012,11 @@ anychart.surfaceModule.Chart.prototype.drawSurface = function(bounds) {
       p2 = anychart.surfaceModule.math.applyTransformationMatrixToPoint(this.transformationMatrix_, this.scalePoint(face[2]));
       p3 = anychart.surfaceModule.math.applyTransformationMatrixToPoint(this.transformationMatrix_, this.scalePoint(face[3]));
 
-      var depth = anychart.surfaceModule.Chart.Z_INDEX_ROOT_LAYER + this.calculateZIndex([p0, p1, p2, p3]);
+      var depth = anychart.surfaceModule.Chart.Z_INDEX_ROOT_LAYER + this.calculateZIndexForFace([p0, p1, p2, p3]);
 
       var pointsToRender = anychart.surfaceModule.math.pointsToScreenCoordinates([p0, p1, p2, p3], bounds);
 
-      var colorScale = this.colorScale();
-      var color;
-
-      if (colorScale) {
-        color = colorScale.valueToColor((originalP0[2] + originalP1[2] + originalP2[2] + originalP3[2]) / 4);
-      } else {
-        var palette = this.palette();
-        color = palette.itemAt(0);
-      }
+      var color = this.resolveColor((originalP0[2] + originalP1[2] + originalP2[2] + originalP3[2]) / 4);
 
       this.drawPolygon(path, pointsToRender, depth, color, stroke);
     }
@@ -1128,7 +1181,7 @@ anychart.surfaceModule.Chart.prototype.drawBox = function(bounds) {
     var p0 = cagePoints[i][0];
     var p1 = cagePoints[i][1];
 
-    var zIndex = Math.min(this.calculateZIndex([p0]), this.calculateZIndex([p1]));
+    var zIndex = Math.min(this.calculateZIndexForFace([p0]), this.calculateZIndexForFace([p1]));
     if (p0 == bottomNearest || p1 == bottomNearest || p0 == upperNearest || p1 == upperNearest)
       zIndex = 100; // zIndex hack, for lines going out of nearest point to the viewer
     this.drawLine(this.boxPaths_[i], anychart.surfaceModule.math.pointsToScreenCoordinates(cagePoints[i], bounds),
@@ -1257,9 +1310,54 @@ anychart.surfaceModule.Chart.prototype.onGridSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.AXES_CHART_GRIDS | anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
+// --- Region Markers.
+/**
+ * Markers invalidation handler.
+ *
+ * @param {anychart.SignalEvent} event
+ * @private
+ */
+anychart.surfaceModule.Chart.prototype.markersInvalidated_ = function(event) {
+  var state = anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.AXES_CHART_GRIDS;
+
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.SCALE_CHART_SCALES;
+  }
+
+  this.xGrid().invalidate(this.xGrid().SUPPORTED_CONSISTENCY_STATES);
+  this.yGrid().invalidate(this.yGrid().SUPPORTED_CONSISTENCY_STATES);
+  this.zGrid().invalidate(this.zGrid().SUPPORTED_CONSISTENCY_STATES);
+
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+};
 
 
+/**
+ * Getter/Setter for chart markers.
+ *
+ * @param {Object=} opt_config
+ * @return {anychart.surfaceModule.Chart|anychart.surfaceModule.markers.Controller}
+ */
+anychart.surfaceModule.Chart.prototype.markers = function(opt_config) {
+  if (!this.markers_) {
+    this.markers_ = new anychart.surfaceModule.markers.Controller(this);
+    this.setupCreated('markers', this.markers_);
+    this.markers_.listenSignals(this.markersInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_config)) {
+    this.markers_.setup(opt_config);
+    return this;
+  }
+
+  return this.markers_;
+};
+
+
+//endregion
 /**
  * Getter for chart which current point belongs to.
  * @return {anychart.surfaceModule.Chart}
@@ -1416,6 +1514,11 @@ anychart.surfaceModule.Chart.prototype.serialize = function() {
   if (this.colorRange_)
     json['colorRange'] = this.colorRange().serialize();
 
+  var markersController = this.getCreated('markers');
+  if (markersController) {
+    json['markers'] = markersController.serialize();
+  }
+
   anychart.core.settings.serialize(this, anychart.surfaceModule.Chart.OWN_DESCRIPTORS, json);
   return {'chart': json};
 };
@@ -1453,11 +1556,17 @@ anychart.surfaceModule.Chart.prototype.setupByJSON = function(config, opt_defaul
   this.setupScalesByJSON(config, 'yGrid');
   this.setupScalesByJSON(config, 'zGrid');
 
-  if ('colorScale' in config)
+  if ('colorScale' in config) {
     this.colorScale(config['colorScale']);
-  if ('colorRange' in config)
-    this.colorRange(config['colorRange']);
+  }
 
+  if ('colorRange' in config) {
+    this.colorRange(config['colorRange']);
+  }
+
+  if ('markers' in config) {
+    this.markers(config['markers']);
+  }
 
   anychart.core.settings.deserialize(this, anychart.surfaceModule.Chart.OWN_DESCRIPTORS, config, opt_default);
 };
@@ -1466,6 +1575,7 @@ anychart.surfaceModule.Chart.prototype.setupByJSON = function(config, opt_defaul
 /** @inheritDoc */
 anychart.surfaceModule.Chart.prototype.disposeInternal = function() {
   goog.disposeAll(
+      this.markers_,
       this.xAxis_,
       this.yAxis_,
       this.zAxis_,
@@ -1534,7 +1644,7 @@ anychart.surfaceModule.Chart.prototype.getCsvColumns = function(dataHolder) {
   proto['getType'] = proto.getType;
 
   proto['palette'] = proto.palette;
-
+  proto['markers'] = proto.markers;
   //auto
   //proto['rotationZ'] = proto.rotationZ;
   //proto['rotationY'] = proto.rotationY;

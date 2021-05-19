@@ -1,7 +1,7 @@
 goog.provide('anychart.pieModule.defaultTheme');
 
 
-goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
+goog.mixin(anychart.module['themes']['defaultTheme'], {
   'pie': {
     /**
      * @this {anychart.pieModule.Chart.SliceDrawerContext}

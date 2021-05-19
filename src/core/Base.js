@@ -64,10 +64,22 @@ anychart.ConsistencyState = {
    */
   CHART_LABELS: 1 << 8,
   // We also add SeparateChart states here to not to add prefix SEPARATE_CHART.
-  // But if bullet or spark chart will need some new consistency states, there is a possibility to add 2 here.
+  // But if any of anychart.core.Chart direct descendants charts will need some new consistency states
+  // there would be a possibility to add 1 here (LEGEND consistency state).
   CHART_LEGEND: 1 << 9,
   CHART_CREDITS: 1 << 10,
   CHART_ANIMATION: 1 << 11,
+  //---------------------------------- CALENDAR STATES (CHART) ---------------------------------
+  CALENDAR_DATA: 1 << 12,
+  CALENDAR_PLOTS: 1 << 13,
+  CALENDAR_COLOR_SCALE: 1 << 14,
+  CALENDAR_COLOR_RANGE: 1 << 15,
+
+  CALENDAR_PLOT_WEEK_LABELS: 1 << 26,
+  CALENDAR_PLOT_MONTHS_LABELS: 1 << 27,
+  CALENDAR_PLOT_BACKGROUND: 1 << 28,
+  CALENDAR_PLOT_TITLE: 1 << 29,
+  CALENDAR_PLOT_APPEARANCE: 1 << 30,
   //---------------------------------- BULLET STATES (CHART) ---------------------------------
   BULLET_DATA: 1 << 12,
   BULLET_SCALES: 1 << 13,
@@ -1342,11 +1354,11 @@ anychart.core.Base.prototype.createExtendedThemes = function(sourceThemes, exten
  */
 anychart.core.Base.prototype.flattenThemes = function() {
   var flatTheme = this.themeSettings || {}; // this one is to preserve themeSettings['enabled'] = true from VisualBase constructor
-
+  var resolver = goog.bind(this.resolveSpecialValue, this);
   for (var i = 0; i < this.themes_.length; i++) {
     var theme = this.themes_[i];
     if (goog.isString(theme))
-      flatTheme = anychart.getFlatTheme(theme, flatTheme, goog.bind(this.resolveSpecialValue, this));
+      flatTheme = anychart.getFlatTheme(theme, flatTheme, resolver);
     else if (goog.isObject(theme))
       goog.mixin(flatTheme, theme);
   }

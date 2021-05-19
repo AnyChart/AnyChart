@@ -243,6 +243,7 @@ anychart.graphModule.Chart.Node;
  *  to: string,
  *  currentState: anychart.SettingsState,
  *  path: (acgraph.vector.Path|undefined),
+ *  arrow: (anychart.graphModule.elements.arrows.Arrow),
  *  hoverPath: (acgraph.vector.Path|undefined),
  *  optimizedText: (anychart.core.ui.OptimizedText|undefined),
  *  labelDx: (number|undefined),
@@ -1134,6 +1135,8 @@ anychart.graphModule.Chart.prototype.proceedEdges_ = function() {
         edge.to = to.id;
         edge.dataRow = iterator.getIndex();
         edge.currentState = anychart.SettingsState.NORMAL;
+        edge.arrow = this.edges().arrows().getArrow();
+        edge.arrow.edge(edge);
 
         var sibling;
 

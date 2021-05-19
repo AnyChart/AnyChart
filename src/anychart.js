@@ -37,10 +37,12 @@ goog.forwardDeclare('anychart.core.Chart');
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Drawing core namespace.
+ * NOTE: on this code evaluation moment acgraph must be already provided
+ *  with goog.provide('acgraph'). It means that it already presents in goog.global.
  * @namespace
  * @name anychart.graphics
  */
-anychart.graphics = anychart.window['acgraph'];
+anychart.graphics = goog.global['acgraph'];
 
 
 /**
@@ -348,47 +350,6 @@ anychart.fromJson = function(jsonConfig) {
 anychart.fromXml = function(xmlConfig) {
   return anychart.fromJson(anychart.utils.xml2json(xmlConfig));
 };
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Default font settings
-//
-//----------------------------------------------------------------------------------------------------------------------
-anychart.window['anychart'] = anychart.window['anychart'] || {};
-
-
-/**
- * Default value for the font size.
- * @type {string|number}
- *
- */
-//anychart.window['anychart']['fontSize'] = '12px';
-anychart.window['anychart']['fontSize'] = '13px';
-
-
-/**
- * Default value for the font color.
- * @type {string}
- *
- */
-//anychart.window['anychart']['fontColor'] = '#000';
-anychart.window['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
-
-
-/**
- * Default value for the font style.
- * @type {string}
- *
- */
-//anychart.window['anychart']['fontFamily'] = 'Arial';
-anychart.window['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
-
-
-/**
- * Default value for the text direction. Text direction may be left-to-right or right-to-left.
- * @type {string}
- *
- */
-anychart.window['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
 
 
 //endregion
@@ -620,7 +581,8 @@ anychart.mergedThemeClones_ = [];
  */
 anychart.getThemes = function() {
   if (!anychart.themes_.length) {
-    anychart.themes_ = [anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {}];
+
+    anychart.themes_ = [anychart.module['themes'][anychart.DEFAULT_THEME] || {}];
 
     if (anychart.additionalThemes_.length)
       anychart.themes_ = goog.array.concat(anychart.themes_, anychart.additionalThemes_);
@@ -662,7 +624,9 @@ anychart.theme = function(opt_value) {
  * @param {string|Object} value
  */
 anychart.appendTheme = function(value) {
-  var clone = goog.isString(value) ? anychart.utils.recursiveClone(/** @type {Object} */(anychart.window['anychart']['themes'][value])) : value;
+  var clone = goog.isString(value) ?
+      anychart.utils.recursiveClone(/** @type {Object} */(anychart.module['themes'][value])) :
+      value;
   anychart.additionalThemes_.push(/** @type {Object} */(clone));
 
   anychart.themes_.length = 0;
@@ -724,12 +688,12 @@ anychart.getFullTheme = function(root) {
   anychart.performance.start('Theme compilation');
   var i;
   if (!anychart.themeClones_.length) {
-    anychart.themeClones_.push(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {});
+    anychart.themeClones_.push(anychart.module['themes'][anychart.DEFAULT_THEME] || {});
     anychart.mergedThemeClones_.push(anychart.themeClones_[0]);
   }
   for (i = anychart.themeClones_.length - 1; i < anychart.additionalThemes_.length; i++) {
     var themeToMerge = anychart.additionalThemes_[i];
-    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? anychart.window['anychart']['themes'][themeToMerge] : themeToMerge);
+    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? anychart.module['themes'][themeToMerge] : themeToMerge);
     anychart.themeClones_.push(goog.isObject(clone) ? clone : {});
     anychart.mergedThemeClones_.push({});
   }
@@ -912,6 +876,7 @@ goog.exportSymbol('anychart.vertical', anychart.getFeatureOrError('anychart.vert
 goog.exportSymbol('anychart.bar3d', anychart.getFeatureOrError('anychart.bar3d', '3D Bar chart'));
 goog.exportSymbol('anychart.bubble', anychart.getFeatureOrError('anychart.bubble', 'Bubble chart'));
 goog.exportSymbol('anychart.bullet', anychart.getFeatureOrError('anychart.bullet', 'Bullet chart'));
+goog.exportSymbol('anychart.calendar', anychart.getFeatureOrError('anychart.calendar', 'Calendar chart'));
 goog.exportSymbol('anychart.cartesian', anychart.getFeatureOrError('anychart.cartesian', 'Cartesian chart'));
 goog.exportSymbol('anychart.cartesian3d', anychart.getFeatureOrError('anychart.cartesian3d', '3D Cartesian chart'));
 goog.exportSymbol('anychart.scatter', anychart.getFeatureOrError('anychart.scatter', 'Scatter chart'));
@@ -953,6 +918,7 @@ goog.exportSymbol('anychart.ganttProject', anychart.getFeatureOrError('anychart.
 goog.exportSymbol('anychart.ganttResource', anychart.getFeatureOrError('anychart.ganttResource', 'Gantt Resource chart'));
 goog.exportSymbol('anychart.stock', anychart.getFeatureOrError('anychart.stock', 'Stock chart'));
 goog.exportSymbol('anychart.treeMap', anychart.getFeatureOrError('anychart.treeMap', 'TreeMap chart'));
+goog.exportSymbol('anychart.circlePacking', anychart.getFeatureOrError('anychart.circlePacking', 'CirclePacking chart'));
 goog.exportSymbol('anychart.pareto', anychart.getFeatureOrError('anychart.pareto', 'Pareto chart'));
 goog.exportSymbol('anychart.resource', anychart.getFeatureOrError('anychart.resource', 'Resource chart'));
 goog.exportSymbol('anychart.quadrant', anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart'));

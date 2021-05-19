@@ -1433,9 +1433,9 @@ anychart.ganttModule.BaseGrid.prototype.getInteractivityEvent = function(event) 
       if (rowType) {
         newEvent['rowType'] = rowType;
       }
+      return newEvent;
     }
 
-    return newEvent;
   }
   return null;
 };
@@ -2419,7 +2419,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
  * Check if context menu is visible, if visible hide it.
  */
 anychart.ganttModule.BaseGrid.prototype.hideContextMenu = function() {
-  if (anychart.window['anychart']['ui']['ContextMenu'] && this.interactivityHandler.contextMenu) {
+  if (anychart.module['ui']['ContextMenu'] && this.interactivityHandler.contextMenu) {
     var menu = this.interactivityHandler.contextMenu();
     if (menu.isVisible()) menu.hide();
   }

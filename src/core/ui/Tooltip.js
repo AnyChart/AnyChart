@@ -816,7 +816,7 @@ anychart.core.ui.Tooltip.prototype.limitPosition_ = function(tooltip, x, y, stag
         global stage has bounds of screen.
        */
       pixelBounds = tooltip.getPixelBounds();
-      var windowBox = goog.dom.getViewportSize();
+      var windowBox = goog.dom.getViewportSize(anychart.window);
 
       if (pixelBounds.left - offsetX + addOffsetX < 0) {
         x -= pixelBounds.left - offsetX + addOffsetX;
@@ -1188,6 +1188,11 @@ anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_co
     opt_contextProvider['clientY'] = clientY;
     this.title().autoText(this.getFormattedTitle(opt_contextProvider));
     this.contentInternal()['text'](this.getFormattedContent_(opt_contextProvider));
+  }
+
+  var isHtml = this.getOption('useHtml');
+  if (isHtml && !this.tooltipInUse_.htmlTooltip.container()) {
+    this.tooltipInUse_.invalidate(anychart.ConsistencyState.CONTAINER);
   }
 
   this.setContainerToTooltip_(this);

@@ -311,8 +311,6 @@ anychart.graphModule.elements.Node.prototype.getLabelPosition = function(node) {
 anychart.graphModule.elements.Node.prototype.getLabelBounds = function(node) {
   var labelSettings = this.resolveLabelSettings(node);
   var position = this.getLabelPosition(node);
-  var context = this.getColorResolutionContext(node);
-  var thickness = anychart.utils.extractThickness(this.getStroke(context, node));
   var nodeHeight = this.getHeight(node);
   var nodeWidth = this.getWidth(node);
 
@@ -563,9 +561,8 @@ anychart.graphModule.elements.Node.prototype.updatePathShape = function(node) {
  * @param {anychart.graphModule.Chart.Node} node
  */
 anychart.graphModule.elements.Node.prototype.updateNodeColors = function(node) {
-  var context = this.getColorResolutionContext(node);
-  var fill = this.getFill(node, context);
-  var stroke = this.getStroke(context, node);
+  var fill = this.getFill(node);
+  var stroke = this.getStroke(node);
   node.path.fill(fill);
   node.path.stroke(stroke);
 };

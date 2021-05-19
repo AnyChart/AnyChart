@@ -330,17 +330,14 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 /**
  * Round passed value to the closest tick value.
  *
- * @param {number} value - Value need to be rounded.
+ * Method exits because of consistency purpose.
  *
- * @return {number} - Rounded value.
+ * @param {number|string} value - Value need to be rounded.
+ *
+ * @return {number|string} - Rounded value.
  */
 anychart.scales.OrdinalTicks.prototype.valueToClosestTick = function(value) {
-  var ticks = this.getInternal();
-  if (ticks.length) {
-    return goog.array.reduce(ticks, function (prev, current) {
-      return (Math.abs(prev - value) > Math.abs(current - value)) ? current : prev;
-    }, Infinity);
-  }
+  // Because value may be represented as string just return it as is.
   return value;
 };
 
