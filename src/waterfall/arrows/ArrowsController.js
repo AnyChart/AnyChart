@@ -1,6 +1,6 @@
 goog.provide('anychart.waterfallModule.ArrowsController');
 
-goog.require('anychart.core.VisualBase');
+ goog.require('anychart.core.VisualBase');
 goog.require('anychart.math.Point2D');
 goog.require('anychart.math.Rect');
 goog.require('anychart.reflow.IMeasurementsTargetProvider');
@@ -53,6 +53,12 @@ anychart.waterfallModule.ArrowsController.prototype.SUPPORTED_SIGNALS =
 
 
 /**
+ * Name of consistency storage.
+ * @type {string}
+ */
+anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME = 'arrowsController';
+
+/**
  * States supported by arrow.
  *
  * @enum {string}
@@ -65,7 +71,7 @@ anychart.waterfallModule.ArrowsController.SUPPORTED_STATES = {
 
 anychart.consistency.supportStates(
     anychart.waterfallModule.ArrowsController,
-    anychart.enums.Store.WATERFALL,
+    anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME,
     [
       anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION,
       anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE
@@ -269,6 +275,24 @@ anychart.waterfallModule.ArrowsController.prototype.createArrowDrawSettings = fu
 
 
 /**
+ * Extend bounds by arrow label bounds.
+ * @param {anychart.waterfallModule.Arrow} arrow - Arrow instance.
+ * @param {anychart.math.Rect} bounds - Bounds to extend.
+ */
+anychart.waterfallModule.ArrowsController.prototype.modifyByLabelBounds = function(arrow, bounds) {
+  var text = arrow.getText();
+  var textBounds = text.getBounds();
+  var textWidth = textBounds.width;
+  var textHeight = textBounds.height;
+
+  var value = this.isVertical() ? textWidth : textHeight;
+
+  bounds.top -= value;
+  bounds.height += value;
+};
+
+
+/**
  * Returns arrow bounds to be used while arrow positioning.
  * Bounds cover horizontal line and label.
  *
@@ -302,42 +326,9 @@ anychart.waterfallModule.ArrowsController.prototype.createArrowBounds = function
       halfSize * 2
       );
 
-  var textActualBounds = this.createArrowTextBounds(arrow, arrowBounds);
-
-  arrowBounds.boundingRect(textActualBounds);
+  this.modifyByLabelBounds(arrow, arrowBounds);
 
   return arrowBounds;
-};
-
-
-/**
- * Returns arrow label text bounds.
- *
- * @param {anychart.waterfallModule.Arrow} arrow - Arrow instance.
- * @param {anychart.math.Rect} arrowBounds - Bounds of the arrow horizontal line.
- * @return {anychart.math.Rect}
- */
-anychart.waterfallModule.ArrowsController.prototype.createArrowTextBounds = function(arrow, arrowBounds) {
-  var text = arrow.getText();
-  var textBounds = text.getBounds();
-  var label = arrow.label();
-
-  var position = /** @type {anychart.enums.Position} */(label.getOption('position'));
-  var anchor = /** @type {anychart.enums.Anchor} */(label.getOption('anchor'));
-
-  var textPosition = text.getTextPosition(
-      arrowBounds.clone(),
-      textBounds.height,
-      position,
-      anchor
-      );
-
-  return new anychart.math.Rect(
-      textPosition.left,
-      textPosition.top,
-      textBounds.width,
-      textBounds.height
-  );
 };
 
 
@@ -394,7 +385,11 @@ anychart.waterfallModule.ArrowsController.prototype.getAllStackLabelsBounds = fu
     labelsArr.push(chart.stackLabels().getLabel(index));
   }
 
-  var nonNullLabels = goog.array.filter(labelsArr, function(label) { return label; });
+  var nonNullLabels = goog.array.filter(labelsArr, function(label) {
+    return label ?
+      label.getFinalSettings('enabled') :
+      false;
+  });
 
   var bounds = goog.array.map(nonNullLabels, function(label) {
     return this.fixLabelsBounds(this.getLabelBounds(label));
@@ -718,11 +713,60 @@ anychart.waterfallModule.ArrowsController.prototype.calculateArrowsPositions = f
 
 
 /**
+ * Resolve anchor value for arrow.
+ * @param {anychart.waterfallModule.Arrow} arrow - Arrow instance.
+ * @return {anychart.enums.Anchor}
+ */
+anychart.waterfallModule.ArrowsController.prototype.resolveAnchor = function(arrow) {
+  var anchor = /** @type {anychart.enums.Anchor} */(arrow.label().getOption('anchor'));
+
+  var isVertical = this.isVertical();
+  if (anchor === 'auto') {
+    if (isVertical) {
+      return anychart.enums.Anchor.RIGHT_CENTER;
+    }
+    return anychart.enums.Anchor.CENTER_TOP;
+  }
+
+  return anchor;
+};
+
+
+/**
+ * Resolve position value for arrow.
+ * @param {anychart.waterfallModule.Arrow} arrow - Arrow instance.
+ * @return {anychart.enums.Position}
+ */
+anychart.waterfallModule.ArrowsController.prototype.resolvePosition = function(arrow) {
+  var position = /** @type {anychart.enums.Position} */(arrow.label().getOption('position'));
+
+  var isVertical = this.isVertical();
+  if (position === 'auto') {
+    if (isVertical) {
+      return anychart.enums.Position.LEFT_CENTER;
+    }
+    return anychart.enums.Position.CENTER;
+  }
+
+  return position;
+};
+
+
+
+/**
  * Applies labels style.
  */
 anychart.waterfallModule.ArrowsController.prototype.applyLabelsStyle = function() {
   goog.array.forEach(this.arrows_, function(arrow) {
-    var flatSettings = arrow.label().flatten();
+    var label = arrow.label();
+
+    label.resetFlatSettings();
+
+    var flatSettings = label.flatten();
+
+    flatSettings['anchor'] = this.resolveAnchor(arrow);
+    flatSettings['position'] = this.resolvePosition(arrow);
+
     var text = arrow.getText();
 
     var fromValue = this.getArrowFrom(arrow);
@@ -767,7 +811,7 @@ anychart.waterfallModule.ArrowsController.prototype.initLayers_ = function() {
  */
 anychart.waterfallModule.ArrowsController.prototype.draw = function() {
   if (!this.arrows_.length) {
-    this.markStoreConsistent(anychart.enums.Store.WATERFALL);
+    this.markStoreConsistent(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME);
     this.markConsistent(anychart.ConsistencyState.ALL);
     return;
   }
@@ -782,7 +826,7 @@ anychart.waterfallModule.ArrowsController.prototype.draw = function() {
     }, this);
 
     this.invalidateMultiState(
-        anychart.enums.Store.WATERFALL,
+        anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME,
         [
           anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION,
           anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE
@@ -791,7 +835,7 @@ anychart.waterfallModule.ArrowsController.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION)) {
+  if (this.hasStateInvalidation(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION)) {
     this.checkArrowsCorrectness();
 
     this.applyLabelsStyle();
@@ -802,19 +846,20 @@ anychart.waterfallModule.ArrowsController.prototype.draw = function() {
 
     this.calculateArrowsPositions();
 
-    this.markStateConsistent(anychart.enums.Store.WATERFALL, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION);
+    this.markStateConsistent(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION);
   }
 
-  if (this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE)) {
+  if (this.hasStateInvalidation(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE)) {
     var arrowsLayer = this.getArrowsLayer();
 
     goog.array.forEach(this.arrows_, function(arrow) {
       arrow.container(arrowsLayer);
+      arrow.invalidateStorage();
       arrow.draw();
     }, this);
-
-    this.markStateConsistent(anychart.enums.Store.WATERFALL, anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE);
   }
+
+  this.markStoreConsistent(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME);
 };
 
 
@@ -882,7 +927,7 @@ anychart.waterfallModule.ArrowsController.prototype.addArrow = function(opt_sett
   this.arrows_.push(arrow);
 
   this.invalidateMultiState(
-      anychart.enums.Store.WATERFALL,
+    anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME,
       [
         anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.APPEARANCE,
         anychart.waterfallModule.ArrowsController.SUPPORTED_STATES.RECALCULATION
@@ -909,12 +954,12 @@ anychart.waterfallModule.ArrowsController.prototype.arrowInvalidationHandler_ = 
 
     goog.array.forEach(this.arrows_, function(arrow) {
       arrow.suspendSignalsDispatching();
-      arrow.invalidateStore(anychart.enums.Store.WATERFALL);
+      arrow.invalidateStore(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME);
       arrow.resumeSignalsDispatching(false);
     }, this);
   }
 
-  this.invalidateMultiState(anychart.enums.Store.WATERFALL, states, anychart.Signal.NEEDS_REDRAW);
+  this.invalidateMultiState(anychart.waterfallModule.ArrowsController.CONSISTENCY_STORAGE_NAME, states, anychart.Signal.NEEDS_REDRAW);
 };
 
 

@@ -844,10 +844,22 @@ anychart.waterfallModule.Chart.prototype.drawLabels = function() {
 };
 
 
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.labelsInvalidated = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.arrowsController().invalidateStorage();
+    this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS);
+  }
+
+  anychart.waterfallModule.Chart.base(this, 'labelsInvalidated', event);
+};
+
+
 /**
  * Stack labels invalidation function.
  */
 anychart.waterfallModule.Chart.prototype.stackLabelsInvalidated = function() {
+  this.arrowsController().invalidateStorage();
   this.invalidateMultiState(
       anychart.enums.Store.WATERFALL,
       [

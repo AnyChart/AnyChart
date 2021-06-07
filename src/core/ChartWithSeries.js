@@ -67,7 +67,7 @@ anychart.core.ChartWithSeries = function() {
   this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.DEFAULT_LABELS_CONSTRUCTOR_NO_THEME);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, /** @this {anychart.core.ChartWithSeries} */ function(factory) {
     factory.markConsistent(anychart.ConsistencyState.ALL);
-    factory.listenSignals(this.labelsInvalidated_, this);
+    factory.listenSignals(this.labelsInvalidated, this);
   });
 
   var descriptorsMeta = {};
@@ -855,9 +855,8 @@ anychart.core.ChartWithSeries.prototype.selected = function(opt_value) {
 /**
  * Listener for labels invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
- * @private
  */
-anychart.core.ChartWithSeries.prototype.labelsInvalidated_ = function(event) {
+anychart.core.ChartWithSeries.prototype.labelsInvalidated = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.normal().labels().markConsistent(anychart.ConsistencyState.ALL);
     this.normal().minLabels().markConsistent(anychart.ConsistencyState.ALL);

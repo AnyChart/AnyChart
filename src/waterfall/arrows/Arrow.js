@@ -29,11 +29,24 @@ anychart.waterfallModule.Arrow = function(controller) {
    */
   this.controller_ = controller;
 
+  /**
+   * @this {anychart.waterfallModule.Arrow}
+   */
+  function positionChanged() {
+    this.invalidateMultiState(
+      anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME,
+      [
+        anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS,
+        anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE
+      ]
+    );
+  }
+
   anychart.core.settings.createDescriptorsMeta(
       this.descriptorsMeta,
       [
-        ['from', 0, anychart.Signal.NEEDS_RECALCULATION],
-        ['to', 0, anychart.Signal.NEEDS_RECALCULATION]
+        ['from', 0, anychart.Signal.NEEDS_RECALCULATION, void 0, positionChanged, this],
+        ['to', 0, anychart.Signal.NEEDS_RECALCULATION, void 0, positionChanged, this]
       ]
   );
 
@@ -98,9 +111,16 @@ anychart.waterfallModule.Arrow.SUPPORTED_STATES = {
 };
 
 
+/**
+ * Consistency storage name.
+ * @type {string}
+ */
+anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME = 'waterfallArrow';
+
+
 anychart.consistency.supportStates(
     anychart.waterfallModule.Arrow,
-    anychart.enums.Store.WATERFALL,
+    anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME,
     [
       anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS,
       anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE
@@ -129,7 +149,7 @@ anychart.waterfallModule.Arrow.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.invalidateMultiState(
-        anychart.enums.Store.WATERFALL,
+        anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME,
         [
           anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS,
           anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE
@@ -138,32 +158,24 @@ anychart.waterfallModule.Arrow.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE)) {
+  if (this.hasStateInvalidation(anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE)) {
     if (this.isCorrect()) {
       this.drawConnector();
       this.drawHead();
     }
-
-    this.markStateConsistent(
-        anychart.enums.Store.WATERFALL,
-        anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE
-    );
   }
 
-  if (this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS)) {
+  if (this.hasStateInvalidation(anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS)) {
     if (this.isCorrect()) {
       this.drawLabel();
     }
-
-    this.markStateConsistent(
-        anychart.enums.Store.WATERFALL,
-        anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS
-    );
   }
 
   if (!this.isCorrect()) {
     this.remove();
   }
+
+  this.markStoreConsistent(anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME);
 };
 
 
@@ -368,10 +380,9 @@ anychart.waterfallModule.Arrow.prototype.label = function(opt_value) {
  * @private
  */
 anychart.waterfallModule.Arrow.prototype.labelsSettingsInvalidated_ = function() {
-  this.invalidateState(
-      anychart.enums.Store.WATERFALL,
-      anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE,
-      anychart.Signal.NEEDS_RECALCULATION
+  this.invalidateMultiState(anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME,
+    [anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE, anychart.waterfallModule.Arrow.SUPPORTED_STATES.LABELS],
+    anychart.Signal.NEEDS_RECALCULATION
   );
 };
 
@@ -465,7 +476,7 @@ anychart.waterfallModule.Arrow.prototype.getArrowHeadPath = function() {
  * @private
  */
 anychart.waterfallModule.Arrow.prototype.connectorInvalidationHandler_ = function() {
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE, anychart.Signal.NEEDS_REDRAW_APPEARANCE);
+  this.invalidateState(anychart.waterfallModule.Arrow.CONSISTENCY_STORAGE_NAME, anychart.waterfallModule.Arrow.SUPPORTED_STATES.APPEARANCE, anychart.Signal.NEEDS_REDRAW_APPEARANCE);
 };
 
 
