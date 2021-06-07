@@ -816,7 +816,7 @@ anychart.waterfallModule.Chart.prototype.drawStackLabels = function() {
       return series.enabled() ? count + 1 : count;
     }, 0);
 
-    if (countOfVisibleSeries > 1 && stackLabels.getOption('enabled')) {
+    if (countOfVisibleSeries && stackLabels.getOption('enabled')) {
       this.updateStackLabels();
     }
   }
