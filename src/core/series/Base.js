@@ -2778,7 +2778,8 @@ anychart.core.series.Base.prototype.getSingleLabelsFactoryElement = function(lab
   var anchor = label.getFinalSettings('anchor');
   label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
   if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
-    label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
+    var autoAnchor = this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0);
+    label.autoAnchor(autoAnchor);
     this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(labelsFactory), label);
   }
 

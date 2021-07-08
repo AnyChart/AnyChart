@@ -20,6 +20,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'fallingHatchFill': false,
           'labels': {
             'enabled': true,
+            'connectorStroke': anychart.core.defaultTheme.colorStrokeBright,
             /**
              * @this {*}
              * @return {*}
