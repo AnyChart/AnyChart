@@ -1,6 +1,6 @@
 goog.provide('anychart.waterfallModule.ArrowsController');
 
- goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.VisualBase');
 goog.require('anychart.math.Point2D');
 goog.require('anychart.math.Rect');
 goog.require('anychart.reflow.IMeasurementsTargetProvider');

@@ -9,7 +9,7 @@ goog.require('anychart.format.Context');
 goog.require('anychart.waterfallModule.ArrowsController');
 goog.require('anychart.waterfallModule.Connectors');
 goog.require('anychart.waterfallModule.Series');
-
+goog.require('anychart.waterfallModule.totals.Controller');
 
 
 /**
@@ -61,7 +61,21 @@ anychart.waterfallModule.Chart = function() {
   this.usedContextsPool_ = [];
 
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
-    ['dataMode', anychart.ConsistencyState.SERIES_CHART_SERIES | anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES, anychart.Signal.NEEDS_REDRAW]
+    ['dataMode',
+      anychart.ConsistencyState.SERIES_CHART_SERIES |
+      anychart.ConsistencyState.SCALE_CHART_SCALES |
+      anychart.ConsistencyState.SCALE_CHART_Y_SCALES,
+      anychart.Signal.NEEDS_REDRAW,
+      void 0,
+      /**
+       * @this {anychart.waterfallModule.Chart}
+       */
+      function() {
+        var controller = this.totalsController();
+        this.invalidateStore(anychart.enums.Store.WATERFALL);
+        controller.invalidate(controller.SUPPORTED_CONSISTENCY_STATES);
+      }
+    ]
   ]);
 };
 goog.inherits(anychart.waterfallModule.Chart, anychart.core.CartesianBase);
@@ -82,9 +96,10 @@ anychart.waterfallModule.Chart.ZINDEX_CONNECTORS_LABELS = anychart.core.ChartWit
  * @enum {string}
  */
 anychart.waterfallModule.Chart.SUPPORTED_STATES = {
-  STACK_LABELS: 'stackLabels',
+  ARROWS: 'arrows',
   CONNECTORS_LABELS: 'connectorsLabels',
-  ARROWS: 'arrows'
+  STACK_LABELS: 'stackLabels',
+  TOTALS: 'totals'
 };
 
 
@@ -92,9 +107,10 @@ anychart.consistency.supportStates(
     anychart.waterfallModule.Chart,
     anychart.enums.Store.WATERFALL,
     [
-     anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+     anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS,
      anychart.waterfallModule.Chart.SUPPORTED_STATES.CONNECTORS_LABELS,
-     anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
+     anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+     anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS
     ]
 );
 
@@ -190,13 +206,22 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
   }
 };
 
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.calculate = function() {
+  this.totalsController().calculate();
+  anychart.waterfallModule.Chart.base(this, 'calculate');
+};
+
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.drawContent = function(contentBounds) {
   anychart.waterfallModule.Chart.base(this, 'drawContent', contentBounds);
 
-  this.drawLabels();
+  this.drawTotals();
+  // Connectors use point bounds for drawing. Draw it after totals and series.
+  this.drawConnector();
 
+  this.drawLabels();
   this.drawArrows();
 };
 
@@ -204,11 +229,12 @@ anychart.waterfallModule.Chart.prototype.drawContent = function(contentBounds) {
 /**
  * Returns connector x coordinate.
  * @param {number} pointMiddleX - Point middle x value.
- * @param {number} pointHalfWidth - Half point width, positive for left point and negative
+ * @param {number} width - Point width, positive for left point and negative
  *  for right point.
  * @return {number} - Connector x coordinate.
  */
-anychart.waterfallModule.Chart.prototype.getConnectorXCoordinate = function(pointMiddleX, pointHalfWidth) {
+anychart.waterfallModule.Chart.prototype.getConnectorXCoordinate = function(pointMiddleX, width) {
+  var pointHalfWidth = width / 2;
   var isVertical = this.isVertical();
   var isXScaleInverted = this.xScale().inverted();
 
@@ -225,9 +251,44 @@ anychart.waterfallModule.Chart.prototype.getConnectorXCoordinate = function(poin
 };
 
 
-/** @inheritDoc */
-anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
-  anychart.waterfallModule.Chart.base(this, 'afterSeriesDraw');
+/**
+ * Return coordinates that uses for connector drawing.
+ *
+ * @param {number} fromIndex - Index of from category.
+ * @param {number} toIndex - Index of to category.
+ * @return {{from: {x: number, y: number}, to: {x: number, y: number}}|undefined}
+ */
+anychart.waterfallModule.Chart.prototype.getConnectorCoordinates = function(fromIndex, toIndex) {
+  if (this.isStackVisible(fromIndex) && this.isStackVisible(toIndex)) {
+    var prevBounds = this.getStackBounds(fromIndex);
+    var curBounds = this.getStackBounds(toIndex);
+
+    var leftX = this.getConnectorXCoordinate(prevBounds.getCenter().x, prevBounds.getSize().width);
+    var leftY = this.transformValue_(this.pointValueSums_[fromIndex]);
+
+    var rightX = this.getConnectorXCoordinate(curBounds.getCenter().x, -curBounds.getSize().width);
+    var rightY = leftY;
+
+    return {
+      from: {
+        x: leftX,
+        y: leftY
+      },
+      to: {
+        x: rightX,
+        y: rightY
+      }
+    };
+  }
+
+  return void 0;
+};
+
+
+/**
+ * Draw connector path.
+ */
+anychart.waterfallModule.Chart.prototype.drawConnector = function() {
   if (!this.connectorPath_) {
     this.connectorPath_ = acgraph.path();
   } else {
@@ -244,68 +305,25 @@ anychart.waterfallModule.Chart.prototype.afterSeriesDraw = function() {
   this.connectorPath_.zIndex(1000);
   this.connectorPath_.clip(this.getPlotBounds());
   var isVertical = /** @type {boolean} */(this.isVertical());
-  var individualPointWidths = xScale.checkWeights();
-  var firstIndex = drawingPlans[0].firstIndex;
-  var lastIndex = drawingPlans[0].lastIndex;
-  var leftX, leftY, meta, drawingPlan, pointWidth, rightX, rightY;
-  var index = this.getLastNonNaNSeries_(drawingPlans, firstIndex);
-  if (isNaN(index)) {
-    leftX = leftY = NaN;
-  } else {
-    drawingPlan = drawingPlans[index];
-    meta = drawingPlan.data[firstIndex].meta;
-    if (individualPointWidths) {
-      pointWidth = drawingPlan.series.getCategoryWidth(goog.isDef(meta['category']) ? /** @type {number} */(meta['category']) : firstIndex);
-    } else {
-      pointWidth = drawingPlan.series.pointWidthCache;
-    }
-    leftY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[0]), thickness);
-    leftX = this.getConnectorXCoordinate(meta['valueX'], pointWidth / 2);
-  }
 
-  this.connectorsPositions_.length = 0;
-  for (var i = firstIndex + 1; i <= lastIndex; i++) {
-    index = this.getFirstNonNaNSeries_(drawingPlans, i);
-    if (isNaN(index)) {
-      rightX = rightY = NaN;
-    } else {
-      drawingPlan = drawingPlans[index];
-      meta = drawingPlan.data[i].meta;
-      if (individualPointWidths) {
-        pointWidth = drawingPlan.series.getCategoryWidth(goog.isDef(meta['category']) ? /** @type {number} */(meta['category']) : firstIndex);
-      } else {
-        pointWidth = drawingPlan.series.pointWidthCache;
+  var prevIndex;
+  for (var index = 0; index < this.drawingPlans[0].data.length; index++) {
+    if (this.isStackVisible(index)) {
+      if (goog.isDef(prevIndex)) {
+        var segmentCoordinates = this.getConnectorCoordinates(prevIndex, index);
+        anychart.core.drawers.move(this.connectorPath_,
+          isVertical,
+          segmentCoordinates.from.x,
+          anychart.utils.applyPixelShift(segmentCoordinates.from.y, thickness)
+        );
+
+        anychart.core.drawers.line(this.connectorPath_,
+          isVertical,
+          segmentCoordinates.to.x,
+          anychart.utils.applyPixelShift(segmentCoordinates.to.y, thickness)
+        );
       }
-      rightY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[i - firstIndex - 1]), thickness);
-      rightX = this.getConnectorXCoordinate(meta['valueX'], -(pointWidth / 2));
-    }
-    if (!isNaN(leftX) && !isNaN(leftY)) {
-      if (!isNaN(rightX) && !isNaN(rightY)) {
-        anychart.core.drawers.move(this.connectorPath_, isVertical, leftX, leftY);
-        anychart.core.drawers.line(this.connectorPath_, isVertical, rightX, rightY);
-        this.connectorsPositions_.push({
-          x1: leftX,
-          y1: leftY,
-          x2: rightX,
-          y2: rightY
-        });
-      } else {
-        continue;
-      }
-    }
-    index = this.getLastNonNaNSeries_(drawingPlans, i);
-    if (isNaN(index)) {
-      leftX = leftY = NaN;
-    } else {
-      drawingPlan = drawingPlans[index];
-      meta = drawingPlan.data[i].meta;
-      if (individualPointWidths) {
-        pointWidth = drawingPlan.series.getCategoryWidth(goog.isDef(meta['category']) ? /** @type {number} */(meta['category']) : firstIndex);
-      } else {
-        pointWidth = drawingPlan.series.pointWidthCache;
-      }
-      leftY = anychart.utils.applyPixelShift(this.transformValue_(this.pointValueSums_[i - firstIndex]), thickness);
-      leftX = this.getConnectorXCoordinate(meta['valueX'], pointWidth / 2);
+      prevIndex = index;
     }
   }
 };
@@ -522,13 +540,14 @@ anychart.waterfallModule.Chart.prototype.getPositionProviderForStackedLabel = fu
 /**
  * Returns position provider for connector.
  *
- * @param {number} connectorIndex - Index of the connector.
+ * @param {number} from - Index of the category connector goes from.
+ * @param {number} to - Index of the category connector goes to.
  * @param {anychart.enums.Position} position - Label position.
  *
  * @return {{value: anychart.math.Coordinate}} - Position provider.
  */
-anychart.waterfallModule.Chart.prototype.getPositionProviderForConnectorLabel = function(connectorIndex, position) {
-  var connectorBounds = this.getConnectorBounds(connectorIndex);
+anychart.waterfallModule.Chart.prototype.getPositionProviderForConnectorLabel = function(from, to, position) {
+  var connectorBounds = this.getConnectorBounds(from, to);
 
   return { 'value': anychart.utils.getCoordinateByAnchor(connectorBounds, position) };
 };
@@ -583,20 +602,20 @@ anychart.waterfallModule.Chart.prototype.resolvePositionForConnectorLabels = fun
 /**
  * Returns format provider for connector.
  *
- * @param {number} index - Index of the point connector goes to.
- * @param {number} previousIndex - Index of the point connector goes out of.
+ * @param {number} fromIndex - Index of the point connector goes from.
+ * @param {number} toIndex - Index of the point connector goes to.
  *
  * @return {anychart.core.BaseContext}
  */
-anychart.waterfallModule.Chart.prototype.getFormatProviderForConnectorLabel = function(index, previousIndex) {
+anychart.waterfallModule.Chart.prototype.getFormatProviderForConnectorLabel = function(fromIndex, toIndex) {
   var provider = this.getContext_();
 
   provider.statisticsSources([this]);
 
-  var total = this.getStackSum(index, 'diff');
+  var total = this.getStackSum(toIndex, 'diff');
 
-  var previousDiffSum = this.getStackSum(previousIndex, 'diff');
-  var previousAbsoluteSum = this.getStackSum(previousIndex, 'absolute');
+  var previousDiffSum = this.getStackSum(fromIndex, 'diff');
+  var previousAbsoluteSum = this.getStackSum(fromIndex, 'absolute');
 
   var stackPercent = total / Math.abs(previousDiffSum);
   var totalPercent = total / Math.abs(previousAbsoluteSum);
@@ -654,6 +673,67 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForArrow = function(to
 };
 
 
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.createDrawingPlans = function() {
+  var plans = anychart.waterfallModule.Chart.base(this, 'createDrawingPlans');
+
+  var values = this.getValuesForOrdinalScale();
+  var totalsPlans = this.totalsController().getDrawingPlans(values.xHashMap, values.xArray);
+
+  for (var i = 0; i < totalsPlans.length; i++) {
+    plans.push(totalsPlans[i]);
+  }
+
+  return plans;
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.getValuesForOrdinalScale = function() {
+  var values = anychart.waterfallModule.Chart.base(this, 'getValuesForOrdinalScale');
+
+  var xArray = values.xArray;
+  var xHashMap = values.xHashMap;
+
+  var totals = this.getAllTotals();
+  var totalsCategories = {};
+  for (var i = 0; i < totals.length; i++) {
+    var total = totals[i];
+
+    if (total.getOption('enabled')) {
+      var totalX = total.getOption('x');
+      if (!totalsCategories[totalX]) {
+        totalsCategories[totalX] = [];
+      }
+      totalsCategories[totalX].push.apply(totalsCategories[totalX], total.getReservedCategories());
+    }
+  }
+
+  for (var targetCategory in totalsCategories) {
+    var categoriesToAdd = totalsCategories[targetCategory];
+    // findIndex because of categories can be numbers.
+    var index = goog.array.findIndex(xArray, function(category) {
+      return targetCategory == category;
+    });
+    if (index !== -1) {
+      goog.array.insertArrayAt(xArray, categoriesToAdd, index + 1);
+    }
+  }
+
+  for (i = 0; i < xArray.length; i++) {
+    var category = xArray[i];
+    var xHash = anychart.utils.hash(category);
+    xHashMap[xHash] = i;
+  }
+
+  return {
+    xArray: xArray,
+    xHashMap: xHashMap
+  };
+};
+
+
 /**
  * Draws connectors labels.
  */
@@ -673,49 +753,25 @@ anychart.waterfallModule.Chart.prototype.updateConnectorsLabels = function() {
   var labelsAnchor = /** @type {anychart.enums.Anchor} */(connectorsLabels.getOption('anchor'));
   var labelsPosition = /** @type {anychart.enums.Position} */(connectorsLabels.getOption('position'));
 
-  var series = this.getSeriesAt(0);
-  var iterator = series.getDetachedIterator();
+  var currentIndex, prevIndex;
+  for (var index = 0; index < this.drawingPlans[0].data.length; index++) {
+    if (this.isStackVisible(index)) {
+      currentIndex = index;
+      if (goog.isDef(prevIndex)) {
+        var stackContribution = this.getStackSum(index, 'diff');
 
-  var lastNonMissingIndex = null;
-  var connectorIndex = 0;
-  while (iterator.advance()) {
-    var index = iterator.getIndex();
-    var isConnectorToTotal = iterator.meta('isTotal');
+        var labelAnchor = this.resolveAnchorForConnectorLabels(labelsAnchor, labelsPosition, stackContribution);
+        var labelPosition = this.resolvePositionForConnectorLabels(labelsPosition, stackContribution);
 
-    var pointsMissing = goog.array.reduce(this.seriesList, function(prevValue, curValue) {
-      var it = curValue.getIterator();
-      it.select(index);
-      return it.meta('missing') ? ++prevValue : prevValue;
-    }, 0);
+        var positionProvider = this.getPositionProviderForConnectorLabel(prevIndex, currentIndex, labelPosition);
+        var formatProvider = this.getFormatProviderForConnectorLabel(prevIndex, currentIndex);
 
-    var isLastNull = goog.isNull(lastNonMissingIndex);
-    var isStackMissing = pointsMissing == this.seriesList.length;
-    if (isLastNull || isStackMissing) {
-      // Update last index only if stack we are skipping is not missing.
-      lastNonMissingIndex = (isLastNull && !isStackMissing) ? index : lastNonMissingIndex;
-      continue;
+        var label = connectorsLabels.add(formatProvider, positionProvider, index);
+
+        label.setOption('anchor', labelAnchor);
+      }
+      prevIndex = currentIndex;
     }
-
-    // If connector goes to total stack, label is skipped, but last and connector index is updated.
-    if (!isConnectorToTotal) {
-      var stackContribution = this.getStackSum(index, 'diff');
-
-      var labelAnchor = this.resolveAnchorForConnectorLabels(labelsAnchor, labelsPosition, stackContribution);
-      var labelPosition = this.resolvePositionForConnectorLabels(labelsPosition, stackContribution);
-
-      var positionProvider = this.getPositionProviderForConnectorLabel(connectorIndex, labelPosition);
-      var formatProvider = this.getFormatProviderForConnectorLabel(
-          index,
-          /** @type {number} */(lastNonMissingIndex)
-          );
-
-      var label = connectorsLabels.add(formatProvider, positionProvider, connectorIndex);
-
-      label.setOption('anchor', labelAnchor);
-    }
-
-    lastNonMissingIndex = index;
-    connectorIndex++;
   }
 
   connectorsLabels.draw();
@@ -747,6 +803,8 @@ anychart.waterfallModule.Chart.prototype.drawConnectorsLabels = function() {
   }
 
   connectorsLabels.markConsistent(connectorsLabels.SUPPORTED_CONSISTENCY_STATES);
+
+  this.markStateConsistent(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.CONNECTORS_LABELS);
 };
 
 
@@ -763,17 +821,11 @@ anychart.waterfallModule.Chart.prototype.updateStackLabels = function() {
   // DVF-4566
   this.stackLabelsLayer_.clip(this.dataBounds);
 
-  var series = this.getSeriesAt(0);
-
-  var iterator = series.getResetIterator();
-
   var labelsAnchor = this.stackLabels_.anchor();
   var labelsPosition = this.stackLabels_.position();
 
-  while (iterator.advance()) {
-    var index = iterator.getIndex();
-
-    if (this.isStackVisible(index)) {
+  for (var index = 0; index < this.drawingPlans[0].data.length; index++) {
+    if (!this.isCategoryUsedForTotal(index) && this.isStackVisible(index)) {
       var labelAnchor = this.resolveAnchorForStackLabel(labelsAnchor, labelsPosition, index);
       var labelPosition = this.resolvePositionForStackLabel(labelsPosition, index);
 
@@ -1028,7 +1080,16 @@ anychart.waterfallModule.Chart.prototype.doHoverOnPoints = function(sourceKey) {
 anychart.waterfallModule.Chart.prototype.legendItemOver = function(item, event) {
   var sourceMode = /** @type {anychart.enums.LegendItemsSourceMode} */(this.legend().getOption('itemsSourceMode'));
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    this.doHoverOnPoints(/** @type {number} */ (item.sourceKey()));
+    var sourceKey = /** @type {number} */ (item.sourceKey());
+    if (this.keyToSeriesMap_[sourceKey].type === 'total') {
+      var totals = this.totalsController().getAllTotals();
+
+      for (var i = 0; i < totals.length; i++) {
+        var total = totals[i];
+        total.hover();
+      }
+    }
+    this.doHoverOnPoints(sourceKey);
   } else {
     return anychart.waterfallModule.Chart.base(this, 'legendItemOver', item, event);
   }
@@ -1062,10 +1123,11 @@ anychart.waterfallModule.Chart.prototype.legendItemClick = function(item, event)
  * Used for labels position calculation.
  *
  * @param {number} index - Stack index.
+ * @param {boolean=} opt_considerLabels - Whether consider labels bounds.
  *
  * @return {!anychart.math.Rect} - Bounds of stack.
  */
-anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
+anychart.waterfallModule.Chart.prototype.getStackBounds = function(index, opt_considerLabels) {
   var width = goog.array.reduce(this.drawingPlans, function(width, plan) {
     var seriesPointWidth = plan.series.pointWidthCache;
     return Math.max(seriesPointWidth, width);
@@ -1073,10 +1135,14 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
 
   var left = this.drawingPlans[0].data[index].meta['valueX'] - width / 2;
 
-  var top = this.transformValue_(this.getStackTop(index));
-  var height = this.transformValue_(this.getStackBottom(index));
+  var top = this.getStackTop(index);
+  var bottom = this.getStackBottom(index);
 
-  return anychart.math.rect(left, top, width, height - top);
+  var tmp = top;
+  top = Math.min(top, bottom);
+  bottom = Math.max(tmp, bottom);
+
+  return anychart.math.rect(left, top, width, bottom - top);
 };
 
 
@@ -1136,6 +1202,26 @@ anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
 
 
 /**
+ * Whether category used for total drawing.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {boolean}
+ */
+anychart.waterfallModule.Chart.prototype.isCategoryUsedForTotal = function(index) {
+  var forTotal = false;
+
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var plan = this.drawingPlans[i];
+    var isTotalSeries = plan.series.getType() === anychart.waterfallModule.totals.Total.seriesType;
+    forTotal = forTotal || (isTotalSeries && !plan.data[index].meta['missing']);
+  }
+
+  return forTotal;
+};
+
+
+/**
  * Return highest value of stack.
  *
  * @param {number} index - Stack index.
@@ -1143,21 +1229,19 @@ anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
  * @return {number}
  */
 anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
-  return goog.array.reduce(this.seriesList, function(top, currentSeries) {
-    if (currentSeries.enabled()) {
-      var iterator = currentSeries.getIterator();
+  var top = -Infinity;
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var plan = this.drawingPlans[i];
+    var meta = plan.data[index].meta;
 
-      iterator.select(index);
+    if (meta['missing']) continue;
 
-      if (iterator.meta('missing')) return top;
+    var stackedValue = /**@type {number}*/(meta['zero']);
+    var stackedZero = /**@type {number}*/(meta['value']);
 
-      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
-      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
-
-      return Math.max(top, stackedValue, stackedZero);
-    }
-    return top;
-  }, -Infinity);
+    top = Math.max(top, stackedValue, stackedZero);
+  }
+  return top;
 };
 
 
@@ -1169,21 +1253,20 @@ anychart.waterfallModule.Chart.prototype.getStackTop = function(index) {
  * @return {number}
  */
 anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
-  return goog.array.reduce(this.seriesList, function(bottom, currentSeries) {
-    if (currentSeries.enabled()) {
-      var iterator = currentSeries.getIterator();
+  var bottom = Infinity;
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var plan = this.drawingPlans[i];
+    var meta = plan.data[index].meta;
 
-      iterator.select(index);
+    if (meta['missing']) continue;
 
-      if (iterator.meta('missing')) return bottom;
+    var stackedValue = /**@type {number}*/(meta['zero']);
+    var stackedZero = /**@type {number}*/(meta['value']);
 
-      var stackedValue = /**@type {number}*/(iterator.meta('stackedValue'));
-      var stackedZero = /**@type {number}*/(iterator.meta('stackedZero'));
+    bottom = Math.min(bottom, stackedValue, stackedZero);
+  }
 
-      return Math.min(stackedValue, stackedZero, bottom);
-    }
-    return bottom;
-  }, Infinity);
+  return bottom;
 };
 
 
@@ -1191,13 +1274,19 @@ anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
 //region --- Series
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.seriesInvalidated = function(event) {
-  this.invalidateMultiState(
-      anychart.enums.Store.WATERFALL,
-      [
-        anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
-        anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS
-      ]
-  );
+  this.invalidateMultiState(anychart.enums.Store.WATERFALL, [
+    anychart.waterfallModule.Chart.SUPPORTED_STATES.ARROWS,
+    anychart.waterfallModule.Chart.SUPPORTED_STATES.STACK_LABELS,
+    anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS
+  ]);
+
+  if (event.hasSignal(
+    anychart.Signal.DATA_CHANGED |
+    anychart.Signal.ENABLED_STATE_CHANGED |
+    anychart.Signal.NEEDS_RECALCULATION
+  )) {
+    this.totalsController().invalidate(anychart.ConsistencyState.SERIES_DATA);
+  }
 
   anychart.waterfallModule.Chart.base(this, 'seriesInvalidated', event);
 };
@@ -1291,22 +1380,205 @@ anychart.waterfallModule.Chart.prototype.connectorsInvalidated = function(event)
 /**
  * Returns bounds used for connector label positioning.
  *
- * @param {number} index - Connector index.
+ * @param {number} from - Index of the point connector goes from.
+ * @param {number} to - Index of the point connector goes to.
  *
  * @return {anychart.math.Rect} Bounds of the connector.
  */
-anychart.waterfallModule.Chart.prototype.getConnectorBounds = function(index) {
-  var connectorPosition = this.connectorsPositions_[index];
-  var x1 = Math.min(connectorPosition.x1, connectorPosition.x2);
-  var y1 = Math.min(connectorPosition.y1, connectorPosition.y2);
-  var x2 = Math.max(connectorPosition.x2, connectorPosition.x1);
-  var y2 = Math.max(connectorPosition.y2, connectorPosition.y1);
+anychart.waterfallModule.Chart.prototype.getConnectorBounds = function(from, to) {
+  var connectorPosition = this.getConnectorCoordinates(from, to);
+  var x1 = Math.min(connectorPosition.from.x, connectorPosition.to.x);
+  var y1 = Math.min(connectorPosition.from.y, connectorPosition.to.y);
+  var x2 = Math.max(connectorPosition.from.x, connectorPosition.to.x);
+  var y2 = Math.max(connectorPosition.from.y, connectorPosition.to.y);
 
   var connectorBounds = this.isVertical() ?
       anychart.math.rect(y1, x1, y2 - y1, x2 - x1) :
       anychart.math.rect(x1, y1, x2 - x1, y2 - y1);
 
   return connectorBounds;
+};
+
+
+//endregion
+//region --- Totals
+/**
+ * Return total value for passed category.
+ *
+ * @param {string} category Category value.
+ * @return {number}
+ */
+anychart.waterfallModule.Chart.prototype.getTotalValue = function(category) {
+  var isDiffMode = this.getOption('dataMode') === anychart.enums.WaterfallDataMode.DIFF;
+  var totalValue = 0;
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = /** @type {anychart.core.series.Cartesian} */(this.seriesList[i]);
+    if (series && series.enabled()) {
+      var data = series.data();
+      if (data) {
+        var iterator = data.getIterator();
+        var excludes = series.getExcludedIndexesInternal();
+        var seriesSum = 0;
+        while (iterator.advance()) {
+          var index = iterator.getIndex();
+          if (goog.array.indexOf(excludes, index) === -1) {
+            var value = iterator.get('value');
+            if (goog.isNumber(value)) {
+              if (isDiffMode) {
+                seriesSum += /** @type {number}*/(value);
+              } else {
+                seriesSum = /** @type {number}*/(value);
+              }
+            }
+            if (category === iterator.get('x')) {
+              break;
+            }
+          }
+        }
+        totalValue += seriesSum;
+      }
+    }
+  }
+  return totalValue;
+};
+
+
+/**
+ * Create Total instance, setup it by passed config and return it.
+ *
+ * @param {!anychart.waterfallModule.totals.Total.Config} config - Configuration object for total.
+ *
+ * @return {?anychart.waterfallModule.totals.Total} - Total instance.
+ */
+anychart.waterfallModule.Chart.prototype.addTotal = function(config) {
+  if (goog.isObject(config)) {
+    return this.totalsController().addTotal(config);
+  }
+  return null;
+};
+
+
+/**
+ * Remove total instance.
+ *
+ * @param {anychart.waterfallModule.totals.Total} totalToRemove - Instance of total to remove.
+ * @return {boolean} - 'true' if total removed successfully 'false' otherwise.
+ */
+anychart.waterfallModule.Chart.prototype.removeTotal = function(totalToRemove) {
+  return this.totalsController().removeTotal(totalToRemove);
+};
+
+
+/**
+ * Remove total by index.
+ *
+ * @param {number} indexToRemove - Index of total to remove.
+ * @return {boolean} - 'true' if total removed successfully 'false' otherwise.
+ */
+anychart.waterfallModule.Chart.prototype.removeTotalAt = function(indexToRemove) {
+  return this.totalsController().removeTotalAt(indexToRemove);
+};
+
+
+/**
+ * Return total by index.
+ *
+ * @param {number} index - Index of total.
+ * @return {anychart.waterfallModule.totals.Total} - Total instance or 'null' if has no total.
+ */
+anychart.waterfallModule.Chart.prototype.getTotalAt = function(index) {
+  return this.totalsController().getTotalAt(index);
+};
+
+
+/**
+ * Return array of totals.
+ *
+ * @return {Array.<anychart.waterfallModule.totals.Total>} - Array of all totals.
+ */
+anychart.waterfallModule.Chart.prototype.getAllTotals = function() {
+  return this.totalsController().getAllTotals();
+};
+
+
+/**
+ * Totals storage invalidate handler.
+ * @param {anychart.SignalEvent} event
+ */
+anychart.waterfallModule.Chart.prototype.totalsControllerInvalidated_ = function(event) {
+  this.invalidateStore(anychart.enums.Store.WATERFALL);
+
+  var stateToInvalidate =
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.SERIES_DATA |
+    anychart.ConsistencyState.SERIES_CHART_SERIES |
+    anychart.ConsistencyState.SCALE_CHART_SCALES |
+    anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
+    anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
+    anychart.ConsistencyState.AXES_CHART_AXES;
+
+  this.invalidate(stateToInvalidate, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Draw totals.
+ */
+anychart.waterfallModule.Chart.prototype.drawTotals = function() {
+  if (
+    this.hasStateInvalidation(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS) ||
+    this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    var controller = this.totalsController();
+
+    controller.container(this.rootElement);
+    controller.parentBounds(this.dataBounds);
+    controller.draw();
+
+    this.markStateConsistent(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
+  }
+};
+
+
+/**
+ * Invalidate totals.
+ * @private
+ */
+anychart.waterfallModule.Chart.prototype.invalidateTotals_ = function() {
+  var totals = this.totalsController().getAllTotals();
+  for (var i = 0; i < totals.length; i++) {
+    var total = totals[i];
+    total.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+  }
+};
+
+
+//endregion
+//region --- Overrides
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.xScaleInvalidated = function(scale) {
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
+  this.invalidateTotals_();
+  anychart.waterfallModule.Chart.base(this, 'xScaleInvalidated', scale);
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.yScaleInvalidated = function(scale) {
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
+  this.invalidateTotals_();
+  anychart.waterfallModule.Chart.base(this, 'yScaleInvalidated', scale);
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.unhover = function(opt_indexOrIndexes) {
+  anychart.waterfallModule.Chart.base(this, 'unhover', opt_indexOrIndexes);
+  var totals = this.totalsController().getAllTotals();
+
+  for (var i = 0; i < totals.length; i++) {
+    var total = totals[i];
+    total.unhover();
+  }
 };
 
 
@@ -1356,6 +1628,20 @@ anychart.waterfallModule.Chart.prototype.arrowsController = function() {
     this.arrowsController_.listenSignals(this.arrowsInvalidationHandler_, this);
   }
   return this.arrowsController_;
+};
+
+
+/**
+ * Returns totals controller.
+ *
+ * @return {anychart.waterfallModule.totals.Controller}
+ */
+anychart.waterfallModule.Chart.prototype.totalsController = function() {
+  if (!this.totalsController_) {
+    this.totalsController_ = new anychart.waterfallModule.totals.Controller(this);
+    this.totalsController_.listenSignals(this.totalsControllerInvalidated_, this);
+  }
+  return this.totalsController_;
 };
 
 
@@ -1436,6 +1722,7 @@ anychart.waterfallModule.Chart.prototype.serialize = function() {
   json['chart']['stackLabels'] = this.stackLabels().serialize();
   json['chart']['connectors'] = this.connectors().serialize();
   json['chart']['arrows'] = this.arrowsController().serialize();
+  json['chart']['totalsController'] = this.totalsController().serialize();
 
   return json;
 };
@@ -1452,6 +1739,10 @@ anychart.waterfallModule.Chart.prototype.setupByJSON = function(config, opt_defa
 
   if (config['arrows']) {
     this.arrowsController().setupInternal(!!opt_default, config['arrows']);
+  }
+
+  if (config['totalsController']) {
+    this.totalsController().setupInternal(!!opt_default, config['totalsController']);
   }
 
   var connectorsConfig = config['connectors'];
@@ -1476,7 +1767,8 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
       this.connectorPath_,
       this.connectorsLabelsLayer_,
       this.connectors_,
-      this.arrowsController_
+      this.arrowsController_,
+      this.totalsController_
   );
   anychart.waterfallModule.Chart.base(this, 'disposeInternal');
 };
@@ -1493,6 +1785,11 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
   //proto['waterfall'] = proto.waterfall;
   //proto['dataMode'] = proto.dataMode;
 
+  proto['addTotal'] = proto.addTotal;
+  proto['removeTotal'] = proto.removeTotal;
+  proto['removeTotalAt'] = proto.removeTotalAt;
+  proto['getTotalAt'] = proto.getTotalAt;
+  proto['getAllTotals'] = proto.getAllTotals;
   proto['stackLabels'] = proto.stackLabels;
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;
