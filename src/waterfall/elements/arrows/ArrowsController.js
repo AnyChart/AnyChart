@@ -371,31 +371,11 @@ anychart.waterfallModule.ArrowsController.prototype.getLabelBounds = function(la
  * @return {Array.<anychart.math.Rect>}
  */
 anychart.waterfallModule.ArrowsController.prototype.getAllStackLabelsBounds = function(index) {
-  var chart = this.chart_;
-  var seriesCount = chart.getSeriesCount();
+  var labels = this.chart_.getStackLabels(index);
 
-  var labelsArr = [];
-
-  for (var i = 0; i < seriesCount; i++) {
-    var labelsFactory = chart.getSeries(i).labels();
-    labelsArr.push(labelsFactory.getLabel(index));
-  }
-
-  if (chart.stackLabels().enabled()) {
-    labelsArr.push(chart.stackLabels().getLabel(index));
-  }
-
-  var nonNullLabels = goog.array.filter(labelsArr, function(label) {
-    return label ?
-      label.getFinalSettings('enabled') :
-      false;
-  });
-
-  var bounds = goog.array.map(nonNullLabels, function(label) {
+  return goog.array.map(labels, function(label) {
     return this.fixLabelsBounds(this.getLabelBounds(label));
   }, this);
-
-  return bounds;
 };
 
 

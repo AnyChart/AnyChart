@@ -125,6 +125,8 @@ anychart.waterfallModule.totals.Controller.prototype.draw = function() {
     this.setupTotals_();
     this.drawTotals_();
   }
+
+  this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
 };
 
 /**
@@ -144,14 +146,7 @@ anychart.waterfallModule.totals.Controller.prototype.updateTotalsData = function
     var total = this.totals_[i];
 
     if (total.getOption('enabled')) {
-      var data = [{
-        'x': total.getCategoryValue(),
-        'value': this.chart_.getTotalValue(/**@type {string}*/(total.getOption('x')))
-      }];
-
-      total.suspendSignalsDispatching();
-      total.data(data);
-      total.resumeSignalsDispatching(false);
+      total.updateData();
     }
   }
 };

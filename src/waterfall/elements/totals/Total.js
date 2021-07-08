@@ -90,6 +90,15 @@ anychart.waterfallModule.totals.Total.Config;
 
 
 /**
+ * @typedef {{
+ *   name: string,
+ *   value: number,
+ * }}
+ */
+anychart.waterfallModule.totals.Total.SplitConfig;
+
+
+/**
  * Return string value that will be displayed in x axis under total value.
  *
  * @return {string}
@@ -100,12 +109,60 @@ anychart.waterfallModule.totals.Total.prototype.getCategoryValue = function() {
 
 
 /**
- * Return category values that total reserves.
+ * Return total and splits points data.
+ *
+ * @return {Array.<Object>}
+ */
+anychart.waterfallModule.totals.Total.prototype.getData = function() {
+  var x = /**@type {string}*/(this.getOption('x'));
+
+  var totalValue = this.chart.getTotalValue(x);
+  var categoryOfLastPoint = this.chart.getLastPointCategory();
+
+  var data = [{
+    'x': this.getCategoryValue(),
+    'name': this.name(),
+    'value': totalValue
+  }];
+
+  var totalSplit = this.chart.splitTotal();
+  if (this.validateSplits_(totalValue, totalSplit) && categoryOfLastPoint === x) {
+    var splits = this.getSplitsData(totalValue, totalSplit);
+    for (var i = 0; i < splits.length; i++) {
+      data.push(splits[i]);
+    }
+  }
+  return data;
+};
+
+
+/**
+ * Update data.
+ */
+anychart.waterfallModule.totals.Total.prototype.updateData = function() {
+  this.suspendSignalsDispatching();
+  this.data(this.getData());
+  this.resumeSignalsDispatching(false);
+};
+
+
+/**
+ * Return array of scale values reserved by total and splits.
  *
  * @return {Array.<string>}
  */
 anychart.waterfallModule.totals.Total.prototype.getReservedCategories = function() {
-  return [this.getCategoryValue()];
+  var rv = [];
+
+  var data = this.data();
+  if (data) {
+    var iterator = data.getIterator();
+    while (iterator.advance()) {
+      rv.push(/** @type {string} */(iterator.get('x')));
+    }
+  }
+
+  return rv;
 };
 
 
@@ -183,7 +240,141 @@ anychart.waterfallModule.totals.Total.prototype.getThemesList = function() {
 
 
 /** @inheritDoc */
-anychart.waterfallModule.totals.Total.prototype.getContextProviderValues = function(provider, rowInfo) {
+anychart.waterfallModule.totals.Total.prototype.initPostProcessingMeta = function() {
+  return {
+    valueOfPreviousPoint: 0
+  };
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.totals.Total.prototype.postProcessPoint = function(iterator, point, processingMeta) {
+  var isSplitPoint = !!point.meta['rawIndex'];
+
+  point.meta['isSplit'] = isSplitPoint;
+
+  if (isSplitPoint) {
+    var splitZero = processingMeta.valueOfPreviousPoint - point.data['value'];
+    point.meta['valueOfPreviousPoint'] = splitZero;
+    processingMeta.valueOfPreviousPoint = splitZero;
+  } else {
+    processingMeta.valueOfPreviousPoint = point.data['value'];
+  }
+
+  point.meta['connectorValue'] = processingMeta.valueOfPreviousPoint;
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.totals.Total.prototype.getPointValue = function(point) {
+  return point.get('value') + (point.meta('valueOfPreviousPoint') || 0);
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.totals.Total.prototype.makeUnstackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+  var map = {};
+
+  map[yNames[0]] = yScale.transform(yScale.applyComparison(this.getPointValue(rowInfo), this.comparisonZero), 0.5);
+
+  this.makePointsMetaFromMap(rowInfo, map, xRatio);
+
+  return pointMissing;
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.totals.Total.prototype.makeZeroMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  anychart.waterfallModule.totals.Total.base(this, 'makeZeroMeta', rowInfo, yNames, yColumns, pointMissing, xRatio);
+
+  if (rowInfo.meta('isSplit')) {
+    var zero = rowInfo.meta('valueOfPreviousPoint');
+    var ratioOfPrevPointValue = goog.math.clamp(this.yScale().transform(zero, 0.5), 0, 1);
+    rowInfo.meta('zero', this.ratiosToPixelPairs(xRatio, [ratioOfPrevPointValue])[1]);
+  }
+
+  return pointMissing;
+};
+
+
+/**
+ * Validate splits configs.
+ *
+ * @param {number} totalValue - Value of total to split.
+ * @param {Array.<anychart.waterfallModule.totals.Total.SplitConfig>} splits - Array of split configs.
+ *
+ * @return {boolean} - Whether configs correct.
+ *
+ * @private
+ */
+anychart.waterfallModule.totals.Total.prototype.validateSplits_ = function(totalValue, splits) {
+  var names = [];
+  if (goog.isArray(splits)) {
+    var isCorrect = true;
+    for (var i = 0; i < splits.length; i++) {
+      var split = splits[i];
+      var splitValue = split['value'];
+      var splitName = split['name'];
+
+      var hasValidValue = goog.isNumber(splitValue) && ((totalValue >= 0 && splitValue >= 0) || (totalValue < 0 && splitValue < 0));
+      var hasUniqName = goog.isDef(splitName) && goog.array.indexOf(names, splitName) === -1;
+
+      names.push(splitName);
+
+      isCorrect = isCorrect && hasUniqName && hasValidValue;
+    }
+    return isCorrect;
+  }
+
+  return false;
+};
+
+
+/**
+ * Return array of split point data.
+ *
+ * @param {number} totalValue
+ * @param {Array.<anychart.waterfallModule.totals.Total.SplitConfig>} splits
+ *
+ * @return {Array.<Object>}
+ */
+anychart.waterfallModule.totals.Total.prototype.getSplitsData = function(totalValue, splits) {
+  var rv = [];
+
+  var splitsSum = 0;
+  for (var i = 0; i < splits.length; i++) {
+    var split = splits[i];
+    split['x'] = split['name'];
+
+    splitsSum += split['value'];
+
+    rv.push(split);
+  }
+
+  if (rv.length) {
+    if (Math.abs(splitsSum) > Math.abs(totalValue)) {
+      return [];
+    } else if (Math.abs(splitsSum) < Math.abs(totalValue)) {
+      var otherSplit = {};
+      otherSplit['name'] = 'Other';
+      otherSplit['x'] = 'Other';
+      otherSplit['value'] = -(splitsSum - totalValue);
+      rv.push(otherSplit);
+    }
+  }
+  return rv;
+};
+
+
+/**
+ * Return context for total point.
+ *
+ * @param {anychart.data.IRowInfo} rowInfo
+ *
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ */
+anychart.waterfallModule.totals.Total.prototype.getTotalContext = function(rowInfo) {
   var allTotals = this.controller_.getAllTotals();
   var value = rowInfo.get('value');
 
@@ -203,8 +394,51 @@ anychart.waterfallModule.totals.Total.prototype.getContextProviderValues = funct
     'x': {
       value: this.getOption('x'),
       type: anychart.enums.TokenType.STRING
+    },
+    'isTotal': {
+      value: true,
+      type: anychart.enums.TokenType.UNKNOWN
     }
   };
+};
+
+
+/**
+ * Return context for split point.
+ *
+ * @param {anychart.data.IRowInfo} rowInfo
+ *
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ */
+anychart.waterfallModule.totals.Total.prototype.getSplitContext = function(rowInfo) {
+  var value = rowInfo.get('value');
+
+  return {
+    'name': {
+      value: rowInfo.get('name'),
+      type: anychart.enums.TokenType.STRING
+    },
+    'value': {
+      value: value,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'index': {
+      value: rowInfo.getIndex() - 1,
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'isSplit': {
+      value: true,
+      type: anychart.enums.TokenType.UNKNOWN
+    }
+  };
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.totals.Total.prototype.getContextProviderValues = function(provider, rowInfo) {
+  return rowInfo.meta('isSplit') ?
+    this.getSplitContext(rowInfo) :
+    this.getTotalContext(rowInfo);
 };
 
 

@@ -61,6 +61,14 @@ anychart.waterfallModule.Chart = function() {
    */
   this.usedContextsPool_ = [];
 
+  /**
+   * Splits configs.
+   *
+   * @type {Array.<anychart.waterfallModule.totals.Total.SplitConfig>}
+   * @private
+   */
+  this.totalSplits_ = [];
+
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
     ['dataMode',
       anychart.ConsistencyState.SERIES_CHART_SERIES |
@@ -203,9 +211,51 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
       absSum += !point.meta['missing'] ? (Number(point.meta['diff']) || 0) : 0;
     }
     prevValue += absSum;
+    if (!point.meta['isSplit'])
+      point.meta['connectorValue'] = prevValue;
     this.pointValueSums_.push(prevValue);
   }
 };
+
+
+/**
+ * Return category value of last visible point.
+ *
+ * @return {string}
+ */
+anychart.waterfallModule.Chart.prototype.getLastPointCategory = function() {
+  var categoriesMap = {};
+  for (var i = 0; i < this.seriesList.length; i++) {
+    var series = this.seriesList[i];
+    if (series && series.enabled()) {
+      var data = series.data();
+      if (data) {
+        var iterator = data.getIterator();
+        while (iterator.advance()) {
+          var pointCategory = iterator.get('x');
+          if (!(pointCategory in categoriesMap)) {
+            categoriesMap[pointCategory] = iterator.getIndex();
+          }
+        }
+      }
+    }
+  }
+
+  var valueOfLastCategory = '';
+  var indexOfLastCategory = -1;
+  for (var category in categoriesMap) {
+    if (valueOfLastCategory) {
+      indexOfLastCategory = Math.max(indexOfLastCategory, categoriesMap[category]);
+      valueOfLastCategory = indexOfLastCategory === categoriesMap[category] ? category : valueOfLastCategory;
+    } else {
+      indexOfLastCategory = categoriesMap[category];
+      valueOfLastCategory = category;
+    }
+  }
+
+  return valueOfLastCategory;
+};
+
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.calculate = function() {
@@ -277,8 +327,18 @@ anychart.waterfallModule.Chart.prototype.getConnectorCoordinates = function(from
     var prevBounds = this.getStackBounds(fromIndex);
     var curBounds = this.getStackBounds(toIndex);
 
+    var connectorValue;
+
+    for (var i = this.drawingPlans.length - 1; i >= 0; i--) {
+      var plan = this.drawingPlans[i];
+      connectorValue = plan.data[fromIndex].meta['connectorValue'];
+      if (goog.isDef(connectorValue)) {
+        break;
+      }
+    }
+
     var leftX = this.getConnectorXCoordinate(prevBounds.getCenter().x, prevBounds.getSize().width);
-    var leftY = this.transformValue_(this.pointValueSums_[fromIndex]);
+    var leftY = this.transformValue_(connectorValue);
 
     var rightX = this.getConnectorXCoordinate(curBounds.getCenter().x, -curBounds.getSize().width);
     var rightY = leftY;
@@ -906,7 +966,6 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForArrow = function(to
 };
 
 
-
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.createDrawingPlans = function() {
   var plans = anychart.waterfallModule.Chart.base(this, 'createDrawingPlans');
@@ -1525,6 +1584,37 @@ anychart.waterfallModule.Chart.prototype.getStackBottom = function(index) {
 };
 
 
+/**
+ * Return all labels that stack use.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {Array.<anychart.core.ui.LabelsFactory.Label>}
+ */
+anychart.waterfallModule.Chart.prototype.getStackLabels = function(index) {
+  var labels = [];
+
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var plan = this.drawingPlans[i];
+    var pointMeta = plan.data[index].meta;
+    var label = pointMeta['label'];
+    if (label && label.getFinalSettings('enabled')) {
+      labels.push(label);
+    }
+  }
+
+  var stackLabels = this.stackLabels();
+  if (stackLabels.enabled()) {
+    var stackLabel = stackLabels.getLabel(index);
+    if (stackLabel) {
+      labels.push(stackLabel);
+    }
+  }
+
+  return labels;
+};
+
+
 //endregion
 //region --- Series
 /** @inheritDoc */
@@ -1664,6 +1754,7 @@ anychart.waterfallModule.Chart.prototype.getConnectorBounds = function(from, to)
  * @return {number}
  */
 anychart.waterfallModule.Chart.prototype.getTotalValue = function(category) {
+  var visibleCategories = this.xScale().values();
   var isDiffMode = this.getOption('dataMode') === anychart.enums.WaterfallDataMode.DIFF;
   var totalValue = 0;
   for (var i = 0; i < this.seriesList.length; i++) {
@@ -1676,7 +1767,12 @@ anychart.waterfallModule.Chart.prototype.getTotalValue = function(category) {
         var seriesSum = 0;
         while (iterator.advance()) {
           var index = iterator.getIndex();
-          if (goog.array.indexOf(excludes, index) === -1) {
+          // !visibleCategories.length Check for first draw, before xScale calculated.
+          var isVisible =
+            (goog.array.indexOf(visibleCategories, iterator.get('x')) !== -1 || !visibleCategories.length) &&
+            (goog.array.indexOf(excludes, index) === -1);
+
+          if (isVisible) {
             var value = iterator.get('value');
             if (goog.isNumber(value)) {
               if (isDiffMode) {
@@ -1757,6 +1853,27 @@ anychart.waterfallModule.Chart.prototype.getAllTotals = function() {
 
 
 /**
+ * Getter/Setter for total splits.
+ * Split independent total that created via this.createTotal({x, name}).
+ * Total will be splitted if it reserve last chart category and sum of all split values is equal or less total value.
+ *
+ * @param {Array.<anychart.waterfallModule.totals.Total.SplitConfig>=} opt_splits - Array of splits. Each split item must contain at least two fields 'name' and 'value'
+ *
+ * @return {Array.<Object>|anychart.waterfallModule.Chart}
+ */
+anychart.waterfallModule.Chart.prototype.splitTotal = function(opt_splits) {
+  if (goog.isDef(opt_splits)) {
+    this.totalSplits_ = opt_splits;
+    this.invalidateStore(anychart.enums.Store.WATERFALL);
+    this.totalsController().invalidate(this.totalsController().SUPPORTED_CONSISTENCY_STATES);
+    this.invalidate(this.SUPPORTED_CONSISTENCY_STATES, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return this.totalSplits_;
+};
+
+
+/**
  * Totals storage invalidate handler.
  * @param {anychart.SignalEvent} event
  */
@@ -1799,11 +1916,7 @@ anychart.waterfallModule.Chart.prototype.drawTotals = function() {
  * @private
  */
 anychart.waterfallModule.Chart.prototype.invalidateTotals_ = function() {
-  var totals = this.totalsController().getAllTotals();
-  for (var i = 0; i < totals.length; i++) {
-    var total = totals[i];
-    total.invalidate(anychart.ConsistencyState.SERIES_POINTS);
-  }
+  this.totalsController().invalidate(anychart.ConsistencyState.SERIES_DATA);
 };
 
 
@@ -1976,8 +2089,9 @@ anychart.waterfallModule.Chart.prototype.serialize = function() {
   anychart.core.settings.serialize(this, anychart.waterfallModule.Chart.PROPERTY_DESCRIPTORS, json['chart']);
   json['chart']['stackLabels'] = this.stackLabels().serialize();
   json['chart']['connectors'] = this.connectors().serialize();
+  json['chart']['totals'] = this.totalsController().serialize();
   json['chart']['arrows'] = this.arrowsController().serialize();
-  json['chart']['totalsController'] = this.totalsController().serialize();
+  json['chart']['totalSplits'] = this.totalSplits_;
 
   return json;
 };
@@ -1996,8 +2110,12 @@ anychart.waterfallModule.Chart.prototype.setupByJSON = function(config, opt_defa
     this.arrowsController().setupInternal(!!opt_default, config['arrows']);
   }
 
-  if (config['totalsController']) {
-    this.totalsController().setupInternal(!!opt_default, config['totalsController']);
+  if (config['totals']) {
+    this.totalsController().setupInternal(!!opt_default, config['totals']);
+  }
+
+  if (config['totalSplits']) {
+    this.splitTotal(config['totalSplits']);
   }
 
   var connectorsConfig = config['connectors'];
@@ -2045,6 +2163,7 @@ anychart.waterfallModule.Chart.prototype.disposeInternal = function() {
   proto['removeTotalAt'] = proto.removeTotalAt;
   proto['getTotalAt'] = proto.getTotalAt;
   proto['getAllTotals'] = proto.getAllTotals;
+  proto['splitTotal'] = proto.splitTotal;
   proto['stackLabels'] = proto.stackLabels;
   proto['xScale'] = proto.xScale;
   proto['yScale'] = proto.yScale;

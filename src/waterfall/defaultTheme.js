@@ -116,8 +116,24 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       'tooltip': {
         'enabled': true,
-        'format': 'Absolute: {%value}',
-        'titleFormat': '{%name}'
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          return this['isTotal'] ?
+            'Absolute: ' + this['value'] :
+            'Value: ' + this['value'];
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormat': function() {
+          return this['isTotal'] ?
+            'Total: ' + this['name'] :
+            'Split: ' + this['name'];
+        }
       }
     }
   }
