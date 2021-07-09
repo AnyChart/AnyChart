@@ -373,6 +373,11 @@ anychart.waterfallModule.ArrowsController.prototype.getLabelBounds = function(la
 anychart.waterfallModule.ArrowsController.prototype.getAllStackLabelsBounds = function(index) {
   var labels = this.chart_.getStackLabels(index);
 
+  labels = goog.array.filter(labels, function(label) {
+    // Outside labels breaks arrow positioning.
+    return !label.positionProvider()['connectorPoint'];
+  });
+
   return goog.array.map(labels, function(label) {
     return this.fixLabelsBounds(this.getLabelBounds(label));
   }, this);
