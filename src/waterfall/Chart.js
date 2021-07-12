@@ -219,12 +219,12 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
 
 
 /**
- * Return category value of last visible point.
+ * Return list of series categories.
  *
- * @return {string}
+ * @return {Array.<string>}
  */
-anychart.waterfallModule.Chart.prototype.getLastPointCategory = function() {
-  var categoriesMap = {};
+anychart.waterfallModule.Chart.prototype.getSeriesCategories = function() {
+  var categories = [];
   for (var i = 0; i < this.seriesList.length; i++) {
     var series = this.seriesList[i];
     if (series && series.enabled()) {
@@ -233,27 +233,15 @@ anychart.waterfallModule.Chart.prototype.getLastPointCategory = function() {
         var iterator = data.getIterator();
         while (iterator.advance()) {
           var pointCategory = iterator.get('x');
-          if (!(pointCategory in categoriesMap)) {
-            categoriesMap[pointCategory] = iterator.getIndex();
+          if (!goog.array.contains(categories, pointCategory)) {
+            categories.push(pointCategory);
           }
         }
       }
     }
   }
 
-  var valueOfLastCategory = '';
-  var indexOfLastCategory = -1;
-  for (var category in categoriesMap) {
-    if (valueOfLastCategory) {
-      indexOfLastCategory = Math.max(indexOfLastCategory, categoriesMap[category]);
-      valueOfLastCategory = indexOfLastCategory === categoriesMap[category] ? category : valueOfLastCategory;
-    } else {
-      indexOfLastCategory = categoriesMap[category];
-      valueOfLastCategory = category;
-    }
-  }
-
-  return valueOfLastCategory;
+  return categories;
 };
 
 
@@ -384,7 +372,7 @@ anychart.waterfallModule.Chart.prototype.drawConnector = function() {
     if (this.isStackVisible(index)) {
       if (goog.isDef(prevIndex)) {
         var segmentCoordinates = this.getConnectorCoordinates(prevIndex, index);
-        
+
         var categoryName = this.drawingPlans[0].data[prevIndex].data['x'];
 
         var leftX = segmentCoordinates.from.x;
@@ -404,8 +392,8 @@ anychart.waterfallModule.Chart.prototype.drawConnector = function() {
           anychart.utils.applyPixelShift(rightY, thickness)
         );
 
-        var connectorPoints = isVertical ? 
-          { x1: leftY, y1: leftX, x2: rightY, y2: rightX } : // OMFG, my mind burns here. 
+        var connectorPoints = isVertical ?
+          { x1: leftY, y1: leftX, x2: rightY, y2: rightX } : // OMFG, my mind burns here.
           { x1: leftX, y1: leftY, x2: rightX, y2: rightY };
 
         this.connectorsPositions_.push(connectorPoints);
@@ -422,15 +410,15 @@ anychart.waterfallModule.Chart.prototype.drawConnector = function() {
 
 /**
  * Defines, whether labels need to be distributed for 'auto' mode. DVF-4545.
- * 
+ *
  * @return {boolean}
  */
 anychart.waterfallModule.Chart.prototype.needsOutsideLabelsDistribution = function() {
   var labels = /** @type {anychart.core.ui.LabelsFactory} */ (this.labels());
   var labelsPosition = labels.getOption('position');
-  return this.getSeriesCount() > 1 && 
+  return this.getSeriesCount() > 1 &&
     (
-      labelsPosition === anychart.enums.Position.AUTO || 
+      labelsPosition === anychart.enums.Position.AUTO ||
       labelsPosition === 'outside'
     );
 };
@@ -438,7 +426,7 @@ anychart.waterfallModule.Chart.prototype.needsOutsideLabelsDistribution = functi
 
 /**
  * Searches for label intersecting connector.
- * 
+ *
  * @param {Array.<Object>} labels - Outside labels data array.
  * @param {number} lineCoordinate - Vertical or horizontal coordinate of connector.
  * @return {number} - Index of label intersecting lineCoordinate.
@@ -460,7 +448,7 @@ anychart.waterfallModule.Chart.prototype.findOutsideLabelIndexInStack_ = functio
 
 
 /**
- * 
+ *
  * @param {Array.<Object>} labels - Array of outside labels data objects.
  * @param {number} startIndex - .
  * @param {number} stackLimit - .
@@ -472,7 +460,7 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackForward_ = function(labe
     var labelBounds = labelsData.bounds;
     var labelBoundsStart = isVertical ? labelBounds.left : labelBounds.top;
     var labelBoundsSize = isVertical ? labelBounds.width : labelBounds.height;
-    if (isNaN(stackLimit)) { 
+    if (isNaN(stackLimit)) {
       stackLimit = labelBoundsStart + labelBoundsSize;
     } else {
       var label = labelsData.label;
@@ -483,8 +471,8 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackForward_ = function(labe
         var newStart = stackLimit + labelHalfSize;
         stackLimit += labelBoundsSize;
 
-        var newPPValue = isVertical ? 
-          { x: newStart, y: positionProvider['value'].y} : 
+        var newPPValue = isVertical ?
+          { x: newStart, y: positionProvider['value'].y} :
           { x: positionProvider['value'].x, y: newStart};
 
         var newPositionProvider = {
@@ -503,7 +491,7 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackForward_ = function(labe
 
 
 /**
- * 
+ *
  * @param {Array.<Object>} labels - Array of outside labels data objects.
  * @param {number} startIndex - .
  * @param {number} stackLimit - .
@@ -514,7 +502,7 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackBackward_ = function(lab
     var labelsData = labels[j];
     var labelBounds = labelsData.bounds;
     var labelBoundsSize = isVertical ? labelBounds.width : labelBounds.height;
-    
+
     var label = labelsData.label;
     var labelHalfSize = labelBoundsSize / 2;
     var positionProvider = label.positionProvider();
@@ -524,8 +512,8 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackBackward_ = function(lab
       var newStart = stackLimit - labelHalfSize;
       stackLimit -= labelBoundsSize;
 
-      var newPPValue = isVertical ? 
-          { x: newStart, y: positionProvider['value'].y} : 
+      var newPPValue = isVertical ?
+          { x: newStart, y: positionProvider['value'].y} :
           { x: positionProvider['value'].x, y: newStart};
 
       var newPositionProvider = {
@@ -543,7 +531,7 @@ anychart.waterfallModule.Chart.prototype.drawLabelsStackBackward_ = function(lab
 
 /**
  * Puts outside labels in assigned category.
- * 
+ *
  * @param {string} categoryName - Drawing plan category name.
  */
 anychart.waterfallModule.Chart.prototype.putLabelsInCategory = function(categoryName) {
@@ -585,7 +573,7 @@ anychart.waterfallModule.Chart.prototype.putLabelsInCategory = function(category
           var labelBoundsStart = isVertical ? labelData.bounds.left : labelData.bounds.top;
           var labelBoundsSize = isVertical ? labelData.bounds.width : labelData.bounds.height;
           var connectorRatio = (connectorCoordinate - labelBoundsStart) / labelBoundsSize;
-          
+
           if (connectorRatio >= 0.5) {
             this.drawLabelsStackForward_(labels, index - 1, connectorCoordinate);
             this.drawLabelsStackBackward_(labels, index, connectorCoordinate);
@@ -1028,7 +1016,7 @@ anychart.waterfallModule.Chart.prototype.getValuesForOrdinalScale = function() {
 
 /**
  * Gets label bounds.
- * 
+ *
  * @param {anychart.core.ui.LabelsFactory.Label} label - Label.
  * @return {anychart.math.Rect} - .
  */
@@ -1449,7 +1437,7 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index, opt_co
 
 
   // return this.isVertical() ? // Turning to screen coordinates.
-  //   anychart.math.rect(top, left, height - top, width) : 
+  //   anychart.math.rect(top, left, height - top, width) :
   //   anychart.math.rect(left, top, width, height - top);
 
   var tmp = top;

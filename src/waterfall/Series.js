@@ -77,7 +77,7 @@ anychart.waterfallModule.Series.prototype.createPositionProvider = function(posi
 
 /**
  * Gets outside labels data object.
- * 
+ *
  * @param {anychart.core.ui.LabelsFactory.Label} label - Label.
  * @param {anychart.data.IRowInfo} point - .
  * @return {Object} - Collected outside label bounds data.
@@ -107,7 +107,7 @@ anychart.waterfallModule.Series.prototype.getLabelOutOfBoundsData = function(lab
 
 /**
  * Creates and returns new position provider for outside labels.
- * 
+ *
  * @param {anychart.data.IRowInfo} point - .
  * @param {{value: {x:number, y:number}}} positionProvider - Incoming default position provider.
  * @return {{value: {x:number, y:number}}} - New position provider.
@@ -125,7 +125,7 @@ anychart.waterfallModule.Series.prototype.getOutsidePositionProvider = function(
     { x: outsideCoordinate + 3 * sign, y: ppValue.y};
 
   var newConnectorPointValue = isVertical ?
-    { x: ppValue.x,  y: outsideCoordinate - 2 * sign} :
+    { x: ppValue.x, y: outsideCoordinate - 2 * sign} :
     { x: outsideCoordinate - 2 * sign, y: ppValue.y};
 
   return {
@@ -139,7 +139,7 @@ anychart.waterfallModule.Series.prototype.getOutsidePositionProvider = function(
 
 /**
  * Comparison function for horizontal layout of chart to sort labels order.
- * 
+ *
  * @param {Object} item1 - Item1 to compare.
  * @param {Object} item2 - Item2 to compare.
  * @return {number} - Comparison result.
@@ -161,7 +161,7 @@ anychart.waterfallModule.Series.prototype.labelOutOfBoundsHorizontalDataComparat
 
 /**
  * Comparison function for vertical layout of chart to sort labels order.
- * 
+ *
  * @param {Object} item1 - Item1 to compare.
  * @param {Object} item2 - Item2 to compare.
  * @return {number} - Comparison result.
@@ -200,7 +200,7 @@ anychart.waterfallModule.Series.prototype.drawFactoryElement = function(seriesFa
     var isVertical = !!this.chart.isVertical();
 
     var autoAnchor = isVertical ?
-      anychart.enums.Anchor.CENTER_BOTTOM : 
+      anychart.enums.Anchor.CENTER_BOTTOM :
       anychart.enums.Anchor.LEFT_CENTER;
 
     var outsideProvider;

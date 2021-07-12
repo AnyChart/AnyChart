@@ -107,6 +107,26 @@ anychart.waterfallModule.totals.Total.prototype.getCategoryValue = function() {
   return /**@type {string}*/(this.name());
 };
 
+/**
+ * Validate total correctness.
+ *
+ * @return {boolean}
+ *
+ * @private
+ */
+anychart.waterfallModule.totals.Total.prototype.validate_ = function() {
+  var name = this.name();
+  var self = this;
+
+  var valid = !goog.array.some(this.controller_.getAllTotals(), function(total) {
+    return !!(total !== self && total.getOption('enabled') && name === total.name());
+  });
+
+  return valid && !goog.array.some(this.chart.getSeriesCategories(), function(seriesCategory) {
+    return name === seriesCategory;
+  });
+};
+
 
 /**
  * Return total and splits points data.
@@ -114,24 +134,31 @@ anychart.waterfallModule.totals.Total.prototype.getCategoryValue = function() {
  * @return {Array.<Object>}
  */
 anychart.waterfallModule.totals.Total.prototype.getData = function() {
+  var data = [];
+  var seriesCategories = this.chart.getSeriesCategories();
   var x = /**@type {string}*/(this.getOption('x'));
 
-  var totalValue = this.chart.getTotalValue(x);
-  var categoryOfLastPoint = this.chart.getLastPointCategory();
+  var name = this.name();
 
-  var data = [{
-    'x': this.getCategoryValue(),
-    'name': this.name(),
-    'value': totalValue
-  }];
+  if (this.validate_()) {
+    var totalValue = this.chart.getTotalValue(x);
 
-  var totalSplit = this.chart.splitTotal();
-  if (this.validateSplits_(totalValue, totalSplit) && categoryOfLastPoint === x) {
-    var splits = this.getSplitsData(totalValue, totalSplit);
-    for (var i = 0; i < splits.length; i++) {
-      data.push(splits[i]);
+    data.push({
+      'x': this.getCategoryValue(),
+      'name': name,
+      'value': totalValue
+    });
+
+    var totalSplit = this.chart.splitTotal();
+    var categoryOfLastPoint = seriesCategories[seriesCategories.length - 1];
+    if (this.validateSplits_(totalValue, totalSplit) && categoryOfLastPoint === x) {
+      var splits = this.getSplitsData(totalValue, totalSplit);
+      for (var i = 0; i < splits.length; i++) {
+        data.push(splits[i]);
+      }
     }
   }
+
   return data;
 };
 
@@ -309,10 +336,17 @@ anychart.waterfallModule.totals.Total.prototype.makeZeroMeta = function(rowInfo,
  * @private
  */
 anychart.waterfallModule.totals.Total.prototype.validateSplits_ = function(totalValue, splits) {
-  var names = [];
+  var names = this.chart.getSeriesCategories();
+
+  var totals = this.controller_.getAllTotals();
+  for (var i = 0; i < totals.length; i++) {
+    var total = totals[i];
+    names.push(total.name());
+  }
+
   if (goog.isArray(splits)) {
     var isCorrect = true;
-    for (var i = 0; i < splits.length; i++) {
+    for (i = 0; i < splits.length; i++) {
       var split = splits[i];
       var splitValue = split['value'];
       var splitName = split['name'];
