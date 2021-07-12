@@ -49,7 +49,7 @@ goog.inherits(anychart.waterfallModule.totals.Controller, anychart.core.VisualBa
  * zIndex for totals layer.
  * @type {number}
  */
-anychart.waterfallModule.totals.Controller.Z_INDEX = 45;
+anychart.waterfallModule.totals.Controller.Z_INDEX = 30;
 
 
 /**
