@@ -279,6 +279,7 @@ anychart.waterfallModule.totals.Total.prototype.postProcessPoint = function(iter
   var isSplitPoint = !!point.meta['rawIndex'];
 
   point.meta['isSplit'] = isSplitPoint;
+  point.meta['isTotal'] = !isSplitPoint;
 
   if (isSplitPoint) {
     var splitZero = processingMeta.valueOfPreviousPoint - point.data['value'];

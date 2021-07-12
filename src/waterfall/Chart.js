@@ -186,6 +186,17 @@ anychart.waterfallModule.Chart.prototype.getPointStackingValue = function(point)
 anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingPlans, firstIndex, lastIndex, yScale) {
   var prevValue = 0;
   var i, point;
+
+  var seriesPlans = [];
+  for (i = 0; i < drawingPlans.length; i++) {
+    var plan = drawingPlans[i];
+    if (plan.series.getType() !== anychart.waterfallModule.totals.Total.seriesType) {
+      seriesPlans.push(plan);
+    }
+  }
+
+  drawingPlans = seriesPlans;
+
   if (firstIndex) {
     for (i = 0; i < drawingPlans.length; i++) {
       point = drawingPlans[i].data[firstIndex - 1];
@@ -211,8 +222,9 @@ anychart.waterfallModule.Chart.prototype.postProcessStacking = function(drawingP
       absSum += !point.meta['missing'] ? (Number(point.meta['diff']) || 0) : 0;
     }
     prevValue += absSum;
-    if (!point.meta['isSplit'])
-      point.meta['connectorValue'] = prevValue;
+
+    point.meta['connectorValue'] = prevValue;
+
     this.pointValueSums_.push(prevValue);
   }
 };
@@ -1050,7 +1062,7 @@ anychart.waterfallModule.Chart.prototype.updateConnectorsLabels = function() {
   for (var index = 0; index < this.drawingPlans[0].data.length; index++) {
     if (this.isStackVisible(index)) {
       currentIndex = index;
-      if (goog.isDef(prevIndex)) {
+      if (goog.isDef(prevIndex) && !this.isTotalStack(currentIndex)) {
         var stackContribution = this.getStackSum(index, 'diff');
         var pointCategory = this.drawingPlans[0].xArray[index];
 
@@ -1500,6 +1512,22 @@ anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
   return goog.array.reduce(this.drawingPlans, function(isVisible, plan) {
     return isVisible || !plan.data[index].meta['missing'];
   }, false);
+};
+
+
+/**
+ * Whether total/split stack.
+ *
+ * Do not treat first series point as total.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {boolean}
+ */
+anychart.waterfallModule.Chart.prototype.isTotalStack = function(index) {
+  return goog.array.reduce(this.drawingPlans, function(isTotal, plan) {
+    return isTotal || plan.data[index].meta['isTotal'] || plan.data[index].meta['isSplit'];
+  }, false) && !!index;
 };
 
 
