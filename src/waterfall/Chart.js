@@ -1966,6 +1966,32 @@ anychart.waterfallModule.Chart.prototype.unhover = function(opt_indexOrIndexes) 
 };
 
 
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.getPointsForUnionDisplayMode = function(series, pointIndex, categoryIndex) {
+  if (series && series.getType() === anychart.waterfallModule.totals.Total.seriesType) {
+    return [{
+      'series': series,
+      'points': [pointIndex]
+    }];
+  }
+
+  return anychart.waterfallModule.Chart.base(this, 'getPointsForUnionDisplayMode', series, pointIndex, categoryIndex);
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.getSeriesList = function() {
+  var chartSeries = anychart.waterfallModule.Chart.base(this, 'getSeriesList');
+  var rv = [];
+
+  rv.push.apply(rv, chartSeries);
+
+  rv.push.apply(rv, this.getAllTotals());
+
+  return rv;
+};
+
+
 //endregion
 //region --- Arrows
 /**

@@ -810,6 +810,47 @@ anychart.core.Chart.prototype.createTooltip = function() {
 
 
 /**
+ * Return points information for union tooltip display mode.
+ *
+ * @param {anychart.core.series.Base} series
+ * @param {number} pointIndex
+ * @param {number} categoryIndex
+ *
+ * @return {Array.<{
+ *   series: anychart.core.series.Base,
+ *   points: Array.<number>
+ * }>}
+ */
+anychart.core.Chart.prototype.getPointsForUnionDisplayMode = function(series, pointIndex, categoryIndex) {
+  var points = [];
+  // check isDef series for compile_each (for gantt, etc.)
+  if (goog.isDef(this.getAllSeries())) {
+    // get points from all series by point index
+    points = goog.array.map(this.getAllSeries(), function(series) {
+      if (series.getOption('xMode') == anychart.enums.XMode.SCATTER)
+        series.getIterator().select(pointIndex);
+      else
+        series.getIterator().select(categoryIndex);
+      return {
+        'series': series,
+        'points': [pointIndex]
+      };
+    });
+  }
+
+  // filter missing
+  return goog.array.filter(points, function(point) {
+    var series = point['series'];
+    var iterator = series.getIterator();
+    if (goog.isDef(iterator.meta('missing'))) {
+      return !iterator.meta('missing');
+    }
+    return !anychart.utils.isNaN(iterator.get('value'));
+  });
+};
+
+
+/**
  * @param {anychart.core.MouseEvent} event
  * @private
  */
@@ -859,35 +900,14 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         var series = event['seriesStatus'][0]['series'];
 
         // if series xScale ordinal and in scatter xMode than we should use categoryIndex insteadof pointIndex
-        if (series.getXScale && anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
-            series.getOption('xMode') == anychart.enums.XMode.SCATTER) {
+        if (series.getXScale &&
+          anychart.utils.instanceOf(series.getXScale(), anychart.scales.Ordinal) &&
+          series.getOption('xMode') == anychart.enums.XMode.SCATTER
+        ) {
           categoryIndex = event['point'].get('x');
         }
 
-        // check isDef series for compile_each (for gantt, etc.)
-        if (goog.isDef(this.getAllSeries())) {
-          // get points from all series by point index
-          points = goog.array.map(this.getAllSeries(), function(series) {
-            if (series.getOption('xMode') == anychart.enums.XMode.SCATTER)
-              series.getIterator().select(pointIndex);
-            else
-              series.getIterator().select(categoryIndex);
-            return {
-              'series': series,
-              'points': [pointIndex]
-            };
-          });
-        }
-
-        // filter missing
-        points = goog.array.filter(points, function(point) {
-          var series = point['series'];
-          var iterator = series.getIterator();
-          if (goog.isDef(iterator.meta('missing'))) {
-            return !iterator.meta('missing');
-          }
-          return !anychart.utils.isNaN(iterator.get('value'));
-        });
+        points = this.getPointsForUnionDisplayMode(series, pointIndex, categoryIndex);
       }
 
       this.tooltip_.showForSeriesPoints(points,
