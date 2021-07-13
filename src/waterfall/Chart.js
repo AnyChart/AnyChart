@@ -1470,19 +1470,17 @@ anychart.waterfallModule.Chart.prototype.getStackBounds_ = function(index) {
     var meta = plan.data[index].meta;
     // Missing point has no path.
     if (!meta['missing']) {
-      var shapes = meta['shapes'];
-      var shape =
-        shapes['path'] ||
-        shapes['risingFill'] ||
-        shapes['fallingFill'] ||
-        shapes['hatchFill'] ||
-        shapes['risingHatchFill'] ||
-        shapes['fallingHatchFill'];
+      var shape = goog.object.findValue(meta['shapes'], function(path) {
+        return !!path.parent();
+      });
 
       var shapeBounds = shape.getBounds();
 
-      bounds = bounds || shapeBounds.clone();
-      bounds.boundingRect(shapeBounds);
+      // In some cases NaNs here.
+      if (!isNaN(shapeBounds.left) && !isNaN(shapeBounds.top) && !isNaN(shapeBounds.width) && !isNaN(shapeBounds.height)) {
+        bounds = bounds || shapeBounds.clone();
+        bounds.boundingRect(shapeBounds);
+      }
     }
   }
 
