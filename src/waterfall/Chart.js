@@ -767,9 +767,16 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForStackedLabel = func
  * @return {anychart.enums.Position}
  */
 anychart.waterfallModule.Chart.prototype.resolvePositionForStackLabel = function(position, index) {
-  if (position == anychart.enums.Position.AUTO) {
+  if (position === anychart.enums.Position.AUTO) {
+    var isVertical = this.isVertical();
+    var isInverted = this.yScale().inverted();
+
     var stackDiff = this.getStackSum(index, 'diff');
-    return stackDiff >= 0 ? anychart.enums.Position.CENTER_TOP : anychart.enums.Position.CENTER_BOTTOM;
+
+    position = stackDiff >= 0 ? anychart.enums.Position.CENTER_TOP : anychart.enums.Position.CENTER_BOTTOM;
+
+    position =/** @type {anychart.enums.Position} */ (anychart.utils.rotateAnchor(position, isInverted ? 180 : 0));
+    position =/** @type {anychart.enums.Position} */ (anychart.utils.rotateAnchor(position, isVertical ? -90 : 0));
   }
 
   return position;
@@ -786,19 +793,11 @@ anychart.waterfallModule.Chart.prototype.resolvePositionForStackLabel = function
  * @return {anychart.enums.Anchor} - Resolved anchor value for stack label.
  */
 anychart.waterfallModule.Chart.prototype.resolveAnchorForStackLabel = function(anchor, position, index) {
-  if (anchor == anychart.enums.Anchor.AUTO) {
-    if (position == anychart.enums.Position.AUTO) {
-      var stackDiff = this.getStackSum(index, 'diff');
-
-      anchor = stackDiff >= 0 ? anychart.enums.Anchor.CENTER_BOTTOM : anychart.enums.Anchor.CENTER_TOP;
-    } else if (position == anychart.enums.Position.CENTER) {
-      anchor = anychart.enums.Anchor.CENTER;
-    } else {
-      anchor = anychart.utils.rotateAnchor(position, 180);
-    }
+  if (anchor === anychart.enums.Anchor.AUTO) {
+    return anychart.utils.rotateAnchor(position, 180);
   }
 
-  return anychart.utils.rotateAnchor(anchor, this.isVertical() ? -90 : 0);
+  return anchor;
 };
 
 
@@ -811,20 +810,13 @@ anychart.waterfallModule.Chart.prototype.resolveAnchorForStackLabel = function(a
  * @return {{value: {x: number, y:number}}} - Position provider.
  */
 anychart.waterfallModule.Chart.prototype.getPositionProviderForStackedLabel = function(index, labelsPosition) {
-  var bounds = this.getStackBounds(index);
+  var bounds = this.getStackBounds_(index);
   var position = anychart.utils.getCoordinateByAnchor(bounds, labelsPosition);
-
-  var x = position['x'];
-  var y = position['y'];
-
-  var tmpX = x;
-  x = this.isVertical() ? y : x;
-  y = this.isVertical() ? tmpX : y;
 
   return {
     'value': {
-      x: x,
-      y: y
+      x: position['x'],
+      y: position['y']
     }
   };
 };
@@ -1135,8 +1127,8 @@ anychart.waterfallModule.Chart.prototype.updateStackLabels = function() {
 
   for (var index = 0; index < this.drawingPlans[0].data.length; index++) {
     if (!this.isCategoryUsedForTotal(index) && this.isStackVisible(index)) {
-      var labelAnchor = this.resolveAnchorForStackLabel(labelsAnchor, labelsPosition, index);
       var labelPosition = this.resolvePositionForStackLabel(labelsPosition, index);
+      var labelAnchor = this.resolveAnchorForStackLabel(labelsAnchor, labelPosition, index);
 
       var positionProvider = this.getPositionProviderForStackedLabel(index, labelPosition);
       var formatProvider = this.getFormatProviderForStackedLabel(index);
@@ -1432,11 +1424,10 @@ anychart.waterfallModule.Chart.prototype.legendItemClick = function(item, event)
  * Used for labels position calculation.
  *
  * @param {number} index - Stack index.
- * @param {boolean=} opt_considerLabels - Whether consider labels bounds.
  *
  * @return {!anychart.math.Rect} - Bounds of stack.
  */
-anychart.waterfallModule.Chart.prototype.getStackBounds = function(index, opt_considerLabels) {
+anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
   var width = goog.array.reduce(this.drawingPlans, function(width, plan) {
     var seriesPointWidth = plan.series.pointWidthCache;
     return Math.max(seriesPointWidth, width);
@@ -1457,6 +1448,45 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index, opt_co
   bottom = Math.max(tmp, bottom);
 
   return anychart.math.rect(left, top, width, bottom - top);
+};
+
+
+/**
+ * Analogue of 'this.getStackBounds' but it works correctly in vertical case.
+ *
+ * We can't rework this.getStackBounds method because of waterfall arrows drawing. May be in future.
+ *
+ * @param {number} index - Stack index.
+ *
+ * @return {!anychart.math.Rect} - Bounds of stack.
+ *
+ * @private
+ */
+anychart.waterfallModule.Chart.prototype.getStackBounds_ = function(index) {
+  var bounds;
+
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var plan = this.drawingPlans[i];
+    var meta = plan.data[index].meta;
+    // Missing point has no path.
+    if (!meta['missing']) {
+      var shapes = meta['shapes'];
+      var shape =
+        shapes['path'] ||
+        shapes['risingFill'] ||
+        shapes['fallingFill'] ||
+        shapes['hatchFill'] ||
+        shapes['risingHatchFill'] ||
+        shapes['fallingHatchFill'];
+
+      var shapeBounds = shape.getBounds();
+
+      bounds = bounds || shapeBounds.clone();
+      bounds.boundingRect(shapeBounds);
+    }
+  }
+
+  return bounds;
 };
 
 
