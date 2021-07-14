@@ -146,6 +146,7 @@ anychart.waterfallModule.totals.Total.prototype.getData = function() {
     data.push({
       'x': this.getCategoryValue(),
       'name': name,
+      'isTotal': true,
       'value': totalValue
     });
 
@@ -380,8 +381,8 @@ anychart.waterfallModule.totals.Total.prototype.getSplitsData = function(totalVa
   var splitsSum = 0;
   for (var i = 0; i < splits.length; i++) {
     var split = splits[i];
+    split['isSplit'] = true;
     split['x'] = split['name'];
-
     splitsSum += split['value'];
 
     rv.push(split);
@@ -394,6 +395,7 @@ anychart.waterfallModule.totals.Total.prototype.getSplitsData = function(totalVa
       var otherSplit = {};
       otherSplit['name'] = 'Other';
       otherSplit['x'] = 'Other';
+      otherSplit['isSplit'] = true;
       otherSplit['value'] = -(splitsSum - totalValue);
       rv.push(otherSplit);
     }
