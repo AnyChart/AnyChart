@@ -1509,22 +1509,23 @@ anychart.waterfallModule.Chart.prototype.getStacksCount = function() {
  * @return {number}
  */
 anychart.waterfallModule.Chart.prototype.getStackSum = function(index, metaFieldName, opt_treatDiffAsAbsForTotal) {
-  return goog.array.reduce(this.seriesList, function(sum, currentSeries) {
-    if (currentSeries.enabled()) {
-      var iterator = currentSeries.getIterator();
-      iterator.select(index);
+  var sum = 0;
 
-      if (iterator.meta('missing')) return sum;
+  for (var i = 0; i < this.drawingPlans.length; i++) {
+    var point = this.drawingPlans[i].data[index];
+    if (point.meta['missing'])
+      continue;
 
-      var value = opt_treatDiffAsAbsForTotal ?
-          this.getPointStackingValue(iterator.getCurrentPoint()) :
-          iterator.meta(metaFieldName);
-
-      return sum + value;
+    var value;
+    if (opt_treatDiffAsAbsForTotal) {
+      this.getPointStackingValue(point);
+    } else {
+      value = goog.isDef(point.meta[metaFieldName]) ? point.meta[metaFieldName] : point.data['value'];
     }
+    sum += value;
+  }
 
-    return sum;
-  }, 0, this);
+  return sum;
 };
 
 
