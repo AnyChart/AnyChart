@@ -1458,7 +1458,7 @@ anychart.waterfallModule.Chart.prototype.getStackBounds = function(index) {
  *
  * @param {number} index - Stack index.
  *
- * @return {!anychart.math.Rect} - Bounds of stack.
+ * @return {anychart.math.Rect} - Bounds of stack.
  *
  * @private
  */
@@ -1538,7 +1538,7 @@ anychart.waterfallModule.Chart.prototype.getStackSum = function(index, metaField
  */
 anychart.waterfallModule.Chart.prototype.isStackVisible = function(index) {
   return goog.array.reduce(this.drawingPlans, function(isVisible, plan) {
-    return isVisible || !plan.data[index].meta['missing'];
+    return isVisible || !(plan.data[index].meta['missing'] || plan.data[index].meta['skipDrawing']);
   }, false);
 };
 
