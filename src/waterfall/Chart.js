@@ -309,9 +309,16 @@ anychart.waterfallModule.Chart.prototype.getConnectorXCoordinate = function(poin
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.beforeSeriesDraw = function() {
   anychart.waterfallModule.Chart.base(this, 'beforeSeriesDraw');
-  this.outsideLabelsData = {
-    isComplete: false
-  }; // Possible point of memory growth until GC runs, but who cares.
+
+  var needsOutsideLabelsDataRecreation = goog.array.some(this.seriesList, function(series) {
+    return Boolean(series && !series.isDisposed() && series.checkDrawingNeeded());
+  });
+  
+  if (needsOutsideLabelsDataRecreation) {
+    this.outsideLabelsData = {
+      isComplete: false
+    }; // Possible point of memory growth until GC runs, but who cares.
+  }
 };
 
 
