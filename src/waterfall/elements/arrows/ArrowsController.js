@@ -743,6 +743,8 @@ anychart.waterfallModule.ArrowsController.prototype.resolvePosition = function(a
  */
 anychart.waterfallModule.ArrowsController.prototype.applyLabelsStyle = function() {
   goog.array.forEach(this.arrows_, function(arrow) {
+    if (!arrow.isCorrect()) return;
+
     var label = arrow.label();
 
     label.resetFlatSettings();
