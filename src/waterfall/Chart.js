@@ -555,51 +555,73 @@ anychart.waterfallModule.Chart.prototype.putLabelsInCategory = function(category
     var connectorPoints = outsideLabelsData.connectorPoints;
     var connectorLabel = outsideLabelsData.connectorLabel;
     var stackBounds = outsideLabelsData.stackBounds;
-    var labels = outsideLabelsData.labels || [];
+    var labels = outsideLabelsData.labels;
 
     // This is left here as possibility to add connector label intersection check.
     // if (connectorLabel) {
     //   console.log(this.getLabelBounds(connectorLabel));
     // }
 
-    if (connectorPoints) {
-      var connectorCoordinate = isVertical ? connectorPoints.x1 : connectorPoints.y1;
-      var stackBoundsStart = isVertical ? stackBounds.left : stackBounds.top;
-      var stackBoundsSize = isVertical ? stackBounds.width : stackBounds.height;
+    if (labels) {
+      if (connectorPoints) {
+        var connectorCoordinate = isVertical ? connectorPoints.x1 : connectorPoints.y1;
+        var stackBoundsStart = isVertical ? stackBounds.left : stackBounds.top;
+        var stackBoundsSize = isVertical ? stackBounds.width : stackBounds.height;
 
-      if (anychart.math.roughlyEqual(connectorCoordinate, stackBoundsStart, 1)) {
-        // Connector goes from the top of stack.
-        (isVertical ^ isInverted) ?
-          this.drawLabelsStackBackward_(labels, 0, connectorCoordinate) :
-          this.drawLabelsStackForward_(labels, labels.length - 1, connectorCoordinate);
-      } else if (anychart.math.roughlyEqual(connectorCoordinate, stackBoundsStart + stackBoundsSize, 1)) {
-        // Connector goes from the bottom of stack.
-        (isVertical ^ isInverted) ?
-          this.drawLabelsStackForward_(labels, labels.length - 1, connectorCoordinate) :
-          this.drawLabelsStackBackward_(labels, 0, connectorCoordinate);
-      } else {
-        // Connector goes from the middle.
-        var index = this.findOutsideLabelIndexInStack_(labels, connectorCoordinate);
-        if (index >= 0) {
-          var labelData = labels[index];
-          var labelBoundsStart = isVertical ? labelData.bounds.left : labelData.bounds.top;
-          var labelBoundsSize = isVertical ? labelData.bounds.width : labelData.bounds.height;
-          var connectorRatio = (connectorCoordinate - labelBoundsStart) / labelBoundsSize;
-
-          if (connectorRatio >= 0.5) {
-            this.drawLabelsStackForward_(labels, index - 1, connectorCoordinate);
-            this.drawLabelsStackBackward_(labels, index, connectorCoordinate);
-          } else {
-            this.drawLabelsStackForward_(labels, index, connectorCoordinate);
-            this.drawLabelsStackBackward_(labels, index + 1, connectorCoordinate);
-          }
+        if (anychart.math.roughlyEqual(connectorCoordinate, stackBoundsStart, 1)) {
+          // Connector goes from the top of stack.
+          (isVertical ^ isInverted) ?
+            this.drawLabelsStackBackward_(labels, 0, connectorCoordinate) :
+            this.drawLabelsStackForward_(labels, labels.length - 1, connectorCoordinate);
+        } else if (anychart.math.roughlyEqual(connectorCoordinate, stackBoundsStart + stackBoundsSize, 1)) {
+          // Connector goes from the bottom of stack.
+          (isVertical ^ isInverted) ?
+            this.drawLabelsStackForward_(labels, labels.length - 1, connectorCoordinate) :
+            this.drawLabelsStackBackward_(labels, 0, connectorCoordinate);
         } else {
-          // TODO This condition is kind of bug. Theoretically, case is impossible.
+          // Connector goes from the middle.
+          var index = this.findOutsideLabelIndexInStack_(labels, connectorCoordinate);
+          if (index >= 0) {
+            var labelData = labels[index];
+            var labelBoundsStart = isVertical ? labelData.bounds.left : labelData.bounds.top;
+            var labelBoundsSize = isVertical ? labelData.bounds.width : labelData.bounds.height;
+            var connectorRatio = (connectorCoordinate - labelBoundsStart) / labelBoundsSize;
+
+            if (connectorRatio >= 0.5) {
+              this.drawLabelsStackForward_(labels, index - 1, connectorCoordinate);
+              this.drawLabelsStackBackward_(labels, index, connectorCoordinate);
+            } else {
+              this.drawLabelsStackForward_(labels, index, connectorCoordinate);
+              this.drawLabelsStackBackward_(labels, index + 1, connectorCoordinate);
+            }
+          } else {
+            /*
+              This condition is for case like this: 
+
+              +--------+
+              |Ins.Lab.| --------- connector --------
+              +--------+
+              |Inside  |
+              |Label   |
+              +--------+
+              |        | -._ Outside Label 1.
+              +--------+
+              |        | _
+              +--------+  \_ Outside Label 2.
+            */
+            var labelData = labels[0];
+            var labelBoundsStart = isVertical ? labelData.bounds.left : labelData.bounds.top;
+            if (labelBoundsStart > connectorCoordinate) {
+              this.drawLabelsStackForward_(labels, labels.length - 1, NaN);
+            } else {
+              this.drawLabelsStackBackward_(labels, 0, NaN);
+            }
+          }
         }
+      } else {
+        // No connector associated. Looks like we draw the very last 'total'.
+        this.drawLabelsStackForward_(labels, labels.length - 1, NaN);
       }
-    } else {
-      // No connector associated. Looks like we draw the very last 'total'.
-      this.drawLabelsStackForward_(labels, labels.length - 1, NaN);
     }
   }
 };
