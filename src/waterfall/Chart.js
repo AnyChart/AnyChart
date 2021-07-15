@@ -313,7 +313,7 @@ anychart.waterfallModule.Chart.prototype.beforeSeriesDraw = function() {
   var needsOutsideLabelsDataRecreation = goog.array.some(this.seriesList, function(series) {
     return Boolean(series && !series.isDisposed() && series.checkDrawingNeeded());
   });
-  
+
   if (needsOutsideLabelsDataRecreation) {
     this.outsideLabelsData = {
       isComplete: false

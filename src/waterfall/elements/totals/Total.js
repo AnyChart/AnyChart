@@ -415,9 +415,12 @@ anychart.waterfallModule.totals.Total.prototype.getTotalContext = function(rowIn
   var allTotals = this.controller_.getAllTotals();
   var value = rowInfo.get('value');
 
+  var names = this.xScale().names();
+  var categoryName = names[rowInfo.getIndex()] || this.name();
+
   return {
     'name': {
-      value: this.name(),
+      value: categoryName,
       type: anychart.enums.TokenType.STRING
     },
     'value': {
@@ -449,10 +452,14 @@ anychart.waterfallModule.totals.Total.prototype.getTotalContext = function(rowIn
  */
 anychart.waterfallModule.totals.Total.prototype.getSplitContext = function(rowInfo) {
   var value = rowInfo.get('value');
+  var pointIndex = rowInfo.getIndex();
+
+  var names = this.xScale().names();
+  var categoryName = names[pointIndex] || rowInfo.get('name');
 
   return {
     'name': {
-      value: rowInfo.get('name'),
+      value: categoryName,
       type: anychart.enums.TokenType.STRING
     },
     'value': {
