@@ -603,7 +603,7 @@ anychart.waterfallModule.Chart.prototype.putLabelsInCategory = function(category
             }
           } else {
             /*
-              This condition is for case like this: 
+              This condition is for case like this:
 
               +--------+
               |Ins.Lab.| --------- connector --------
@@ -1547,7 +1547,7 @@ anychart.waterfallModule.Chart.prototype.getStackSum = function(index, metaField
 
     var value;
     if (opt_treatDiffAsAbsForTotal) {
-      this.getPointStackingValue(point);
+      value = this.getPointStackingValue(point);
     } else {
       value = goog.isDef(point.meta[metaFieldName]) ? point.meta[metaFieldName] : point.data['value'];
     }
