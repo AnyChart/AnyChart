@@ -1990,6 +1990,7 @@ anychart.waterfallModule.Chart.prototype.drawTotals = function() {
  * @private
  */
 anychart.waterfallModule.Chart.prototype.invalidateTotals_ = function() {
+  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
   this.totalsController().invalidate(anychart.ConsistencyState.SERIES_DATA);
 };
 
@@ -1998,7 +1999,6 @@ anychart.waterfallModule.Chart.prototype.invalidateTotals_ = function() {
 //region --- Overrides
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.xScaleInvalidated = function(scale) {
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
   this.invalidateTotals_();
   anychart.waterfallModule.Chart.base(this, 'xScaleInvalidated', scale);
 };
@@ -2006,7 +2006,6 @@ anychart.waterfallModule.Chart.prototype.xScaleInvalidated = function(scale) {
 
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.yScaleInvalidated = function(scale) {
-  this.invalidateState(anychart.enums.Store.WATERFALL, anychart.waterfallModule.Chart.SUPPORTED_STATES.TOTALS);
   this.invalidateTotals_();
   anychart.waterfallModule.Chart.base(this, 'yScaleInvalidated', scale);
 };
@@ -2047,6 +2046,13 @@ anychart.waterfallModule.Chart.prototype.getSeriesList = function() {
   rv.push.apply(rv, this.getAllTotals());
 
   return rv;
+};
+
+
+/** @inheritDoc */
+anychart.waterfallModule.Chart.prototype.onMarkersSignal = function(event) {
+  this.invalidateTotals_();
+  anychart.waterfallModule.Chart.base(this, 'onMarkersSignal', event);
 };
 
 

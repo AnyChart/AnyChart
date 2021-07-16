@@ -414,9 +414,10 @@ anychart.waterfallModule.totals.Total.prototype.getSplitsData = function(totalVa
 anychart.waterfallModule.totals.Total.prototype.getTotalContext = function(rowInfo) {
   var allTotals = this.controller_.getAllTotals();
   var value = rowInfo.get('value');
+  var pointIndex = rowInfo.getIndex();
 
   var names = this.xScale().names();
-  var categoryName = names[rowInfo.getIndex()] || this.name();
+  var categoryName = goog.isDef(names[pointIndex]) ? names[pointIndex] : rowInfo.get('name');
 
   return {
     'name': {
@@ -455,7 +456,7 @@ anychart.waterfallModule.totals.Total.prototype.getSplitContext = function(rowIn
   var pointIndex = rowInfo.getIndex();
 
   var names = this.xScale().names();
-  var categoryName = names[pointIndex] || rowInfo.get('name');
+  var categoryName = goog.isDef(names[pointIndex]) ? names[pointIndex] : rowInfo.get('name');
 
   return {
     'name': {
