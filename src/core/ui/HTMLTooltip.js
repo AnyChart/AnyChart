@@ -220,6 +220,7 @@ anychart.core.ui.HTMLTooltip.prototype.titleText = function(opt_value) {
  * @return {anychart.core.ui.HTMLTooltip}
  */
 anychart.core.ui.HTMLTooltip.prototype.updateTexts = function() {
+  this.domReady_();
   this.titleText(/** @type {string} */ (this.tooltip_.title().autoText()));
   goog.style.setElementShown(this.titleDiv_, this.tooltip_.title()['enabled']());
 
