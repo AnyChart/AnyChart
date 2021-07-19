@@ -2163,6 +2163,15 @@ anychart.core.ChartWithOrthogonalScales.contextMenuMap = {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Return chart series list.
+ * @return {!Array<anychart.core.series.Cartesian>}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getSeriesList = function() {
+  return this.seriesList;
+};
+
+
+/**
  * Gets points info considering interactivity by X.
  * @param {number} clientX - .
  * @param {number} clientY - .
@@ -2189,8 +2198,9 @@ anychart.core.ChartWithOrthogonalScales.prototype.getByXInfo = function(clientX,
   var i, len, series, names;
   var indexes;
 
-  for (i = 0, len = this.seriesList.length; i < len; i++) {
-    series = this.seriesList[i];
+  var seriesList = this.getSeriesList();
+  for (i = 0, len = seriesList.length; i < len; i++) {
+    series = seriesList[i];
     if (series && series.enabled()) {
       value = series.xScale().inverseTransform(ratio);
       if (this.categorizeData) {
