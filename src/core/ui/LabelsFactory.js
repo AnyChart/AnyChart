@@ -926,6 +926,8 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
   //we should ask text element about bounds only after text format and text settings are applied
 
   text = this.callFormat(format, formatProvider, opt_cacheIndex);
+  text = measureLabel.applyInternalTextFormatters(text);
+
   textElement.width(null);
   textElement.height(null);
   if (isHtml) {
