@@ -2,7 +2,7 @@
 
 --process_closure_primitives
 
---language_in ECMASCRIPT3
+--language_in ECMASCRIPT5
 --language_out ECMASCRIPT3
 
 --extra_annotation_name "includeDoc"

@@ -49,6 +49,8 @@ anychart.graphics = goog.global['acgraph'];
  * Get/Set global object.
  * @param {Window=} opt_value Global context.
  * @return {Window} .
+ *
+ * @suppress {constantProperty}
  */
 anychart.global = function(opt_value) {
   if (goog.isDef(opt_value)) {
