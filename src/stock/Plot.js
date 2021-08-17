@@ -2707,15 +2707,32 @@ anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
 
 
 /**
+ * Extracts 'touches' field from touch events.
+ * 
+ * @param {goog.events.Event} e - Incoming touch-event wrapper.
+ * @return {IArrayLike<Object>|null} - 'Touches' field.
+ */
+anychart.stockModule.Plot.prototype.extractTouches_ = function(e) {
+  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e.getOriginalEvent());
+
+  // TODO I don't know why, but 'touches' field is in this path.
+  var originalEvent = /** @type {goog.events.BrowserEvent} */ (acgraphBrowserEvent.getOriginalEvent());
+  var touchEvent = originalEvent.getBrowserEvent();
+  return touchEvent['touches'];
+};
+
+
+/**
  * Handles touch start.
- * @param {acgraph.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
-  var googEvent = e.getOriginalEvent();
-  var touches = googEvent.getBrowserEvent()['touches'];
+  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e.getOriginalEvent());
+  var touches = this.extractTouches_(e);
+
   if (touches && touches.length > 1) {
-    this.dragger_.endDrag(googEvent);
+    this.dragger_.endDrag(acgraphBrowserEvent);
     if (touches.length == 2) {
       var coords = [];
       var ids = {};
@@ -2741,11 +2758,12 @@ anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
 
 /**
  * Handles touchMove in zooming.
- * @param {goog.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
-  var touches = e.getBrowserEvent()['touches'];
+  var touches = this.extractTouches_(e);
+
   if (this.zooming_ && touches && touches.length > 1) {
     var coords = [];
     for (var i = 0; i < touches.length; i++) {
@@ -2775,20 +2793,23 @@ anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
 
 /**
  * Handles touch start.
- * @param {acgraph.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleTouchEnd_ = function(e) {
-  var googEvent = e.getOriginalEvent();
-  var browserEvent = googEvent.getBrowserEvent();
-  var touches = browserEvent['touches'];
+  var touches = this.extractTouches_(e);
+
   if (touches.length == 1) {
     goog.events.unlisten(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {
       capture: true,
       passive: false
     }, this);
     var touch = touches[0];
+
+    var acgraphBrowserEvent = e.getOriginalEvent();
+    var browserEvent = acgraphBrowserEvent.getBrowserEvent();
     var newEvent = new goog.events.BrowserEvent(browserEvent);
+
     newEvent.clientX = touch['clientX'] !== undefined ? touch['clientX']: touch['pageX'];
     newEvent.clientY = touch['clientY'] !== undefined ? touch['clientY']: touch['pageY'];
     newEvent.screenX = touch['screenX'] || 0;
