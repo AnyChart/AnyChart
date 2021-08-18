@@ -2216,6 +2216,86 @@ anychart.stockModule.Plot.prototype.draw = function() {
 
 
 /**
+ * Extract position info from mouse event.
+ *
+ * @param {anychart.core.MouseEvent} event
+ * @return {{xRatio: number, x: number, yRatio: number, y: number}}
+ *
+ * @private
+ */
+anychart.stockModule.Plot.prototype.getPositionFromEvent_ = function(event) {
+  var bounds = this.seriesBounds_;
+  var stageReferencePoint = this.container().getStage().getClientPosition();
+  var x = event['clientX'] - stageReferencePoint.x - bounds.left;
+  var y = event['clientY'] - stageReferencePoint.y - bounds.top;
+
+  return {
+    xRatio: x / bounds.width,
+    yRatio: y / bounds.height,
+    x: event['clientX'],
+    y: event['clientY']
+  };
+};
+
+
+/**
+ * Extract object for each series that contains info about series and nearest point.
+ *
+ * @param {number} xRatio
+ * @param {number} yRatio
+ *
+ * @return {Array.<{
+ *   series: anychart.stockModule.Series,
+ *   nearestPointToCursor: {
+ *     distance: number,
+ *     index: number
+ *   }
+ * }>}
+ */
+anychart.stockModule.Plot.prototype.getSeriesStatus = function(xRatio, yRatio) {
+  var rawValue = this.chart_.xScale().inverseTransform(xRatio);
+  var alignedValue = this.chart_.alignValue(rawValue);
+  var highlightInfo = this.prepareHighlight(alignedValue);
+
+  var seriesStatus = [];
+
+  for (var i = 0; i < highlightInfo.length; i++) {
+    var plotInfo = highlightInfo[i];
+
+    var point = plotInfo['point'];
+    var series = plotInfo['series'];
+
+    if (point) {
+      var seriesHeight = series.getPixelBounds().height;
+      var distance = this.chart_.getDistanceToSeries(series, point, yRatio).distance * seriesHeight;
+
+      seriesStatus.push({
+        'series': series,
+        'nearestPointToCursor': {
+          'distance': distance,
+          'index': point.getIndex()
+        }
+      });
+    }
+  }
+
+  return seriesStatus;
+};
+
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.makeBrowserEvent = function(e) {
+  var event = anychart.stockModule.Plot.base(this, 'makeBrowserEvent', e);
+  var eventPositionInfo = this.getPositionFromEvent_(event);
+
+  event['seriesStatus'] = this.getSeriesStatus(eventPositionInfo.xRatio, eventPositionInfo.yRatio);
+
+  return event;
+};
+
+
+/**
  * Ensures that the root layer is created.
  * @private
  */
@@ -2242,7 +2322,7 @@ anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
 
 /**
  * Applies listeners to marker.
- * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase} marker 
+ * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase} marker
  */
 anychart.stockModule.Plot.prototype.applyMarkersListeners_ = function(marker) {
   this.eventsHandler.listen(marker, [acgraph.events.EventType.TOUCHSTART, acgraph.events.EventType.MOUSEDOWN], this.markersListener_);
@@ -2256,7 +2336,7 @@ anychart.stockModule.Plot.prototype.applyMarkersListeners_ = function(marker) {
 anychart.stockModule.Plot.prototype.markersListener_ = function(event) {
   var originalEvent = event.originalEvent;
 
-  var dragShouldStart = goog.isDef(this.dragger_) && 
+  var dragShouldStart = goog.isDef(this.dragger_) &&
                         (event.type === acgraph.events.EventType.MOUSEDOWN ||
                         event.type === acgraph.events.EventType.TOUCHSTART);
 
@@ -2595,7 +2675,7 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
   return goog.array.map(this.series_, function(series) {
     return {
       'series': series,
-      'point': series && series.enabled() && series.prepareHighlight(value) || null
+      'point': series && series.enabled() && series.getClosestPointByX(value) || null
     };
   });
 };
@@ -2626,7 +2706,7 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
     var chartOffset = this.container().getStage().getClientPosition();
     // Apply no pixelshift for y value because scale use it for transform.
     // We need this value as is.
-    opt_y = (this.seriesBounds_.height - pointYRatio * this.seriesBounds_.height) + this.seriesBounds_.top + chartOffset.y;
+    opt_y = pointYRatio * this.seriesBounds_.height + this.seriesBounds_.top + chartOffset.y;
   }
 
   this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
@@ -2708,7 +2788,7 @@ anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
 
 /**
  * Extracts 'touches' field from touch events.
- * 
+ *
  * @param {goog.events.Event} e - Incoming touch-event wrapper.
  * @return {IArrayLike<Object>|null} - 'Touches' field.
  */
@@ -2834,10 +2914,11 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
     // testing that the point is inside series area
     if (x >= 0 && x <= this.seriesBounds_.width &&
         y >= 0 && y <= this.seriesBounds_.height) {
-      this.frameHighlightRatio_ = x / this.seriesBounds_.width;
-      this.frameHighlightYRatio_ = y / this.seriesBounds_.height;
-      this.frameHighlightX_ = e['clientX'];
-      this.frameHighlightY_ = e['clientY'];
+      var eventPosition = this.getPositionFromEvent_(/** @type {anychart.core.MouseEvent} */(e));
+      this.frameHighlightRatio_ = eventPosition.xRatio;
+      this.frameHighlightYRatio_ = eventPosition.yRatio;
+      this.frameHighlightX_ = eventPosition.x;
+      this.frameHighlightY_ = eventPosition.y;
       this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
       if (!goog.isDef(this.frame_))
         this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);

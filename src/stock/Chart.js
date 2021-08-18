@@ -2351,6 +2351,16 @@ anychart.stockModule.Chart.prototype.getScrollerIndexByKey = function(key) {
 };
 
 
+ /**
+ * Aligns passed timestamp to current registry points set.
+ * @param {number} value
+ * @return {number}
+ */
+anychart.stockModule.Chart.prototype.alignValue = function(value) {
+  return this.dataController_.alignHighlight(value);
+};
+
+
 //endregion
 //region Annotations
 //----------------------------------------------------------------------------------------------------------------------
@@ -2599,6 +2609,48 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
 
 
 /**
+ * Calculate distance between yRatio and closest series point.
+ *
+ * @param {anychart.stockModule.Series} series
+ * @param {anychart.stockModule.data.TableSelectable.RowProxy} point
+ * @param {number} targetRatio
+ *
+ * @return {{
+ *   distance: number,
+ *   ratio: number
+ * }}
+ */
+anychart.stockModule.Chart.prototype.getDistanceToSeries = function(series, point, targetRatio) {
+  var distance = Infinity;
+  var ratio = 0;
+
+  if (point && series) {
+    var scale = series.yScale();
+
+    /*
+      Should consider that
+        - OHLC series returns 'close' as 'value'
+        - Range series returns 'high' as 'value'
+        - etc.
+     */
+    var value = anychart.utils.getFirstNotNullValue(point.get('value'), point.get('close'), point.get('high'));
+    value = anychart.utils.toNumber(value);
+    if (!isNaN(value)) {
+      var pointValueRatio = 1 - scale.transform(scale.applyComparison(value, series.comparisonZero));
+
+      distance = Math.abs(pointValueRatio - targetRatio);
+      ratio = pointValueRatio;
+    }
+  }
+
+  return {
+    ratio: ratio,
+    distance: distance
+  };
+};
+
+
+/**
  * Finds closest series (by yRatio) in array of highlighted data rows for each series of the plot.
  *
  * @param {!Array.<anychart.stockModule.Plot.HighlightedSeriesInfo>} sourcePlotInfo
@@ -2618,30 +2670,12 @@ anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function(sourcePlot
    */
   for (var i = 0; i < sourcePlotInfo.length; i++) {
     var inf = sourcePlotInfo[i];
-    var ser = inf['series'];
-    var pt = inf['point'];
-    if (pt && ser) {
-      var scale = ser.yScale();
-
-      /*
-        Should consider that
-          - OHLC series returns 'close' as 'value'
-          - Range series returns 'high' as 'value'
-          - etc.
-       */
-      var value = anychart.utils.getFirstNotNullValue(pt.get('value'), pt.get('close'), pt.get('high'));
-      value = anychart.utils.toNumber(value);
-
-      if (!isNaN(value)) {
-        var ptYRatio = scale.transform(value);
-        var yR = scale.inverted() ? yRatio : 1 - yRatio;
-        var d = Math.abs(ptYRatio - yR);
-        if (distance > d) {
-          distance = d;
-          pointYRatio = ptYRatio;
-          closestIndex = i;
-        }
-      }
+    var distanceToSeries = this.getDistanceToSeries(inf['series'], inf['point'], yRatio);
+    var d = distanceToSeries.distance;
+    if (distance > d) {
+      distance = d;
+      pointYRatio = distanceToSeries.ratio;
+      closestIndex = i;
     }
   }
 
@@ -3428,7 +3462,9 @@ anychart.stockModule.Chart.prototype.limitDragRatio = function(ratio, anchor) {
  * @return {boolean}
  */
 anychart.stockModule.Chart.prototype.askDragStart = function() {
-  var res = !this.inMarquee() && this.dispatchRangeChange_(
+  var res = !this.inMarquee() &&
+    !!this.interactivity().getOption('allowPlotDrag') &&
+    this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   if (res) {

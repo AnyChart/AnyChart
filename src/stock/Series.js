@@ -456,7 +456,7 @@ anychart.stockModule.Series.prototype.planIsStacked = function() {
  * @param {number} value
  * @return {anychart.stockModule.data.TableSelectable.RowProxy}
  */
-anychart.stockModule.Series.prototype.prepareHighlight = function(value) {
+anychart.stockModule.Series.prototype.getClosestPointByX = function(value) {
   return this.data_.search(value, anychart.enums.TableSearchMode.EXACT);
 };
 
@@ -475,11 +475,11 @@ anychart.stockModule.Series.prototype.updateLastRow = function() {
  * @param {number} stickyValue
  */
 anychart.stockModule.Series.prototype.highlight = function(value, stickyValue) {
-  this.highlightedRow_ = this.prepareHighlight(value);
+  this.highlightedRow_ = this.getClosestPointByX(value);
   this.inHighlight_ = true;
 
   this.highlightStickyRow_(anychart.PointState.NORMAL);
-  this.highlightedStyckyRow_ = this.highlightedRow_ ? this.highlightedRow_ : this.prepareHighlight(stickyValue);
+  this.highlightedStyckyRow_ = this.highlightedRow_ ? this.highlightedRow_ : this.getClosestPointByX(stickyValue);
   this.highlightStickyRow_(anychart.PointState.HOVER);
 };
 
