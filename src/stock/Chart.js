@@ -896,7 +896,7 @@ anychart.stockModule.Chart.prototype.swapPlots = function(plot1, plot2) {
  * @param {boolean} expand Expand or collapse (true - for expand, false - collapse)
  */
 anychart.stockModule.Chart.prototype.expandPlot = function(plot, expand) {
-  plot.isExpanded(expand);
+  plot.isExpandedInternal(expand);
   this.suspendSignalsDispatching();
   for (var i = 0; i < this.plots_.length; i++) {
     var thePlot = this.plots_[i];

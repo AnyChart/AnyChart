@@ -2988,15 +2988,63 @@ anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
 
 /**
  * Whether plot is expanded by plot controls.
+ * Internal getter/setter.
+ * 
  * @param {boolean=} opt_value
  * @return {anychart.stockModule.Plot|boolean}
  */
-anychart.stockModule.Plot.prototype.isExpanded = function(opt_value) {
+anychart.stockModule.Plot.prototype.isExpandedInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.isExpanded_ = opt_value;
     return this;
   }
   return this.isExpanded_;
+};
+
+
+/**
+ * Whether plot is expanded by plot controls.
+ * 
+ * @return {boolean}
+ */
+anychart.stockModule.Plot.prototype.isExpanded = function() {
+  return this.isExpanded_;
+};
+
+
+/**
+ * Moves current plot up in chart.
+ * 
+ * @return {anychart.stockModule.Plot} - Self for chaining.
+ */
+anychart.stockModule.Plot.prototype.moveUp = function() {
+  var swapPlot = this.chart_.getPrevPlot(this);
+  this.chart_.swapPlots(this, swapPlot);
+  return this;
+};
+
+
+/**
+ * Moves current plot down in chart.
+ * 
+ * @return {anychart.stockModule.Plot} - Self for chaining.
+ */
+anychart.stockModule.Plot.prototype.moveDown = function() {
+  var swapPlot = this.chart_.getNextPlot(this);
+  this.chart_.swapPlots(this, swapPlot);
+  return this;
+};
+
+
+/**
+ * Toggles expanded state of current plot.
+ * 
+ * @return {anychart.stockModule.Plot} - Current plot for method chaining.
+ */
+anychart.stockModule.Plot.prototype.toggleExpandedState = function() {
+  var newState = !this.isExpanded();
+  this.chart_.expandPlot(this, newState);
+  return this;
 };
 
 
@@ -4019,4 +4067,9 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['noData'] = proto.noData;
   proto['getStat'] = proto.getStat;
   proto['dataArea'] = proto.dataArea;
+
+  proto['moveUp'] = proto.moveUp;
+  proto['moveDown'] = proto.moveDown;
+  proto['toggleExpandedState'] = proto.toggleExpandedState;
+  proto['isExpanded'] = proto.isExpanded;
 })();

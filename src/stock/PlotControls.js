@@ -206,16 +206,12 @@ anychart.stockModule.PlotControls.prototype.handleButtonAction_ = function(e) {
     var type = model['type'];
 
     var currentPlot = this.target_;
-    var swapPlot;
-    var chart = currentPlot.getChart();
     if (type == 'up') {
-      swapPlot = chart.getPrevPlot(currentPlot);
-      chart.swapPlots(currentPlot, swapPlot);
+      currentPlot.moveUp();
     } else if (type == 'down') {
-      swapPlot = chart.getNextPlot(currentPlot);
-      chart.swapPlots(currentPlot, swapPlot);
+      currentPlot.moveDown();
     } else if (type == 'zoom') {
-      chart.expandPlot(currentPlot, !currentPlot.isExpanded());
+      currentPlot.toggleExpandedState();
       currentPlot.isExpanded() ? button.setIcon('ac ac-dot-square-o') : button.setIcon('ac ac-enlarge');
     }
     this.preventHiding_ = false;
