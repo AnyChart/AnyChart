@@ -1525,6 +1525,9 @@ anychart.core.ui.OptimizedText.prototype.dispose = function() {
     this.foreignObject_ = null;
     this.foreignDiv_ = null;
   }
+
+  this.disposeTextsToRender_(true);
+
   this.container = null;
   this.stage = null;
   this.style({});
