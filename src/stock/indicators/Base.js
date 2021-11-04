@@ -40,6 +40,13 @@ anychart.stockModule.indicators.Base = function(args) {
    * @private
    */
   this.computer_ = null;
+
+  /**
+   * Chart instance.
+   * @type {?anychart.core.Chart}
+   * @private
+   */
+  this.chart_ = null;
 };
 goog.inherits(anychart.stockModule.indicators.Base, goog.Disposable);
 
@@ -58,6 +65,7 @@ anychart.stockModule.indicators.Base.SeriesDescriptor;
 /**
  * Creates and returns computer.
  * @param {!anychart.stockModule.data.TableMapping} mapping
+ * @param {?anychart.core.Chart} chart
  * @return {anychart.stockModule.data.TableComputer}
  * @protected
  */
@@ -138,9 +146,12 @@ anychart.stockModule.indicators.Base.prototype.setupMapping = function(mapping, 
  * @protected
  */
 anychart.stockModule.indicators.Base.prototype.init = function() {
+  if (!this.chart_)
+    this.chart_ = this.plot_.getChart();
+
   if (!this.computer_)
-    this.computer_ = this.createComputer(this.mapping_);
-  this.plot_.getChart().suspendSignalsDispatching();
+    this.computer_ = this.createComputer(this.mapping_, this.chart_);
+  this.chart_.suspendSignalsDispatching();
 
   for (var seriesId in this.series_) {
     var descriptor = this.series_[seriesId];
@@ -206,6 +217,7 @@ anychart.stockModule.indicators.Base.prototype.disposeInternal = function() {
   this.computer_ = null;
   delete this.plot_;
   delete this.mapping_;
+  delete this.chart_;
   anychart.stockModule.indicators.Base.base(this, 'disposeInternal');
 };
 
