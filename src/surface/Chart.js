@@ -6,8 +6,10 @@ goog.require('anychart.colorScalesModule.ui.ColorRange');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.reporting');
 goog.require('anychart.data.Set');
-goog.require('anychart.surfaceModule.Axis');
 goog.require('anychart.surfaceModule.Grid');
+goog.require('anychart.surfaceModule.axes.XAxis');
+goog.require('anychart.surfaceModule.axes.YAxis');
+goog.require('anychart.surfaceModule.axes.ZAxis');
 goog.require('anychart.surfaceModule.markers.Controller');
 goog.require('anychart.surfaceModule.math');
 //endregion
@@ -162,11 +164,11 @@ anychart.surfaceModule.Chart.Z_INDEX_ROOT_LAYER = 36;
 /**
  *
  * @param {(Object|boolean|null)=} opt_value Axis settings
- * @return {(anychart.surfaceModule.Axis|anychart.surfaceModule.Chart)}
+ * @return {(anychart.surfaceModule.axes.XAxis|anychart.surfaceModule.Chart)}
  */
 anychart.surfaceModule.Chart.prototype.zAxis = function(opt_value) {
   if (!this.zAxis_) {
-    this.zAxis_ = new anychart.surfaceModule.Axis();
+    this.zAxis_ = new anychart.surfaceModule.axes.ZAxis();
     this.zAxis_.listenSignals(this.onAxisSignal_, this);
     this.zAxis_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.zAxis_.rotationY(/** @type {number} */(this.getOption('rotationY')));
@@ -183,11 +185,11 @@ anychart.surfaceModule.Chart.prototype.zAxis = function(opt_value) {
 /**
  *
  * @param {(Object|boolean|null)=} opt_value Axis settings
- * @return {(anychart.surfaceModule.Axis|anychart.surfaceModule.Chart)}
+ * @return {(anychart.surfaceModule.axes.XAxis|anychart.surfaceModule.Chart)}
  */
 anychart.surfaceModule.Chart.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
-    this.xAxis_ = new anychart.surfaceModule.Axis();
+    this.xAxis_ = new anychart.surfaceModule.axes.XAxis();
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
     this.xAxis_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.xAxis_.rotationY(/** @type {number} */(this.getOption('rotationY')));
@@ -204,11 +206,11 @@ anychart.surfaceModule.Chart.prototype.xAxis = function(opt_value) {
 /**
  *
  * @param {(Object|boolean|null)=} opt_value Axis settings
- * @return {(anychart.surfaceModule.Axis|anychart.surfaceModule.Chart)}
+ * @return {(anychart.surfaceModule.axes.XAxis|anychart.surfaceModule.Chart)}
  */
 anychart.surfaceModule.Chart.prototype.yAxis = function(opt_value) {
   if (!this.yAxis_) {
-    this.yAxis_ = new anychart.surfaceModule.Axis();
+    this.yAxis_ = new anychart.surfaceModule.axes.YAxis();
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
     this.yAxis_.rotationZ(/** @type {number} */(this.getOption('rotationZ')));
     this.yAxis_.rotationY(/** @type {number} */(this.getOption('rotationY')));

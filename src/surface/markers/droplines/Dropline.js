@@ -31,6 +31,8 @@ anychart.surfaceModule.markers.droplines.Dropline = function(controller) {
    * @private
    */
   this.path_ = acgraph.path();
+  // Bellow marker.
+  this.path_.zIndex(1);
 };
 goog.inherits(anychart.surfaceModule.markers.droplines.Dropline, anychart.core.VisualBase);
 
