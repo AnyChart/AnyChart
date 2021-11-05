@@ -717,6 +717,16 @@ anychart.core.settings.numberOrZeroNormalizer = function(val) {
 
 
 /**
+ * Single arg normalizer for string number or null values.
+ * @param {*} val
+ * @return {?number|string}
+ */
+anychart.core.settings.numberOrStringOrNullNormalizer = function(val) {
+  return anychart.utils.toNumberOrStringOrNull(val);
+};
+
+
+/**
  * Single arg normalizer for string params.
  * @param {*} val
  * @return {string}

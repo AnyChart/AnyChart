@@ -967,6 +967,7 @@ goog.exportSymbol('anychart.themes.defaultTheme', {
   },
 
   'defaultAxis': {
+    'value': null,
     'enabled': true,
     'startAngle': 0,
     'drawLastLabel': true,
