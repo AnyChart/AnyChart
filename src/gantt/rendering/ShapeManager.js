@@ -238,7 +238,7 @@ anychart.ganttModule.rendering.ShapeManager.prototype.clearShapes = function() {
 anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(item, tag, state, opt_only, opt_baseZIndex, opt_shape, opt_periodIndex, opt_initializerUid) {
   var res = {};
   var names = opt_only || this.defs;
-  var uid = goog.getUid(item) + (goog.isDef(opt_periodIndex) ? ('_' + String(opt_periodIndex)) : '');
+  var uid = goog.getUid(item) + '_' + tag.type + (goog.isDef(opt_periodIndex) ? ('_' + String(opt_periodIndex)) : '');
 
   /*
     Magic in this "if" allows to identify milestone preview by its initializer (grouping
@@ -247,7 +247,7 @@ anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(
     the uid unique (see anychart.ganttModule.TimeLine.prototype.drawLabels_ that uses tagsData
     to draw labels).
    */
-  if (tag.type == anychart.enums.TLElementTypes.MILESTONES_PREVIEW) {
+  if (tag.type == anychart.enums.TLElementTypes.MILESTONES_PREVIEW || tag.type == anychart.enums.TLElementTypes.BASELINE_MILESTONES_PREVIEW) {
     var iterItem = item;
     while (iterItem.getParent()) {
       var parent = iterItem.getParent();
@@ -272,6 +272,7 @@ anychart.ganttModule.rendering.ShapeManager.prototype.getShapesGroup = function(
       res[name].tag = tag;
     }
   }
+
   return res;
 };
 

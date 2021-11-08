@@ -2201,6 +2201,8 @@ anychart.enums.TLElementTypes = {
   BASELINES: 'baselines',
   MILESTONES: 'milestones',
   MILESTONES_PREVIEW: 'milestones-preview',
+  BASELINE_MILESTONES: 'baselines-milestones',
+  BASELINE_MILESTONES_PREVIEW: 'baselines-milestones-preview',
   PERIODS: 'periods',
   CONNECTORS: 'connectors'
 };

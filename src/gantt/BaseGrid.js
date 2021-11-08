@@ -412,6 +412,9 @@ anychart.ganttModule.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
  *   progress: number,
  *   isValidStart: boolean,
  *   isValidEnd: boolean,
+ *   isValidBaselineStart: boolean,
+ *   isValidBaselineEnd: boolean,
+ *   hasBaselineFields: boolean,
  *   isValidTask: boolean,
  *   isFlatGroupingTask: boolean,
  *   isValidBaseline: boolean,
@@ -573,6 +576,20 @@ anychart.ganttModule.BaseGrid.prototype.selection = function() {
 //endregion
 //region -- Row type definition
 /**
+ * Checks whether tree data item is actually a baseline milestone.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @return {boolean} - Whether tree data item is milestone.
+ */
+ anychart.ganttModule.BaseGrid.isProjectBaselineMilestone = function(item, opt_info) {
+  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+  var sameStartEndMatch = info.isValidBaselineStart && info.isValidBaselineEnd && info.baselineStart === info.baselineEnd;
+  var invalidBaselineMilestoneMatch = info.isValidBaselineStart && !info.isValidBaselineEnd;
+  return !item.numChildren() && (sameStartEndMatch || invalidBaselineMilestoneMatch);
+};
+
+/**
  * Checks whether tree data item is actually a milestone.
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
@@ -581,13 +598,16 @@ anychart.ganttModule.BaseGrid.prototype.selection = function() {
  */
 anychart.ganttModule.BaseGrid.isProjectMilestone = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return !item.numChildren() &&
-      ((info.isValidStart && !info.isValidEnd) || (info.isValidStart && info.isValidEnd && info.start == info.end));
+  var sameStartEndMatch = info.isValidStart && info.isValidEnd && info.start == info.end;
+  var invalidEndMatch = info.isValidStart && !info.isValidEnd;
+  return !item.numChildren() && (invalidEndMatch || sameStartEndMatch);
 };
 
 
 /**
- * Checks whether tree data item is actually a general baseline (this method doesn't check whether item is grouping task or not).
+ * Checks whether tree data item is actually a general 
+ * baseline (this method doesn't check whether item is 
+ * grouping task or not).
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
  * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
@@ -600,6 +620,22 @@ anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
     isValidTask field has true value if item has valid actualStart and valid actualEnd values.
    */
   return info.isValidBaseline || (info.isValidTask && info.baselineProgressPresents);
+};
+
+/**
+ * Checks whether tree data item is not valid baseline, but has baseline
+ * fields (this method doesn't check whether item is grouping task or not).
+ * 
+ * Anyway, the item must be drawn considering space for the baseline even 
+ * if baseline is not valid.
+ *
+ * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @return {boolean} - Whether tree data item is baseline-like.
+ */
+ anychart.ganttModule.BaseGrid.isBaselineLike = function(item, opt_info) {
+  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
+  return !info.isValidBaseline && info.hasBaselineFields;
 };
 
 
@@ -723,7 +759,13 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   var end = item.meta(anychart.enums.GanttDataFields.ACTUAL_END);
   var autoEnd = item.meta('autoEnd');
   var baselineStart = item.meta(anychart.enums.GanttDataFields.BASELINE_START);
+  var autoBaselineStart = item.meta('autoBaselineStart');
   var baselineEnd = item.meta(anychart.enums.GanttDataFields.BASELINE_END);
+  var autoBaselineEnd = item.meta('autoBaselineEnd');
+  var hasBaselineFields = item.hasField(anychart.enums.GanttDataFields.BASELINE_START) ||
+    item.hasField(anychart.enums.GanttDataFields.BASELINE_END) ||
+    !isNaN(autoBaselineStart) ||
+    !isNaN(autoBaselineEnd);
   var progress = item.meta('progressValue');
   var autoProgress = item.meta('autoProgress');
   var baselineProgress = item.get(anychart.enums.GanttDataFields.BASELINE_PROGRESS_VALUE);
@@ -734,6 +776,8 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
 
   var startVal = anychart.ganttModule.BaseGrid.checkNaN(start, autoStart);
   var endVal = anychart.ganttModule.BaseGrid.checkNaN(end, autoEnd);
+  var startBaselineVal = anychart.ganttModule.BaseGrid.checkNaN(baselineStart, autoBaselineStart);
+  var endBaselineVal = anychart.ganttModule.BaseGrid.checkNaN(baselineEnd, autoBaselineEnd);
   var progressVal = anychart.ganttModule.BaseGrid.checkNaN(progress, autoProgress);
 
   var minPeriodDate = item.meta('minPeriodDate');
@@ -742,15 +786,18 @@ anychart.ganttModule.BaseGrid.getProjectItemInfo = function(item) {
   return /** @type {anychart.ganttModule.BaseGrid.ProjectItemData} */ ({
     start: startVal,
     end: endVal,
-    baselineStart: baselineStart,
-    baselineEnd: baselineEnd,
+    baselineStart: startBaselineVal,
+    baselineEnd: endBaselineVal,
     baselineProgress: baselineProgress,
     progress: progressVal,
     isValidStart: !isNaN(startVal),
     isValidEnd: !isNaN(endVal),
+    isValidBaselineStart: !isNaN(startBaselineVal),
+    isValidBaselineEnd: !isNaN(endBaselineVal),
+    hasBaselineFields: hasBaselineFields,
     isValidTask: !isNaN(startVal) && !isNaN(endVal) && startVal != endVal,
     isFlatGroupingTask: !isNaN(startVal) && !isNaN(endVal) && startVal == endVal && item.numChildren(),
-    isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) && !isNaN(baselineEnd),
+    isValidBaseline: goog.isNumber(startBaselineVal) && !isNaN(startBaselineVal) && goog.isNumber(endBaselineVal) && !isNaN(endBaselineVal) && (startBaselineVal !== endBaselineVal),
     isValidProgress: !isNaN(progressVal),
     baselineProgressPresents: baselineProgressPresents,
     minPeriodDate: minPeriodDate,
@@ -938,11 +985,13 @@ anychart.ganttModule.BaseGrid.prototype.processProjectFormatProviderValues_ = fu
 
   values['baselineProgress'] = {value: info.baselineProgressPresents ? info.baselineProgress : 0, type: anychart.enums.TokenType.PERCENT};
 
-  if (info.isValidBaseline) {
+  if (info.isValidBaselineStart) {
     values['baselineStart'] = {
       value: info.baselineStart,
       type: anychart.enums.TokenType.DATE_TIME
     };
+  }
+  if (info.isValidBaselineEnd) {
     values['baselineEnd'] = {
       value: info.baselineEnd,
       type: anychart.enums.TokenType.DATE_TIME

@@ -62,3 +62,10 @@ anychart.data.ITreeDataInfo.prototype.get = function(var_args) {};
  * @return {*} - Value.
  */
 anychart.data.ITreeDataInfo.prototype.meta = function(name) {};
+
+/**
+ * Defines whether raw data has the field.
+ * @param {string} fieldName - Field name.
+ * @return {boolean} - fieldName presence.
+ */
+ anychart.data.ITreeDataInfo.prototype.hasField = function(fieldName) {};

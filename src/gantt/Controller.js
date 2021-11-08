@@ -507,6 +507,8 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
   var autoStart = NaN;
   var autoEnd = NaN;
+  var autoBaselineStart = NaN;
+  var autoBaselineEnd = NaN;
 
   for (var i = 0, l = item.numChildren(); i < l; i++) {
     var child = item.getChildAt(i);
@@ -530,6 +532,12 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
       var metaEnd = child.meta(anychart.enums.GanttDataFields.ACTUAL_END);
       var childEnd = /** @type {number} */ ((goog.isNumber(metaEnd) && !isNaN(metaEnd)) ? metaEnd : (child.meta('autoEnd') || childStart));
 
+      var metaBaselineStart = child.meta(anychart.enums.GanttDataFields.BASELINE_START);
+      var childBaselineStart = /** @type {number} */ ((goog.isNumber(metaBaselineStart) && !isNaN(metaBaselineStart)) ? metaBaselineStart : (child.meta('autoBaselineStart') || NaN));
+      
+      var metaBaselineEnd = child.meta(anychart.enums.GanttDataFields.BASELINE_END);
+      var childBaselineEnd = /** @type {number} */ ((goog.isNumber(metaBaselineEnd) && !isNaN(metaBaselineEnd)) ? metaBaselineEnd : (child.meta('autoBaselineEnd') || metaBaselineStart));
+
       var progressValue = /** @type {number|string} */ (child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
       if (goog.isDefAndNotNull(progressValue)) {
         progressValue = anychart.utils.normalizeToRatio(progressValue);
@@ -540,6 +548,8 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
       autoStart = this.actualizeProjectDates_(Math.min, autoStart, autoEnd, childStart, childEnd);
       autoEnd = this.actualizeProjectDates_(Math.max, autoStart, autoEnd, childStart, childEnd);
+      autoBaselineStart = this.actualizeProjectDates_(Math.min, autoBaselineStart, autoBaselineEnd, childBaselineStart, childBaselineEnd);
+      autoBaselineEnd = this.actualizeProjectDates_(Math.max, autoBaselineStart, autoBaselineEnd, childBaselineStart, childBaselineEnd);
 
       if (!isNaN(childStart) && !isNaN(childEnd)) {
         var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
@@ -553,6 +563,8 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
     if (totalLength != 0) item.meta('autoProgress', progressLength / totalLength);
     item.meta('autoStart', autoStart);
     item.meta('autoEnd', autoEnd);
+    item.meta('autoBaselineStart', autoBaselineStart);
+    item.meta('autoBaselineEnd', autoBaselineEnd);
   }
 
 };

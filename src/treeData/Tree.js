@@ -1426,6 +1426,14 @@ anychart.treeDataModule.Tree.DataItem.prototype.del = function(var_args) {
 
 
 /**
+ * @inheritDoc
+ */
+ anychart.treeDataModule.Tree.DataItem.prototype.hasField = function(fieldName) {
+   return fieldName in this.data_;
+ };
+
+
+/**
  * Gets index of data item in parent.
  * NOTE: If parent is null (tree data item is root), index of root in tree will be returned.
  * TODO (A.Kudryavtsev): Do we need to export this?

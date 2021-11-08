@@ -376,7 +376,62 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'depth': null,
         'drawOnCollapsedOnly': false,
-        'position': 'left-top',
+        'position': 'left-center',
+        'markerType': 'diamond'
+      },
+      'markerType': 'diamond'
+    },
+
+    'baselineMilestones': {
+      'rendering': {
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'drawer': function() {
+          var shapes = this['shapes'];
+          var path = shapes['path'];
+          var bounds = this['predictedBounds'];
+          var markerType = this['markerType'];
+          var radius = bounds.width / 2;
+          anychart.utils.getMarkerDrawer(markerType)(path, bounds.left + radius, bounds.top + radius, radius);
+        }
+      },
+      'preview': {
+        'enabled': false,
+        'rendering': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'drawer': function() {
+            var shapes = this['shapes'];
+            var path = shapes['path'];
+            var bounds = this['predictedBounds'];
+            var markerType = this['markerType'];
+            var radius = bounds.width / 2;
+            anychart.utils.getMarkerDrawer(markerType)(path, bounds.left + radius, bounds.top + radius, radius);
+          },
+          'shapes': [
+            {
+              'name': 'path',
+              'shapeType': 'path',
+              'zIndex': 12,
+              'disablePointerEvents': false
+            }
+          ]
+        },
+        'labels': {
+          'enabled': false,
+          'format': '{%Name}',
+          'background': {
+            'enabled': true,
+            'fill': 'white 0.7'
+          }
+        },
+        'depth': null,
+        'drawOnCollapsedOnly': false,
+        'position': 'left-center',
         'markerType': 'diamond'
       },
       'markerType': 'diamond'
@@ -615,6 +670,18 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         },
         'tooltip': {
           'format': '{%start}'
+        }
+      },
+      'baselineMilestones': {
+        'labels': {
+          'format': '{%Name}',
+          'anchor': 'left-center',
+          'position': 'right-center',
+          'enabled': null
+        },
+        'tooltip': {
+          'titleFormat': '{%Name}',
+          'format': '{%baselineStart}'
         }
       }
     }
