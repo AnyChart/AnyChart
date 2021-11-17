@@ -3775,12 +3775,10 @@ anychart.ganttModule.TimeLine.prototype.shouldDrawPreviewMilestone_ = function(p
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData} info - .
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight, opt_info) {
-  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
-
+anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight, info) {
   var isParent = info.isLoadable || anychart.ganttModule.BaseGrid.isGroupingTask(dataItem, info);
   var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
   var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
@@ -3928,13 +3926,10 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData} info - .
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsBaselineLike_ = function(dataItem, totalTop, itemHeight, opt_info) {
-  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
-  var isBaselineMilestone = anychart.ganttModule.BaseGrid.isProjectBaselineMilestone(dataItem, info);
-
+anychart.ganttModule.TimeLine.prototype.drawAsBaselineLike_ = function(dataItem, totalTop, itemHeight, info) {
   var isParent = info.isLoadable || anychart.ganttModule.BaseGrid.isGroupingTask(dataItem, info);
   var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
   var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
@@ -3951,7 +3946,6 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaselineLike_ = function(dataItem,
 
   var actualStartRatio = this.scale_.timestampToRatio(actualStart);
   var actualEndRatio = this.scale_.timestampToRatio(actualEnd);
-  var baselineStartRatio = this.scale_.timestampToRatio(baselineStart);
   var isElementEnabled = element.getOption('enabled');
 
   var actualPresents = (actualEndRatio > 0 && actualStartRatio < 1 && isElementEnabled); // ratios can contain NaNs
@@ -4066,12 +4060,10 @@ anychart.ganttModule.TimeLine.prototype.fixBaselineBarsPositioning_ = function(b
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData} info - .
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight, opt_info) {
-  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
-
+anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight, info) {
   if (this.groupingTasks().getOption('enabled') && (info.isValidTask || info.isFlatGroupingTask || info.isLoadable)) {
     var milestonesPreview = /** @type {anychart.ganttModule.elements.MilestonesElement.Preview} */ (this.milestones().preview());
     var baselineMilestonesPreview = /** @type {anychart.ganttModule.elements.BaselineMilestonesElement.Preview} */ (this.baselineMilestones().preview());
@@ -4208,11 +4200,10 @@ anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - .
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData} info - .
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, totalTop, itemHeight, opt_info) {
-  var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(dataItem);
+anychart.ganttModule.TimeLine.prototype.drawAsProgress_ = function(dataItem, totalTop, itemHeight, info) {
   var el = /** @type {anychart.ganttModule.elements.TasksElement} */ (this.tasks());
 
   if (el.getOption('enabled') && info.isValidTask) {
