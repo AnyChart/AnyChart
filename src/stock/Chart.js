@@ -2609,48 +2609,6 @@ anychart.stockModule.Chart.prototype.highlightAtRatio_ = function(xRatio, yRatio
 
 
 /**
- * Calculate distance between yRatio and closest series point.
- *
- * @param {anychart.stockModule.Series} series
- * @param {anychart.stockModule.data.TableSelectable.RowProxy} point
- * @param {number} targetRatio
- *
- * @return {{
- *   distance: number,
- *   ratio: number
- * }}
- */
-anychart.stockModule.Chart.prototype.getDistanceToSeries = function(series, point, targetRatio) {
-  var distance = Infinity;
-  var ratio = 0;
-
-  if (point && series) {
-    var scale = series.yScale();
-
-    /*
-      Should consider that
-        - OHLC series returns 'close' as 'value'
-        - Range series returns 'high' as 'value'
-        - etc.
-     */
-    var value = anychart.utils.getFirstNotNullValue(point.get('value'), point.get('close'), point.get('high'));
-    value = anychart.utils.toNumber(value);
-    if (!isNaN(value)) {
-      var pointValueRatio = 1 - scale.transform(scale.applyComparison(value, series.comparisonZero));
-
-      distance = Math.abs(pointValueRatio - targetRatio);
-      ratio = pointValueRatio;
-    }
-  }
-
-  return {
-    ratio: ratio,
-    distance: distance
-  };
-};
-
-
-/**
  * Finds closest series (by yRatio) in array of highlighted data rows for each series of the plot.
  *
  * @param {!Array.<anychart.stockModule.Plot.HighlightedSeriesInfo>} sourcePlotInfo
@@ -2670,7 +2628,9 @@ anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function(sourcePlot
    */
   for (var i = 0; i < sourcePlotInfo.length; i++) {
     var inf = sourcePlotInfo[i];
-    var distanceToSeries = this.getDistanceToSeries(inf['series'], inf['point'], yRatio);
+    var series = inf['series'];
+    var plot = /** @type {anychart.stockModule.Plot} */(inf['series'].plot);
+    var distanceToSeries = plot.getDistanceToSeries(series, inf['point'], yRatio);
     var d = distanceToSeries.distance;
     if (distance > d) {
       distance = d;
