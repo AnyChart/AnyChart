@@ -536,25 +536,35 @@ anychart.core.ChartWithOrthogonalScales.prototype.finishOrdinalXScaleCalculation
 /**
  * Return values that chart's ordinal xScale use.
  *
- * @return {{
+ * @return {Object.<number, {
  *   xArray: !Array.<string>,
  *   xHashMap: !Object.<number>
- * }}
+ * }>}
  */
 anychart.core.ChartWithOrthogonalScales.prototype.getValuesForOrdinalScale = function() {
   var chartXScale = this.xScale();
+  var rv = /**@type {Object.<number,{xArray:!Array.<string>, xHashMap: !Object.<number>}>}*/({});
 
   if (chartXScale.needsAutoCalc()) {
-    var xArray = [];
-    var xHashMap = {};
     for (var i = 0; i < this.seriesList.length; i++) {
       var series = /** @type {anychart.core.series.Cartesian} */(this.seriesList[i]);
       if (series && series.enabled()) {
+        var scaleUid = goog.getUid(series.xScale());
+        if (!rv[scaleUid]) {
+          rv[scaleUid] = {
+            xArray: [],
+            xHashMap: {}
+          };
+        }
+
+        var xArray = rv[scaleUid].xArray;
+        var xHashMap = rv[scaleUid].xHashMap;
+
         var data = series.data();
         if (data) {
           var iterator = data.getIterator();
           while (iterator.advance()) {
-            var category = iterator.get('x');
+            var category = /**@type {string}*/(iterator.get('x'));
             var xHash = anychart.utils.hash(category);
             if (!(xHash in xHashMap)) {
               xHashMap[xHash] = xArray.length;
@@ -564,17 +574,14 @@ anychart.core.ChartWithOrthogonalScales.prototype.getValuesForOrdinalScale = fun
         }
       }
     }
-
-    return {
-      xArray: xArray,
-      xHashMap: xHashMap
+  } else {
+    rv[goog.getUid(chartXScale)] = {
+      xArray: chartXScale.values(),
+      xHashMap: chartXScale.getValuesMapInternal()
     };
   }
 
-  return {
-    xArray: chartXScale.values(),
-    xHashMap: chartXScale.getValuesMapInternal()
-  };
+  return rv;
 };
 
 
@@ -593,7 +600,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.createDrawingPlans = function(
       var drawingPlan;
       if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
         var values = this.getValuesForOrdinalScale();
-        drawingPlan = series.getOrdinalDrawingPlan(values.xHashMap, values.xArray, !xScale.needsAutoCalc());
+        var uid = goog.getUid(series.xScale());
+        var xHashMap = values[uid].xHashMap;
+        var xArray = values[uid].xArray;
+
+        drawingPlan = series.getOrdinalDrawingPlan(xHashMap, xArray, !xScale.needsAutoCalc());
       } else {
         drawingPlan = series.getScatterDrawingPlan(true, anychart.utils.instanceOf(xScale, anychart.scales.DateTime));
       }

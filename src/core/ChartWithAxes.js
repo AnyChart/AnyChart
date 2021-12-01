@@ -1335,7 +1335,13 @@ anychart.core.ChartWithAxes.prototype.placeCrossAxes_ = function(axes, bounds) {
         axis.parentBounds(bounds);
 
         var axisBounds = axis.getPixelBounds(true);
-        var targetScale = this.getValueTargetFromAxis(axis).scale();
+        var targetAxis = this.getValueTargetFromAxis(axis);
+
+        if (!targetAxis) {
+          continue;
+        }
+
+        var targetScale = targetAxis.scale();
         var orientation = axis.getOption('orientation');
         var padding = 0;
 
@@ -1407,6 +1413,11 @@ anychart.core.ChartWithAxes.prototype.getBoundsChangedSignal = function() {
 anychart.core.ChartWithAxes.prototype.isAxisVisible_ = function(axis) {
   var value = axis.getOption('value');
   var targetAxis = this.getValueTargetFromAxis(axis);
+
+  if (!targetAxis) {
+    return true;
+  }
+
   var scale = targetAxis.scale();
 
   var isVisible = goog.isNull(value);
@@ -1832,13 +1843,14 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
  * @protected
  *
  * @param {Array.<anychart.core.Axis>} axes
- * @param {Object.<number>} info
+ * @param {Array.<number>} info - Array where index is index of axis, value is index of target axis.
  */
 anychart.core.ChartWithAxes.prototype.setupCrossAxes = function(axes, info) {
-  for (var axisIndex in info) {
-    var index = parseInt(axisIndex,10);
-    var axis = axes[index];
-    axis.valueTarget(info[index]);
+  for (var i = 0; i < info.length; i++) {
+    var axis = axes[i];
+    if (goog.isDefAndNotNull(axis)) {
+      axis.valueTarget(info[i]);
+    }
   }
 };
 
@@ -1865,10 +1877,10 @@ anychart.core.ChartWithAxes.prototype.setupAxes = function(opt_config) {
  * @param {Array.<anychart.core.Axis>} axes
  * @param {Array.<anychart.core.Axis>} targetsArray
  *
- * @return {Object.<number>}
+ * @return {Array.<number>} - Array where index is index of axis, value is index of target axis.
  */
 anychart.core.ChartWithAxes.prototype.serializeCrossAxes = function(axes, targetsArray) {
-  var info = {};
+  var info = [];
 
   for (var i = 0; i < axes.length; i++) {
     var axis = axes[i];
@@ -1877,6 +1889,8 @@ anychart.core.ChartWithAxes.prototype.serializeCrossAxes = function(axes, target
       info[i] = goog.isNumber(target) ?
         /** @type {number} */ (target) :
         goog.array.indexOf(targetsArray, /** @type {anychart.core.Axis} */ (target));
+    } else {
+      info[i] = null;
     }
   }
 

@@ -990,12 +990,15 @@ anychart.waterfallModule.Chart.prototype.getFormatProviderForArrow = function(to
 /** @inheritDoc */
 anychart.waterfallModule.Chart.prototype.createDrawingPlans = function() {
   var plans = anychart.waterfallModule.Chart.base(this, 'createDrawingPlans');
-
   var values = this.getValuesForOrdinalScale();
-  var totalsPlans = this.totalsController().getDrawingPlans(values.xHashMap, values.xArray);
 
-  for (var i = 0; i < totalsPlans.length; i++) {
-    plans.push(totalsPlans[i]);
+  if (!goog.object.isEmpty(values)) {
+    var uid = goog.getUid(this.xScale());
+    var totalsPlans = this.totalsController().getDrawingPlans(values[uid].xHashMap, values[uid].xArray);
+
+    for (var i = 0; i < totalsPlans.length; i++) {
+      plans.push(totalsPlans[i]);
+    }
   }
 
   return plans;
@@ -1006,44 +1009,44 @@ anychart.waterfallModule.Chart.prototype.createDrawingPlans = function() {
 anychart.waterfallModule.Chart.prototype.getValuesForOrdinalScale = function() {
   var values = anychart.waterfallModule.Chart.base(this, 'getValuesForOrdinalScale');
 
-  var xArray = values.xArray;
-  var xHashMap = values.xHashMap;
+  if (!goog.object.isEmpty(values)) {
+    var scaleUid = goog.getUid(this.xScale());
+    var xArray = values[scaleUid].xArray;
+    var xHashMap = values[scaleUid].xHashMap;
+    var totals = this.getAllTotals();
+    var totalsCategories = {};
 
-  var totals = this.getAllTotals();
-  var totalsCategories = {};
-  for (var i = 0; i < totals.length; i++) {
-    var total = totals[i];
+    for (var i = 0; i < totals.length; i++) {
+      var total = totals[i];
 
-    if (total.getOption('enabled')) {
-      var totalX = total.getOption('x');
-      if (!totalsCategories[totalX]) {
-        totalsCategories[totalX] = [];
+      if (total.getOption('enabled')) {
+        var totalX = total.getOption('x');
+        if (!totalsCategories[totalX]) {
+          totalsCategories[totalX] = [];
+        }
+        totalsCategories[totalX].push.apply(totalsCategories[totalX], total.getReservedCategories());
       }
-      totalsCategories[totalX].push.apply(totalsCategories[totalX], total.getReservedCategories());
     }
-  }
 
-  for (var targetCategory in totalsCategories) {
-    var categoriesToAdd = totalsCategories[targetCategory];
-    // findIndex because of categories can be numbers.
+    for (var targetCategory in totalsCategories) {
+      var categoriesToAdd = totalsCategories[targetCategory];
+      // findIndex because of categories can be numbers.
     var index = goog.array.findIndex(xArray, function(category) {
-      return targetCategory == category;
-    });
-    if (index !== -1) {
-      goog.array.insertArrayAt(xArray, categoriesToAdd, index + 1);
+        return targetCategory == category;
+      });
+      if (index !== -1) {
+        goog.array.insertArrayAt(xArray, categoriesToAdd, index + 1);
+      }
+    }
+
+    for (i = 0; i < xArray.length; i++) {
+      var category = xArray[i];
+      var xHash = anychart.utils.hash(category);
+      xHashMap[xHash] = i;
     }
   }
 
-  for (i = 0; i < xArray.length; i++) {
-    var category = xArray[i];
-    var xHash = anychart.utils.hash(category);
-    xHashMap[xHash] = i;
-  }
-
-  return {
-    xArray: xArray,
-    xHashMap: xHashMap
-  };
+  return values;
 };
 
 

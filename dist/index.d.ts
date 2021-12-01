@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.10.0
+// Type definitions for AnyChart JavaScript Charting Library, v8.11.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -2391,6 +2391,7 @@ declare namespace anychart.charts {
         a11y(settings?: boolean | Object): anychart.charts.Waterfall;
         addArrow(settings?: Object): anychart.core.waterfall.Arrow;
         addSeries(...var_args: (anychart.data.View | anychart.data.Set | Array<any>)[]): Array<anychart.core.cartesian.series.Base>;
+        addTotal(config: anychart.core.waterfall.TotalConfig): anychart.core.waterfall.Total;
         annotations(): anychart.core.annotations.PlotController;
         annotations(annotationsList?: Array<any>): anychart.charts.Waterfall;
         autoRedraw(): boolean;
@@ -2435,6 +2436,7 @@ declare namespace anychart.charts {
         fullScreen(): boolean;
         fullScreen(enabled?: boolean): anychart.charts.Waterfall;
         getAllArrows(): Array<anychart.core.waterfall.Arrow>;
+        getAllTotals(): Array<anychart.core.waterfall.Total>;
         getArrow(settings?: number): anychart.core.waterfall.Arrow;
         getJpgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), width?: number, height?: number, quality?: number, forceTransparentWhite?: boolean): void;
         getPdfBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: number | string, landscapeOrWidth?: number | boolean, x?: number, y?: number): void;
@@ -2446,6 +2448,7 @@ declare namespace anychart.charts {
         getSeriesCount(): number;
         getStat(key?: string): any;
         getSvgBase64String(onSuccessOrOptions: ((response:string)=>void) | Object, onError?: ((response:string)=>void), paperSizeOrWidth?: string | number, landscapeOrHeight?: boolean | string): void;
+        getTotalAt(index: number): anychart.charts.Waterfall;
         getType(): string;
         getXAxesCount(): number;
         getXScales(): Array<any>;
@@ -2522,6 +2525,8 @@ declare namespace anychart.charts {
         removeArrowAt(Arrow: number): boolean;
         removeSeries(id: number | string): anychart.charts.Waterfall;
         removeSeriesAt(index: number): anychart.charts.Waterfall;
+        removeTotal(total: anychart.core.waterfall.Total): anychart.charts.Waterfall;
+        removeTotalAt(index: number): anychart.charts.Waterfall;
         right(): number | string;
         right(right?: number | string): anychart.charts.Waterfall;
         saveAsCsv(chartDataExportMode?: string, csvSettings?: {[prop:string]:string|boolean|((name:any,value:any)=>void)}, filename?: string): void;
@@ -2551,6 +2556,8 @@ declare namespace anychart.charts {
         shareWithLinkedIn(captionOrOptions?: string | Object, description?: string): void;
         shareWithPinterest(linkOrOptions?: string | Object, description?: string): void;
         shareWithTwitter(): void;
+        splitTotal(splits: Array<anychart.core.waterfall.SplitConfig>): anychart.charts.Waterfall;
+        splitTotal(): Array<anychart.core.waterfall.SplitConfig>;
         stackLabels(): anychart.core.ui.LabelsFactory;
         stackLabels(settings?: Object | boolean): anychart.charts.Waterfall;
         startSelectRectangleMarquee(repeat?: boolean): anychart.charts.Waterfall;
@@ -8625,6 +8632,10 @@ declare namespace anychart.core.axes {
         ticks(settings?: Object | boolean): anychart.core.axes.Surface;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.axes.Surface;
+        value(): number;
+        value(value?: number): anychart.core.axes.Surface;
+        valueTarget(): anychart.core.axes.Surface;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.core.axes.Surface;
         width(): number | string;
         width(width?: number | string): anychart.core.axes.Surface;
         zIndex(): number;
@@ -8785,6 +8796,10 @@ declare namespace anychart.core.axes {
         ticks(settings?: Object | boolean): anychart.core.axes.Linear;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.axes.Linear;
+        value(): number;
+        value(value?: number): anychart.core.axes.Linear;
+        valueTarget(): anychart.core.axes.Linear;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.core.axes.Linear;
         width(): number | string;
         width(width?: number | string): anychart.core.axes.Linear;
         zIndex(): number;
@@ -9105,6 +9120,10 @@ declare namespace anychart.core.axes {
         width(width?: number | string): anychart.core.axes.LinearGauge;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.axes.LinearGauge;
+        value(): number;
+        value(value?: number): anychart.core.axes.LinearGauge;
+        valueTarget(): anychart.core.axes.LinearGauge;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.core.axes.LinearGauge;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.axes.LinearGauge;
         parentBounds(): anychart.math.Rect;
@@ -14317,6 +14336,54 @@ declare namespace anychart.core.gantt.elements {
         unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
         unlistenByKey(key: Object): boolean;
     }
+    interface BaselineMilestonesElement extends anychart.core.gantt.elements.TimelineElement {
+        anchor(): string;
+        anchor(anchor?: string): anychart.core.gantt.elements.BaselineMilestonesElement;
+        edit(): anychart.core.gantt.edit.ElementEdit;
+        edit(settings?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        enabled(): boolean;
+        enabled(settings?: boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(): anychart.graphics.vector.Fill | string;
+        fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(color: string, opacity?: number): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.elements.BaselineMilestonesElement;
+        fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.elements.BaselineMilestonesElement;
+        height(): string | number;
+        height(height?: string | number): anychart.core.gantt.elements.BaselineMilestonesElement;
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        markerType(): string;
+        markerType(markerType: string): anychart.core.gantt.elements.BaselineMilestonesElement;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesElement;
+        preview(): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        preview(settings: Object): anychart.core.gantt.elements.BaselineMilestonesElement;
+        rendering(): anychart.core.gantt.rendering.Settings;
+        rendering(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesElement;
+        selected(): anychart.core.StateSettings;
+        selected(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesElement;
+        stroke(): anychart.graphics.vector.Stroke | string;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.BaselineMilestonesElement;
+        stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.BaselineMilestonesElement;
+        stroke(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesElement;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(value?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        endMarker(): anychart.core.gantt.elements.Marker;
+        endMarker(config: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        offset(): string | number;
+        offset(offset?: string | number): anychart.core.gantt.elements.BaselineMilestonesElement;
+        position(): string;
+        position(position?: string): anychart.core.gantt.elements.BaselineMilestonesElement;
+        startMarker(): anychart.core.gantt.elements.Marker;
+        startMarker(config: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
     interface PeriodsElement extends anychart.core.gantt.elements.TimelineElement {
         anchor(): string;
         anchor(anchor?: string): anychart.core.gantt.elements.PeriodsElement;
@@ -14683,6 +14750,58 @@ declare namespace anychart.core.gantt.elements {
         stroke(settings?: Object): anychart.core.gantt.elements.TasksElement;
         tooltip(): anychart.core.ui.Tooltip;
         tooltip(value?: Object | boolean): anychart.core.gantt.elements.TasksElement;
+        listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
+        removeAllListeners(type?: string): number;
+        unlisten(type: string, listener: ((e:Object)=>boolean), useCapture?: boolean, listenerScope?: Object): boolean;
+        unlistenByKey(key: Object): boolean;
+    }
+    interface BaselineMilestonesPreviewElement extends anychart.core.gantt.elements.BaselineMilestonesElement {
+        anchor(): string;
+        anchor(anchor?: string): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        depth(): number;
+        depth(value: number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        drawOnCollapsedOnly(): boolean;
+        drawOnCollapsedOnly(value: boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        edit(): anychart.core.gantt.edit.ElementEdit;
+        edit(settings?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        enabled(): boolean;
+        enabled(settings?: boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(): anychart.graphics.vector.Fill | string;
+        fill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(fillFunction?: (()=>anychart.graphics.vector.Fill)): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(color: string, opacity?: number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        fill(imageSettings: anychart.graphics.vector.Fill): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        height(): string | number;
+        height(height?: string | number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        labels(): anychart.core.ui.LabelsFactory;
+        labels(settings?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        markerType(): string;
+        markerType(markerType: string): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        rendering(): anychart.core.gantt.rendering.Settings;
+        rendering(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        selected(): anychart.core.StateSettings;
+        selected(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        stroke(): anychart.graphics.vector.Stroke | string;
+        stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        stroke(strokeFunction?: (()=>anychart.graphics.vector.Stroke|anychart.graphics.vector.ColoredFill)): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        stroke(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        normal(): anychart.core.StateSettings;
+        normal(settings?: Object): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        preview(): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        preview(settings: Object): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        tooltip(): anychart.core.ui.Tooltip;
+        tooltip(value?: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        endMarker(): anychart.core.gantt.elements.Marker;
+        endMarker(config: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        offset(): string | number;
+        offset(offset?: string | number): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        position(): string;
+        position(position?: string): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
+        startMarker(): anychart.core.gantt.elements.Marker;
+        startMarker(config: Object | boolean): anychart.core.gantt.elements.BaselineMilestonesPreviewElement;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         removeAllListeners(type?: string): number;
@@ -19929,6 +20048,7 @@ declare namespace anychart.core.stock {
         height(height?: number | string): anychart.core.stock.Plot;
         hilo(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.Hilo;
         ikh(mapping: anychart.data.TableMapping, conversionPeriod?: number, basePeriod?: number, leadingPeriod?: number, conversionSeriesType?: string, baseSeriesType?: string, leadingSeriesType?: string, laggingSeriesType?: string): anychart.core.stock.indicators.IKH;
+        isExpanded(): boolean;
         jumpLine(data?: anychart.data.TableMapping | anychart.data.Table | Array<Array<any>> | string, mappingSettings?: {[prop:string]:{column:number,type:string|string,weights:number}|number}, csvSettings?: Object): anychart.core.stock.series.JumpLine;
         kdj(mapping: anychart.data.TableMapping, kPeriod?: number, kMAPeriod?: number, dPeriod?: number, kMAType?: string, dMAType?: string, kMultiplier?: number, dMultiplier?: number, kSeriesType?: string, dSeriesType?: string, jSeriesType?: string): anychart.core.stock.indicators.KDJ;
         keltnerChannels(mapping: anychart.data.TableMapping, maPeriod?: number, atrPeriod?: number, maType?: string, multiplier?: number, maSeries?: string): anychart.core.stock.indicators.KeltnerChannels;
@@ -19959,6 +20079,8 @@ declare namespace anychart.core.stock {
         minWidth(width?: number | string): anychart.core.stock.Plot;
         mma(mapping: anychart.data.TableMapping, period?: number, seriesType?: string): anychart.core.stock.indicators.MMA;
         momentum(mapping: anychart.data.TableMapping, period?: number, seriesType?: string): anychart.core.stock.indicators.Momentum;
+        moveDown(): anychart.core.stock.Plot;
+        moveUp(): anychart.core.stock.Plot;
         noData(): anychart.core.NoDataSettings;
         noData(value?: Object): anychart.core.stock.Plot;
         obv(mapping: anychart.data.TableMapping, seriesType?: string): anychart.core.stock.indicators.OBV;
@@ -20002,6 +20124,7 @@ declare namespace anychart.core.stock {
         textMarker(index?: number, settings?: Object | boolean): anychart.core.stock.Plot;
         title(): anychart.core.ui.Title;
         title(settings?: boolean | Object | string): anychart.core.stock.Plot;
+        toggleExpandedState(): anychart.core.stock.Plot;
         top(): number | string;
         top(top?: number | string): anychart.core.stock.Plot;
         trix(mapping: anychart.data.TableMapping, period?: number, signalPeriod?: number, maType?: string, signalMaType?: string, trixSeriesType?: string, signalSeriesType?: string): anychart.core.stock.indicators.TRIX;
@@ -24369,6 +24492,8 @@ declare namespace anychart.core.ui {
         backgroundFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.Timeline;
         backgroundFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.Timeline;
         backgroundFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.Timeline;
+        baselineMilestones(): anychart.core.gantt.elements.BaselineMilestonesElement;
+        baselineMilestones(settings?: Object): anychart.core.ui.Timeline;
         baselines(): anychart.core.gantt.elements.BaselinesElement;
         baselines(settings?: Object): anychart.core.ui.Timeline;
         bottom(): number | string;
@@ -24852,6 +24977,10 @@ declare namespace anychart.core.ui {
         width(width?: number | string): anychart.core.ui.ColorRange;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.core.ui.ColorRange;
+        value(): number;
+        value(value?: number): anychart.core.ui.ColorRange;
+        valueTarget(): anychart.core.ui.ColorRange;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.core.ui.ColorRange;
         container(): anychart.graphics.vector.Layer | anychart.graphics.vector.Stage;
         container(element?: anychart.graphics.vector.Layer | anychart.graphics.vector.Stage | string | Element): anychart.core.ui.ColorRange;
         parentBounds(): anychart.math.Rect;
@@ -26902,6 +27031,8 @@ declare namespace anychart.core.utils {
         stroke(settings?: Object): anychart.core.utils.UnboundRegionsSettings;
     }
     interface StockInteractivity extends anychart.core.utils.Interactivity {
+        allowPlotDrag(): boolean;
+        allowPlotDrag(enabled?: boolean): anychart.core.utils.StockInteractivity;
         multiSelectOnClick(): boolean;
         multiSelectOnClick(enabled?: boolean): anychart.core.utils.StockInteractivity;
         scrollOnMouseWheel(): boolean;
@@ -27298,6 +27429,36 @@ declare namespace anychart.core.venn {
 }
 
 declare namespace anychart.core.waterfall {
+    type TotalConfig = {
+        fill: string;
+        hatchFill: string;
+        label: Object | string;
+        name: string;
+        stroke: string;
+        x: string;
+    }
+    type SplitConfig = {
+        fill: string;
+        label: Object | string;
+        name: string;
+        stroke: string;
+        value: number;
+    }
+    interface Total {
+        fill(): anychart.graphics.vector.Fill;
+        fill(color: anychart.graphics.vector.Fill): anychart.core.waterfall.Total;
+        hatchFill(): anychart.graphics.vector.HatchFill;
+        hatchFill(type?: anychart.graphics.vector.HatchFill.HatchFillType | string): anychart.core.waterfall.Total;
+        label(): anychart.core.ui.LabelsFactory;
+        label(config: Object): anychart.core.waterfall.Total;
+        label(enabled: boolean): anychart.core.waterfall.Total;
+        name(): string;
+        name(value: string): anychart.core.waterfall.Total;
+        stroke(): anychart.graphics.vector.Stroke;
+        stroke(settings?: anychart.graphics.vector.Stroke): anychart.core.waterfall.Total;
+        x(): string;
+        x(value: string): anychart.core.waterfall.Total;
+    }
     interface ArrowConnector {
         stroke(): anychart.graphics.vector.Stroke;
         stroke(color?: anychart.graphics.vector.Stroke | anychart.graphics.vector.ColoredFill | string, thickness?: number, dashpattern?: string, lineJoin?: string | anychart.graphics.vector.StrokeLineJoin, lineCap?: string | anychart.graphics.vector.StrokeLineCap): anychart.core.waterfall.ArrowConnector;
@@ -30790,6 +30951,8 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.ProjectTimeline;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ProjectTimeline;
+        baselineMilestones(): anychart.core.gantt.elements.BaselineMilestonesElement;
+        baselineMilestones(settings?: Object): anychart.standalones.ProjectTimeline;
         cropLabels(): boolean;
         cropLabels(value?: boolean): anychart.standalones.ProjectTimeline;
         holidaysFill(): anychart.graphics.vector.Fill;
@@ -30926,6 +31089,8 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.ResourceTimeline;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ResourceTimeline;
+        baselineMilestones(): anychart.core.gantt.elements.BaselineMilestonesElement;
+        baselineMilestones(settings?: Object): anychart.standalones.ResourceTimeline;
         baselines(): anychart.core.gantt.elements.BaselinesElement;
         baselines(settings?: Object): anychart.standalones.ResourceTimeline;
         cropLabels(): boolean;
@@ -31283,6 +31448,10 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.ColorRange;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ColorRange;
+        value(): number;
+        value(value?: number): anychart.standalones.ColorRange;
+        valueTarget(): anychart.standalones.ColorRange;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.standalones.ColorRange;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -32123,6 +32292,10 @@ declare namespace anychart.standalones.axes {
         width(width?: number | string): anychart.standalones.axes.Linear;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.axes.Linear;
+        value(): number;
+        value(value?: number): anychart.standalones.axes.Linear;
+        valueTarget(): anychart.standalones.axes.Linear;
+        valueTarget(target?: anychart.core.axes.Linear): anychart.standalones.axes.Linear;
         print(paperSizeOrOptions?: anychart.graphics.vector.PaperSize | Object, landscape?: boolean): void;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
         listenOnce(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;

@@ -2325,8 +2325,8 @@ anychart.stockModule.Plot.prototype.getSeriesStatus = function(eventPositionInfo
 
       // DVF-4607
       var insideRangeSeries =
-        (y >= Math.min(value, zero) && y <= Math.max(value, zero)) || // Column, area
-        (y >= Math.min(high, low) && y <= Math.max(high, low)) && // Ohlc, candlestick, range series
+        ((y >= Math.min(value, zero) && y <= Math.max(value, zero)) || // Column, area
+        (y >= Math.min(high, low) && y <= Math.max(high, low))) && // Ohlc, candlestick, range series
         !series.isLineBased();
 
       var distance = insideRangeSeries ? 0 : this.getDistanceToSeries(series, point, yRatio).distance * this.seriesBounds_.height;

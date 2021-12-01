@@ -5506,25 +5506,26 @@ anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cu
 
   var newWidth = labelFinalRight - labelFinalLeft;
 
+  var needsLabelSizeLimitation = false;
   var curTagLabelAnchor = cur.label.getFinalSettings('anchor').split('-')[0];
   if (curTagLabelAnchor === 'center') {
     var curTagLabelPosition = cur.label.getFinalSettings('position').split('-')[0];
     var anchorPoint = anychart.utils.getCoordinateByAnchor(cur.bounds, curTagLabelPosition);
     newWidth = Math.min(anchorPoint.x - labelFinalLeft, labelFinalRight - anchorPoint.x) * 2;
+    needsLabelSizeLimitation = true;
   }
 
   // Minimum allowed width for labels, currently is not configurable.
   var minimumAllowedWidth = 20;
 
   if (newWidth >= minimumAllowedWidth && newWidth < curTagLabelBounds.width) {
-    var verticalIntersection = false;
     if (next) {
       var nextTagLabelBounds = this.getTagLabelBounds_(next.label);
       var minTop = Math.min(curTagLabelBounds.top, nextTagLabelBounds.top);
       var maxBottom = Math.max(curTagLabelBounds.top + curTagLabelBounds.height, nextTagLabelBounds.top + nextTagLabelBounds.height);
-      verticalIntersection = maxBottom - minTop < curTagLabelBounds.height + nextTagLabelBounds.height;
+      needsLabelSizeLimitation = maxBottom - minTop < curTagLabelBounds.height + nextTagLabelBounds.height;
     }
-    if (verticalIntersection) {
+    if (needsLabelSizeLimitation) {
       cur.label.width(newWidth);
       cur.label.height(curTagLabelBounds.height);
     }

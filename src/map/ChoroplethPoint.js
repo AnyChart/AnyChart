@@ -94,7 +94,14 @@ anychart.mapModule.ChoroplethPoint.prototype.middleY = function(opt_value) {
 anychart.mapModule.ChoroplethPoint.prototype.translation = function(opt_dx, opt_dy) {
   var map = /** @type {anychart.mapModule.Chart} */(this.getChart());
   if (goog.isDef(opt_dx) || goog.isDef(opt_dy)) {
-    map.featureTranslation(this.getFeatureProp()[this.series.getFinalGeoIdField()], opt_dx, opt_dy);
+    var finalGeoIdField = this.series.getFinalGeoIdField();
+    var featureProp = this.getFeatureProp();
+    if (featureProp && finalGeoIdField) {
+      var featureId = featureProp[finalGeoIdField];
+      if (featureId) {
+        map.featureTranslation(featureId, opt_dx, opt_dy);
+      }
+    }
     return this;
   } else {
     return /** @type {Array.<number>} */(map.featureTranslation(this.getFeatureProp()[this.series.getFinalGeoIdField()]));
