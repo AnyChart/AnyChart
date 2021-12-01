@@ -97,7 +97,21 @@ anychart.core.Axis = function() {
         this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }, this],
     ['orientation', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED, 0, this.dropStaggeredLabelsCache_, this],
-    ['stroke', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED]
+    ['stroke', this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED],
+    ['value',
+      this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      void 0,
+      function() {
+        var value = this.getOption('value');
+        if (goog.isNull(value)) {
+          this.resetAutoZIndex();
+        } else {
+          this.setAutoZIndex(25);
+        }
+        this.invalidate(anychart.ConsistencyState.Z_INDEX);
+      },
+      this
+    ]
   ]);
 
   this.resumeSignalsDispatching(false);
@@ -134,7 +148,8 @@ anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerMode', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerMaxLines', anychart.core.settings.numberOrNullNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'staggerLines', anychart.core.settings.numberOrNullNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', anychart.core.settings.orientationNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'orientation', anychart.core.settings.orientationNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'value', anychart.utils.toNumberOrStringOrNull]
   ]);
 
   return map;
@@ -580,6 +595,24 @@ anychart.core.Axis.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, op
 
 
 /**
+ * Getter/Setter for the axis that will be used for position calculation.
+ *
+ * @param {anychart.core.Axis|number=} opt_target
+ *
+ * @return {anychart.core.Axis|number}
+ */
+anychart.core.Axis.prototype.valueTarget = function(opt_target) {
+  if (goog.isNumber(opt_target) || anychart.utils.instanceOf(opt_target, anychart.core.Axis)) {
+    this.valueTarget_ = opt_target;
+    this.invalidate(this.ALL_VISUAL_STATES,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  }
+
+  return this.valueTarget_;
+};
+
+
+/**
  * Listener for padding invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -1021,7 +1054,7 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
 /**
  * Calculate labels to draw.
  * @param {anychart.math.Rect=} opt_bounds Parent bounds.
- * @return {boolean|Object.<string, boolean|Array.<boolean>>} Object with indexes of labels to draw.
+ * @return {boolean|Object.<boolean|Array.<boolean>>} Object with indexes of labels to draw.
  * or Boolean when there are no labels.
  * @private
  */
@@ -1475,7 +1508,7 @@ anychart.core.Axis.prototype.getLength = function(parentLength) {
 anychart.core.Axis.prototype.getRemainingBounds = function(opt_includeInsideContent) {
   var parentBounds = this.parentBounds();
 
-  if (parentBounds) {
+  if (parentBounds && goog.isNull(this.getOption('value'))) {
     var remainingBounds = parentBounds.clone();
 
     if (this.scale() && this.enabled()) {
@@ -1909,6 +1942,36 @@ anychart.core.Axis.prototype.updateZIndex = function() {
 
 
 /**
+ * Resolve label enabled state.
+ *
+ * @param {number} index
+ * @param {Array.<number|string>} values
+ * @param {Array.<boolean>|boolean} states
+ * @return {boolean}
+ *
+ * @protected
+ */
+anychart.core.Axis.prototype.resolveLabelEnabledState = function(index, values, states) {
+  return goog.isArray(states) ? states[index] : states;
+};
+
+
+/**
+ * Resolve tick enabled state.
+ *
+ * @param {number} index
+ * @param {Array.<number|string>} values
+ * @param {Array.<boolean>|boolean} states
+ * @return {boolean}
+ *
+ * @protected
+ */
+anychart.core.Axis.prototype.resolveTickEnabledState = function(index, values, states) {
+  return goog.isArray(states) ? states[index] : goog.isBoolean(states);
+};
+
+
+/**
  * Axis drawing.
  * @return {anychart.core.Axis} An instance of {@link anychart.core.Axis} class for method chaining.
  */
@@ -1992,7 +2055,7 @@ anychart.core.Axis.prototype.draw = function() {
   }
 
   if (goog.isDef(ticksDrawer) || goog.isDef(minorTicksDrawer)) {
-    var i, j, overlappedLabels, needDrawLabels, needDrawMinorLabels;
+    var i, j, needDrawLabels, needDrawMinorLabels;
 
     var scaleTicksArr = scale.ticks().get();
     var ticksArrLen = scaleTicksArr.length;
@@ -2007,7 +2070,7 @@ anychart.core.Axis.prototype.draw = function() {
     var isOrdinal = anychart.utils.instanceOf(scale, anychart.scales.Ordinal);
 
     if (anychart.utils.instanceOf(scale, anychart.scales.ScatterBase)) {
-      overlappedLabels = this.calcLabels_();
+      var overlappedLabels = this.calcLabels_();
 
       if (goog.isObject(overlappedLabels)) {
         needDrawLabels = overlappedLabels.labels;
@@ -2043,8 +2106,8 @@ anychart.core.Axis.prototype.draw = function() {
         }
         if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
           var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
-          drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
-          drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);
+          drawLabel = this.resolveLabelEnabledState(i, scaleTicksArr, needDrawLabels);
+          drawTick = this.resolveTickEnabledState(i, scaleTicksArr, needDrawLabels);
           if (drawTick && ticksDrawer)
             ticksDrawer.call(
                 ticks,
@@ -2066,8 +2129,8 @@ anychart.core.Axis.prototype.draw = function() {
           i++;
         } else {
           var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
-          drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
-          drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
+          drawLabel = this.resolveLabelEnabledState(j, scaleMinorTicksArr, needDrawMinorLabels);
+          drawTick = this.resolveTickEnabledState(j, scaleMinorTicksArr, needDrawMinorLabels);
 
           if (drawTick && minorTicksDrawer && prevMajorRatio != minorRatio)
             minorTicksDrawer.call(
@@ -2249,12 +2312,13 @@ anychart.core.Axis.prototype.getLabelsFormatProvider = function(index, value) {
   return context.propagate();
 };
 
+
 /**
  * Returns ration for the axis by passed tick value.
  *
  * @param {number|Array<number>} value - Tick value.
  *
- * @returns {number}
+ * @return {number}
  */
 anychart.core.Axis.prototype.getRatioForTickValue = function(value) {
   var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
@@ -2267,6 +2331,8 @@ anychart.core.Axis.prototype.getRatioForTickValue = function(value) {
   }
   return ratio;
 };
+
+
 /**
  * Returns position provider.
  * @param {number} index Label index.
@@ -2345,6 +2411,11 @@ anychart.core.Axis.prototype.hasInsideElements = function() {
 anychart.core.Axis.prototype.serialize = function() {
   var json = anychart.core.Axis.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.Axis.SIMPLE_PROPS_DESCRIPTORS, json);
+
+  if (!this.hasOwnOption('zIndex')) {
+    delete json['zIndex'];
+  }
+
   json['title'] = this.title().serialize();
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
@@ -2456,6 +2527,7 @@ anychart.standalones.axes.linear = function() {
   proto['isHorizontal'] = proto.isHorizontal;
   proto['padding'] = proto.padding;
   proto['getPixelBounds'] = proto.getPixelBounds;
+  proto['valueTarget'] = proto.valueTarget;
   proto = anychart.standalones.axes.Linear.prototype;
   goog.exportSymbol('anychart.standalones.axes.linear', anychart.standalones.axes.linear);
   proto['padding'] = proto.padding;

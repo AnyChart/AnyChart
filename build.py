@@ -8,6 +8,7 @@ import sys
 import subprocess
 import platform
 import urllib
+import urllib2
 import zipfile
 import time
 import argparse
@@ -66,8 +67,8 @@ BINARIES_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_w
 BINARIES_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources','binaries_wrapper_end.txt')
 AMD_WRAPPER_START = os.path.join(PROJECT_PATH, 'bin', 'sources','amd_wrapper_start.txt')
 AMD_WRAPPER_END = os.path.join(PROJECT_PATH, 'bin', 'sources','amd_wrapper_end.txt')
-GIT_CONTRIBUTORS_URL = 'https://api.github.com/repos/anychart/anychart/contributors?anon=1%s'
-GIT_COMPARE_URL_TEMPLATE = 'https://api.github.com/repos/AnyChart/AnyChart/compare/master...%s%s'
+GIT_CONTRIBUTORS_URL = 'https://api.github.com/repos/anychart/anychart/contributors'
+GIT_COMPARE_URL_TEMPLATE = 'https://api.github.com/repos/AnyChart/AnyChart/compare/master...%s'
 
 
 # endregion
@@ -264,15 +265,15 @@ def __get_build_version():
 
     if travis_branch is not None:
         # see https://anychart.atlassian.net/browse/DVF-3193
-        contributors_token = '&access_token=' + github_token if github_token else ''
-        contributors_response = urllib.urlopen(GIT_CONTRIBUTORS_URL % contributors_token)
+        get_request = lambda url: urllib2.Request(url, None, {'Authorization' : 'token %s' % github_token if github_token else ''})
+
+        contributors_response = urllib2.urlopen(get_request(GIT_CONTRIBUTORS_URL))
         contributors_data = json.loads(contributors_response.read())
         contributions = 0
         for contributor in contributors_data:
             contributions += contributor['contributions']
 
-        compare_token = '?access_token=' + github_token if github_token else ''
-        compare_response = urllib.urlopen(GIT_COMPARE_URL_TEMPLATE % (travis_branch, compare_token))
+        compare_response = urllib2.urlopen(get_request(GIT_COMPARE_URL_TEMPLATE % travis_branch))
         compare_data = json.loads(compare_response.read())
 
         behind_by = compare_data.get('behind_by', 0)

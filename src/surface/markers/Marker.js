@@ -44,6 +44,8 @@ anychart.surfaceModule.markers.Marker = function(controller, dropline) {
    * @private
    */
   this.path_ = acgraph.path();
+  // Above dropline.
+  this.path_.zIndex(2);
 
   this.dropline_.container(this.rootLayer_);
   this.path_.parent(this.rootLayer_);

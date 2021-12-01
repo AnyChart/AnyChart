@@ -649,6 +649,13 @@ anychart.treeDataModule.View.DataItem.prototype.del = function(var_args) {
   return this;
 };
 
+/**
+ * @inheritDoc
+ */
+ anychart.treeDataModule.View.DataItem.prototype.hasField = function(fieldName) {
+   return this.dataItem_.hasField(fieldName);
+ };
+
 
 /**
  * Gets/sets a meta data.

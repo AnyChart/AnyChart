@@ -21,8 +21,8 @@ goog.inherits(anychart.stockModule.indicators.VWAP, anychart.stockModule.indicat
 
 
 /** @inheritDoc */
-anychart.stockModule.indicators.VWAP.prototype.createComputer = function(mapping) {
-  return anychart.stockModule.math.vwap.createComputer(mapping);
+anychart.stockModule.indicators.VWAP.prototype.createComputer = function(mapping, chart) {
+  return anychart.stockModule.math.vwap.createComputer(mapping, chart);
 };
 
 

@@ -552,6 +552,7 @@ anychart.core.ChartWithAxes.prototype.xAxis = function(opt_indexOrValue, opt_val
   var axis = this.xAxes_[index];
   if (!axis) {
     axis = new anychart.core.Axis();
+    axis.valueTarget(0);
     axis.setParentEventTarget(this);
     this.setupCreated('defaultXAxisSettings', axis);
     this.xAxes_[index] = axis;
@@ -590,6 +591,7 @@ anychart.core.ChartWithAxes.prototype.yAxis = function(opt_indexOrValue, opt_val
   var axis = this.yAxes_[index];
   if (!axis) {
     axis = new anychart.core.Axis();
+    axis.valueTarget(0);
     this.setupCreated('defaultYAxisSettings', axis);
     axis.setParentEventTarget(this);
     this.yAxes_[index] = axis;
@@ -674,6 +676,31 @@ anychart.core.ChartWithAxes.prototype.getYAxisByIndex = function(index) {
  */
 anychart.core.ChartWithAxes.prototype.setYAxisScale = function(axis) {
   axis.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+};
+
+
+/**
+ * Extract target axis from axis.
+ *
+ * @param {anychart.core.Axis} axis
+ * @return {anychart.core.Axis}
+ */
+anychart.core.ChartWithAxes.prototype.getValueTargetFromAxis = function(axis) {
+  var target = axis.valueTarget();
+
+  if (anychart.utils.instanceOf(target, anychart.core.Axis)) {
+    return /** @type {anychart.core.Axis} */ (target);
+  }
+
+  if (goog.array.contains(this.xAxes_, axis)) {
+    return this.yAxes_[ /** @type {number} */(target)];
+  }
+
+  if (goog.array.contains(this.yAxes_, axis)) {
+    return this.xAxes_[/** @type {number} */(target)];
+  }
+
+  return axis;
 };
 
 
@@ -1133,7 +1160,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
   var firstLeftAxis, firstTopAxis, firstRightAxis, firstBottomAxis;
   for (i = 0, count = axes.length; i < count; i++) {
     axis = /** @type {anychart.core.Axis} */(axes[i]);
-    if (axis && axis.enabled()) {
+    if (axis && axis.enabled() && goog.isNull(axis.getOption('value'))) {
       switch (axis.getOption('orientation')) {
         case anychart.enums.Orientation.TOP:
           if (!firstTopAxis)
@@ -1178,7 +1205,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
 
     for (i = axes.length; i--;) {
       axis = /** @type {anychart.core.Axis} */(axes[i]);
-      if (axis && axis.enabled()) {
+      if (axis && axis.enabled() && goog.isNull(axis.getOption('value'))) {
         axis.parentBounds(contentAreaBounds);
         orientation = axis.getOption('orientation');
         var stroke = /** @type {acgraph.vector.Stroke|string} */(axis.getOption('stroke'));
@@ -1226,7 +1253,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
 
     for (i = axes.length; i--;) {
       axis = /** @type {anychart.core.Axis} */(axes[i]);
-      if (axis && axis.enabled()) {
+      if (axis && axis.enabled() && goog.isNull(axis.getOption('value'))) {
         var isNotFirstAxis = firstTopAxis != axis && firstBottomAxis != axis && firstLeftAxis != axis && firstRightAxis != axis;
         var remainingBoundsBeforeSetPadding = axis.getRemainingBounds(isNotFirstAxis);
 
@@ -1273,7 +1300,7 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
 
   for (i = 0, count = axes.length; i < count; i++) {
     axis = axes[i];
-    if (axis && axis.enabled()) {
+    if (axis && axis.enabled() && goog.isNull(axis.getOption('value'))) {
       if (axis == firstTopAxis || axis == firstBottomAxis || axis == firstLeftAxis || axis == firstRightAxis) {
         axis.insideBounds(axesInsideBounds);
       }
@@ -1281,7 +1308,65 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
       axis.resumeSignalsDispatching(false);
     }
   }
+
+  this.placeCrossAxes_(axes, boundsWithoutAxes);
+
   return boundsWithoutAxes.clone().round();
+};
+
+
+/**
+ * Setup cross axes.
+ *
+ * @param {Array.<anychart.core.Axis>} axes
+ * @param {anychart.math.Rect} bounds
+ *
+ * @private
+ */
+anychart.core.ChartWithAxes.prototype.placeCrossAxes_ = function(axes, bounds) {
+  for (var i = 0; i < axes.length; i++) {
+    var axis = /** @type {anychart.core.Axis} */(axes[i]);
+
+    if (axis && axis.getOption('enabled')) {
+      var axisValue = axis.getOption('value');
+
+      if (!goog.isNull(axisValue)) {
+        axis.suspendSignalsDispatching();
+        axis.parentBounds(bounds);
+
+        var axisBounds = axis.getPixelBounds(true);
+        var targetAxis = this.getValueTargetFromAxis(axis);
+
+        if (!targetAxis) {
+          continue;
+        }
+
+        var targetScale = targetAxis.scale();
+        var orientation = axis.getOption('orientation');
+        var padding = 0;
+
+        axis.padding(padding);
+
+        var pointWidthRatio = targetScale.getPointWidthRatio();
+        var axisPositionRatio = targetScale.transform(axisValue) +
+          (targetScale.inverted() ? -pointWidthRatio : pointWidthRatio) / 2;
+
+        if (orientation === anychart.enums.Orientation.TOP) {
+          padding = bounds.height * (1 - axisPositionRatio) - axisBounds.height;
+        } else if (orientation === anychart.enums.Orientation.BOTTOM) {
+          padding = bounds.height - bounds.height * (1 - axisPositionRatio) - axisBounds.height;
+        } else if (orientation === anychart.enums.Orientation.RIGHT) {
+          padding = bounds.width - bounds.width * axisPositionRatio - axisBounds.width;
+        } else if (orientation === anychart.enums.Orientation.LEFT) {
+          padding = bounds.width * axisPositionRatio - axisBounds.width;
+        }
+
+        axis.padding()[orientation](padding);
+
+        axis.resumeSignalsDispatching(false);
+      }
+    }
+  }
 };
 
 
@@ -1319,6 +1404,52 @@ anychart.core.ChartWithAxes.prototype.getBoundsChangedSignal = function() {
 
 
 /**
+ * Check whether axis visible.
+ *
+ * @param {anychart.core.Axis} axis
+ *
+ * @return {boolean}
+ */
+anychart.core.ChartWithAxes.prototype.isAxisVisible_ = function(axis) {
+  var value = axis.getOption('value');
+  var targetAxis = this.getValueTargetFromAxis(axis);
+
+  if (!targetAxis) {
+    return true;
+  }
+
+  var scale = targetAxis.scale();
+
+  var isVisible = goog.isNull(value);
+  var ratio = scale.transform(value);
+
+  var halfPointWidthRatio = scale.getPointWidthRatio() / 2;
+
+  return isVisible ||
+    !isNaN(ratio) &&
+    ratio >= -halfPointWidthRatio && ratio <= 1 - halfPointWidthRatio; // Hide axis if it locate off bounds.
+};
+
+
+/**
+ * Draw axes.
+ *
+ * @param {Array.<anychart.core.Axis>} axes
+ */
+anychart.core.ChartWithAxes.prototype.drawAxes = function(axes) {
+  for (var i = 0; i < axes.length; i++) {
+    var axis = axes[i];
+    if (axis) {
+      axis.suspendSignalsDispatching();
+      axis.container(this.isAxisVisible_(axis) ? this.rootElement : null);
+      axis.draw();
+      axis.resumeSignalsDispatching(false);
+    }
+  }
+};
+
+
+/**
  * Draw chart elements.
  */
 anychart.core.ChartWithAxes.prototype.drawElements = function() {
@@ -1346,17 +1477,8 @@ anychart.core.ChartWithAxes.prototype.drawElements = function() {
   // draw axes outside of data bounds
   // only inside axes ticks can intersect data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_CHART_AXES)) {
-    var axes = goog.array.concat(this.xAxes_, this.yAxes_);
-    var axis;
-    for (i = 0, count = axes.length; i < count; i++) {
-      axis = /** @type {anychart.core.Axis} */(axes[i]);
-      if (axis) {
-        axis.suspendSignalsDispatching();
-        axis.container(this.rootElement);
-        axis.draw();
-        axis.resumeSignalsDispatching(false);
-      }
-    }
+    this.drawAxes(this.xAxes_);
+    this.drawAxes(this.yAxes_);
     this.markConsistent(anychart.ConsistencyState.AXES_CHART_AXES);
   }
 
@@ -1652,7 +1774,7 @@ anychart.core.ChartWithAxes.prototype.setupByJSON = function(config, opt_default
  */
 anychart.core.ChartWithAxes.prototype.setupAxisMarkers = function(opt_config) {
   var scalesInstances = this.getScaleInstances();
-  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var config = goog.isDef(opt_config) ? opt_config : this.themeSettings;
   var setupElement = goog.isDef(opt_config);
 
   this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances, setupElement);
@@ -1667,7 +1789,7 @@ anychart.core.ChartWithAxes.prototype.setupAxisMarkers = function(opt_config) {
  */
 anychart.core.ChartWithAxes.prototype.setupGrids = function(opt_config) {
   var scalesInstances = this.getScaleInstances();
-  var config  = goog.isDef(opt_config) ? opt_config : this.themeSettings;
+  var config = goog.isDef(opt_config) ? opt_config : this.themeSettings;
   var setupElement = goog.isDef(opt_config);
 
   this.setupElementsWithScales(config['xGrids'], this.xGrid, scalesInstances, setupElement);
@@ -1704,6 +1826,32 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
 
   if ('crosshair' in config)
     this.crosshair().setupInternal(!!opt_default, config['crosshair']);
+
+  if ('yCrossAxes' in config) {
+    this.setupCrossAxes(this.yAxes_, config['yCrossAxes']);
+  }
+
+  if ('xCrossAxes' in config) {
+    this.setupCrossAxes(this.xAxes_, config['xCrossAxes']);
+  }
+};
+
+
+/**
+ * Setup valueTarget for axes.
+ *
+ * @protected
+ *
+ * @param {Array.<anychart.core.Axis>} axes
+ * @param {Array.<number>} info - Array where index is index of axis, value is index of target axis.
+ */
+anychart.core.ChartWithAxes.prototype.setupCrossAxes = function(axes, info) {
+  for (var i = 0; i < info.length; i++) {
+    var axis = axes[i];
+    if (goog.isDefAndNotNull(axis)) {
+      axis.valueTarget(info[i]);
+    }
+  }
 };
 
 
@@ -1721,11 +1869,42 @@ anychart.core.ChartWithAxes.prototype.setupAxes = function(opt_config) {
 };
 
 
+/**
+ * Serialize 'valueTarget' info.
+ *
+ * @protected
+ *
+ * @param {Array.<anychart.core.Axis>} axes
+ * @param {Array.<anychart.core.Axis>} targetsArray
+ *
+ * @return {Array.<number>} - Array where index is index of axis, value is index of target axis.
+ */
+anychart.core.ChartWithAxes.prototype.serializeCrossAxes = function(axes, targetsArray) {
+  var info = [];
+
+  for (var i = 0; i < axes.length; i++) {
+    var axis = axes[i];
+    if (axis) {
+      var target = axis.valueTarget();
+      info[i] = goog.isNumber(target) ?
+        /** @type {number} */ (target) :
+        goog.array.indexOf(targetsArray, /** @type {anychart.core.Axis} */ (target));
+    } else {
+      info[i] = null;
+    }
+  }
+
+  return info;
+};
+
+
 /** @inheritDoc */
 anychart.core.ChartWithAxes.prototype.serialize = function() {
   var json = anychart.core.ChartWithAxes.base(this, 'serialize');
   json['crossing'] = this.crossing().serialize();
   json['quarters'] = this.quarters().serialize();
+  json['yCrossAxes'] = this.serializeCrossAxes(this.yAxes_, this.xAxes_);
+  json['xCrossAxes'] = this.serializeCrossAxes(this.xAxes_, this.yAxes_);
   return json;
 };
 

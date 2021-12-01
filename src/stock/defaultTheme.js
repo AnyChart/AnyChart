@@ -755,6 +755,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'zoomMarqueeFill': '#d3d3d3 0.4',
     'zoomMarqueeStroke': '#d3d3d3',
     'interactivity': {
+      'allowPlotDrag': true,
       'zoomOnMouseWheel': false,
       'scrollOnMouseWheel': false
     },

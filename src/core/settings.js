@@ -686,6 +686,17 @@ anychart.core.settings.numberNormalizer = function(val) {
 
 
 /**
+ * Number or function normalizer.
+ *
+ * @param {*} val
+ * @return {number|Function}
+ */
+anychart.core.settings.numberOrFunctionNormalizer = function(val) {
+  return goog.isFunction(val) ? val : Number(val);
+};
+
+
+/**
  * Single arg normalizer for number params.
  * @param {*} val
  * @return {?number}
@@ -702,6 +713,16 @@ anychart.core.settings.numberOrNullNormalizer = function(val) {
  */
 anychart.core.settings.numberOrZeroNormalizer = function(val) {
   return anychart.utils.toNumberOrStringOrNull(val) || 0;
+};
+
+
+/**
+ * Single arg normalizer for string number or null values.
+ * @param {*} val
+ * @return {?number|string}
+ */
+anychart.core.settings.numberOrStringOrNullNormalizer = function(val) {
+  return anychart.utils.toNumberOrStringOrNull(val);
 };
 
 

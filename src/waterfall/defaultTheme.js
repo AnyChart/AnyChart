@@ -20,6 +20,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           'fallingHatchFill': false,
           'labels': {
             'enabled': true,
+            'connectorStroke': anychart.core.defaultTheme.colorStrokeBright,
             /**
              * @this {*}
              * @return {*}
@@ -94,8 +95,45 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       },
       'label': {
         'fontSize': '12px',
-        'position': 'center',
-        'anchor': 'center-top'
+        'position': 'auto',
+        'anchor': 'auto'
+      }
+    },
+    'total': {
+      'enabled': true,
+      'normal': {
+        'fill': anychart.core.defaultTheme.waterfallTotalFill,
+        'stroke': anychart.core.defaultTheme.waterfallTotalStroke,
+        'labels': {
+          'enabled': true,
+          'anchor': 'auto',
+          'position': 'auto'
+        }
+      },
+      'hovered': {
+        'fill': anychart.core.defaultTheme.returnSourceColor65,
+        'stroke': anychart.core.defaultTheme.returnSourceColor65
+      },
+      'tooltip': {
+        'enabled': true,
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'format': function() {
+          return this['isTotal'] ?
+            'Absolute: ' + this['value'] :
+            'Value: ' + this['value'];
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormat': function() {
+          return this['isTotal'] ?
+            'Total: ' + this['name'] :
+            'Split: ' + this['name'];
+        }
       }
     }
   }

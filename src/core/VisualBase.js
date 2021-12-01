@@ -99,7 +99,7 @@ anychart.core.VisualBase.prototype.doubleSuspension;
 
 /**
  * Auto z index of the element.
- * @type {number}
+ * @type {number|undefined}
  * @protected
  */
 anychart.core.VisualBase.prototype.autoZIndex;
@@ -377,6 +377,14 @@ anychart.core.VisualBase.prototype.zIndex = function(opt_value) {
  */
 anychart.core.VisualBase.prototype.setAutoZIndex = function(value) {
   this.autoZIndex = value;
+};
+
+
+/**
+ * Reset auto z-index value.
+ */
+anychart.core.VisualBase.prototype.resetAutoZIndex = function() {
+  this.autoZIndex = void 0;
 };
 
 

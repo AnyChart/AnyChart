@@ -307,10 +307,10 @@ anychart.stockModule.Plot.prototype.frameHighlightY_;
  * @type {number}
  */
 anychart.stockModule.Plot.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.NEEDS_RECALCULATION |
-    // signal dispatched on highlight
-    anychart.Signal.NEED_UPDATE_LEGEND;
+  anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+  anychart.Signal.NEEDS_RECALCULATION |
+  // signal dispatched on highlight
+  anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -318,21 +318,21 @@ anychart.stockModule.Plot.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.stockModule.Plot.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.STOCK_PLOT_GRIDS |
-    anychart.ConsistencyState.STOCK_PLOT_AXES |
-    anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
-    anychart.ConsistencyState.STOCK_PLOT_SERIES |
-    anychart.ConsistencyState.STOCK_PLOT_BACKGROUND |
-    anychart.ConsistencyState.STOCK_PLOT_PALETTE |
-    anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
-    anychart.ConsistencyState.STOCK_PLOT_EVENT_MARKERS |
-    anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-    anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
-    anychart.ConsistencyState.AXES_CHART_CROSSHAIR |
-    anychart.ConsistencyState.STOCK_PLOT_TITLE |
-    anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS |
-    anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS;
+  anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+  anychart.ConsistencyState.STOCK_PLOT_GRIDS |
+  anychart.ConsistencyState.STOCK_PLOT_AXES |
+  anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
+  anychart.ConsistencyState.STOCK_PLOT_SERIES |
+  anychart.ConsistencyState.STOCK_PLOT_BACKGROUND |
+  anychart.ConsistencyState.STOCK_PLOT_PALETTE |
+  anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
+  anychart.ConsistencyState.STOCK_PLOT_EVENT_MARKERS |
+  anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+  anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
+  anychart.ConsistencyState.AXES_CHART_CROSSHAIR |
+  anychart.ConsistencyState.STOCK_PLOT_TITLE |
+  anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS |
+  anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS;
 
 
 /**
@@ -452,11 +452,11 @@ anychart.stockModule.Plot.prototype.calculateStatistics = function() {
   elementsStat['grids']['yMinor'] = 0;
 
   var length = Math.max(
-      this.yAxes_.length,
-      this.xGrids_.length,
-      this.yGrids_.length,
-      this.xMinorGrids_.length,
-      this.yMinorGrids_.length);
+    this.yAxes_.length,
+    this.xGrids_.length,
+    this.yGrids_.length,
+    this.xMinorGrids_.length,
+    this.yMinorGrids_.length);
 
   for (var i = length; i--;) {
     if (this.yAxes_[i]) elementsStat['axes']['y']++;
@@ -904,9 +904,9 @@ anychart.stockModule.Plot.prototype.removeSeriesAt = function(index) {
     goog.array.splice(this.series_, index, 1);
     goog.dispose(series);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
-        anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-        anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
-        anychart.Signal.NEEDS_REDRAW);
+      anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
+      anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
   }
   return this;
@@ -924,9 +924,9 @@ anychart.stockModule.Plot.prototype.removeAllSeries = function() {
     this.series_ = [];
     goog.disposeAll(series);
     this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
-        anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-        anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
-        anychart.Signal.NEEDS_REDRAW);
+      anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL,
+      anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
   }
   return this;
@@ -969,8 +969,8 @@ anychart.stockModule.Plot.prototype.defaultSeriesSettings = function(opt_value) 
  */
 anychart.stockModule.Plot.prototype.getBaseSeriesZIndex = function(series) {
   return series.isLineBased() ?
-      anychart.stockModule.Plot.ZINDEX_LINE_SERIES :
-      anychart.stockModule.Plot.ZINDEX_SERIES;
+    anychart.stockModule.Plot.ZINDEX_LINE_SERIES :
+    anychart.stockModule.Plot.ZINDEX_SERIES;
 };
 
 
@@ -1008,9 +1008,9 @@ anychart.stockModule.Plot.prototype.createSeriesByType = function(type, opt_data
     series.listenSignals(this.seriesInvalidated_, this);
 
     this.invalidate(
-        anychart.ConsistencyState.STOCK_PLOT_SERIES |
-        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
-        anychart.Signal.NEEDS_REDRAW);
+      anychart.ConsistencyState.STOCK_PLOT_SERIES |
+      anychart.ConsistencyState.STOCK_PLOT_LEGEND,
+      anychart.Signal.NEEDS_REDRAW);
   } else {
     series = null;
   }
@@ -1226,15 +1226,15 @@ anychart.stockModule.Plot.prototype.invalidateRedrawable = function(doInvalidate
   }
 
   this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
-      anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
-      anychart.ConsistencyState.STOCK_PLOT_EVENT_MARKERS |
-      anychart.ConsistencyState.STOCK_PLOT_AXES |
-      anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS |
-      anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
-      anychart.ConsistencyState.STOCK_PLOT_GRIDS |
-      anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-      anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
-      anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS);
+    anychart.ConsistencyState.STOCK_PLOT_ANNOTATIONS |
+    anychart.ConsistencyState.STOCK_PLOT_EVENT_MARKERS |
+    anychart.ConsistencyState.STOCK_PLOT_AXES |
+    anychart.ConsistencyState.STOCK_PLOT_PRICE_INDICATORS |
+    anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
+    anychart.ConsistencyState.STOCK_PLOT_GRIDS |
+    anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+    anychart.ConsistencyState.STOCK_PLOT_NO_DATA_LABEL |
+    anychart.ConsistencyState.STOCK_PLOT_AXIS_MARKERS);
   this.invalidateState(anychart.enums.Store.PLOT, anychart.enums.State.DATA_AREA);
 };
 
@@ -1262,7 +1262,7 @@ anychart.stockModule.Plot.prototype.getPlotBounds = function() {
 /** @inheritDoc */
 anychart.stockModule.Plot.prototype.getEnableChangeSignals = function() {
   return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED |
-      anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
 };
 
 
@@ -1365,7 +1365,7 @@ anychart.stockModule.Plot.prototype.legend = function(opt_value) {
 anychart.stockModule.Plot.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var val = anychart.scales.Base.setupScale(this.yScale_, opt_value, null,
-        anychart.scales.Base.ScaleTypes.SCATTER, ['Stock plot Y scale', 'scatter', 'linear, log'], this.yScaleInvalidated, this);
+      anychart.scales.Base.ScaleTypes.SCATTER, ['Stock plot Y scale', 'scatter', 'linear, log'], this.yScaleInvalidated, this);
     if (val) {
       var dispatch = this.yScale_ == val;
       this.yScale_ = /** @type {anychart.scales.ScatterBase} */(val);
@@ -1630,9 +1630,9 @@ anychart.stockModule.Plot.prototype.xMinorGrid = function(opt_indexOrValue, opt_
   if (!grid) {
     grid = new anychart.stockModule.Grid();
     grid.addThemes(
-        'defaultMinorGridSettings',
-        'stock.defaultPlotSettings.defaultMinorGridSettings',
-        this.defaultMinorGridSettings());
+      'defaultMinorGridSettings',
+      'stock.defaultPlotSettings.defaultMinorGridSettings',
+      this.defaultMinorGridSettings());
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     grid.zIndex(this.getGridZIndex(grid));
@@ -1671,9 +1671,9 @@ anychart.stockModule.Plot.prototype.yMinorGrid = function(opt_indexOrValue, opt_
     grid.setOwner(this);
     grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.addThemes(
-        'defaultMinorGridSettings',
-        'stock.defaultPlotSettings.defaultMinorGridSettings',
-        this.defaultMinorGridSettings());
+      'defaultMinorGridSettings',
+      'stock.defaultPlotSettings.defaultMinorGridSettings',
+      this.defaultMinorGridSettings());
     grid.zIndex(this.getGridZIndex(grid));
     this.yMinorGrids_[index] = grid;
     grid.listenSignals(this.onGridSignal_, this);
@@ -1730,6 +1730,51 @@ anychart.stockModule.Plot.prototype.onTitleSignal_ = function(event) {
   }
   // If there are no signals - !state and nothing will happen.
   this.invalidate(state, signal);
+};
+
+
+/**
+ * Calculate distance between yRatio and closest series point.
+ *
+ * @param {anychart.stockModule.Series} series
+ * @param {anychart.stockModule.data.TableSelectable.RowProxy} point
+ * @param {number} targetRatio
+ *
+ * @return {{
+ *   distance: number,
+ *   ratio: number
+ * }}
+ */
+anychart.stockModule.Plot.prototype.getDistanceToSeries = function(series, point, targetRatio) {
+  var distance = Infinity;
+  var ratio = 0;
+
+  if (point && series) {
+    var scale = series.yScale();
+
+    /*
+      Should consider that
+        - OHLC series returns 'close' as 'value'
+        - Range series returns 'high' as 'value'
+        - etc.
+     */
+    var value = anychart.utils.getFirstNotNullValue(point.get('value'), point.get('close'), point.get('high'));
+    value = anychart.utils.toNumber(value);
+    if (!isNaN(value)) {
+      var drawableAreaBounds = this.seriesBounds_;
+      var seriesBounds = series.getPixelBounds();
+      var pointYRatio = 1 - scale.transform(scale.applyComparison(value, series.comparisonZero));
+      var pointYPosition = seriesBounds.top + seriesBounds.height * pointYRatio;
+
+      ratio = (pointYPosition - drawableAreaBounds.top) / drawableAreaBounds.height;
+      distance = Math.abs(ratio - targetRatio);
+    }
+  }
+
+  return {
+    ratio: ratio,
+    distance: distance
+  };
 };
 
 
@@ -2216,6 +2261,102 @@ anychart.stockModule.Plot.prototype.draw = function() {
 
 
 /**
+ * Extract position info from mouse event.
+ *
+ * @param {anychart.core.MouseEvent} event
+ * @return {{xRatio: number, x: number, yRatio: number, y: number}}
+ *
+ * @private
+ */
+anychart.stockModule.Plot.prototype.getPositionFromEvent_ = function(event) {
+  var bounds = this.seriesBounds_;
+  var stageReferencePoint = this.container().getStage().getClientPosition();
+  var x = event['clientX'] - stageReferencePoint.x - bounds.left;
+  var y = event['clientY'] - stageReferencePoint.y - bounds.top;
+
+  return {
+    xRatio: x / bounds.width,
+    yRatio: y / bounds.height,
+    x: event['clientX'],
+    y: event['clientY']
+  };
+};
+
+
+/**
+ * Extract object for each series that contains info about series and nearest point.
+ *
+ * @param {{xRatio: number, x: number, yRatio: number, y: number}} eventPositionInfo
+ *
+ * @return {Array.<{
+ *   series: anychart.stockModule.Series,
+ *   nearestPointToCursor: {
+ *     distance: number,
+ *     index: number
+ *   }
+ * }>}
+ */
+anychart.stockModule.Plot.prototype.getSeriesStatus = function(eventPositionInfo) {
+  var y = eventPositionInfo.y;
+  var xRatio = eventPositionInfo.xRatio;
+  var yRatio = eventPositionInfo.yRatio;
+
+  var rawValue = this.chart_.xScale().inverseTransform(xRatio);
+  var alignedValue = this.chart_.alignValue(rawValue);
+  var highlightInfo = this.prepareHighlight(alignedValue);
+
+  var seriesStatus = [];
+
+  highlightInfo.sort(function (a, b) {
+    return b['series'].zIndex() - a['series'].zIndex();
+  });
+
+  for (var i = 0; i < highlightInfo.length; i++) {
+    var plotInfo = highlightInfo[i];
+
+    var point = plotInfo['point'];
+    var series = plotInfo['series'];
+
+    if (point) {
+      var value = point.meta('value');
+      var zero = point.meta('zero');
+      var high = point.meta('high');
+      var low = point.meta('low');
+
+      // DVF-4607
+      var insideRangeSeries =
+        ((y >= Math.min(value, zero) && y <= Math.max(value, zero)) || // Column, area
+        (y >= Math.min(high, low) && y <= Math.max(high, low))) && // Ohlc, candlestick, range series
+        !series.isLineBased();
+
+      var distance = insideRangeSeries ? 0 : this.getDistanceToSeries(series, point, yRatio).distance * this.seriesBounds_.height;
+
+      seriesStatus.push({
+        'series': series,
+        'nearestPointToCursor': {
+          'distance': distance,
+          'index': point.getIndex()
+        }
+      });
+    }
+  }
+
+  return seriesStatus;
+};
+
+
+/** @inheritDoc */
+anychart.stockModule.Plot.prototype.makeBrowserEvent = function(e) {
+  var event = anychart.stockModule.Plot.base(this, 'makeBrowserEvent', e);
+  var eventPositionInfo = this.getPositionFromEvent_(event);
+
+  event['seriesStatus'] = this.getSeriesStatus(eventPositionInfo);
+
+  return event;
+};
+
+
+/**
  * Ensures that the root layer is created.
  * @private
  */
@@ -2242,7 +2383,7 @@ anychart.stockModule.Plot.prototype.ensureVisualReady_ = function() {
 
 /**
  * Applies listeners to marker.
- * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase} marker 
+ * @param {anychart.core.axisMarkers.PathBase|anychart.core.axisMarkers.TextBase} marker
  */
 anychart.stockModule.Plot.prototype.applyMarkersListeners_ = function(marker) {
   this.eventsHandler.listen(marker, [acgraph.events.EventType.TOUCHSTART, acgraph.events.EventType.MOUSEDOWN], this.markersListener_);
@@ -2256,9 +2397,9 @@ anychart.stockModule.Plot.prototype.applyMarkersListeners_ = function(marker) {
 anychart.stockModule.Plot.prototype.markersListener_ = function(event) {
   var originalEvent = event.originalEvent;
 
-  var dragShouldStart = goog.isDef(this.dragger_) && 
-                        (event.type === acgraph.events.EventType.MOUSEDOWN ||
-                        event.type === acgraph.events.EventType.TOUCHSTART);
+  var dragShouldStart = goog.isDef(this.dragger_) &&
+    (event.type === acgraph.events.EventType.MOUSEDOWN ||
+      event.type === acgraph.events.EventType.TOUCHSTART);
 
   // Fixes dragging on axis markers.
   if (dragShouldStart) {
@@ -2286,8 +2427,8 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.STOCK_PLOT_LEGEND |
-          anychart.ConsistencyState.STOCK_PLOT_TITLE)) {
+    anychart.ConsistencyState.STOCK_PLOT_LEGEND |
+    anychart.ConsistencyState.STOCK_PLOT_TITLE)) {
     var seriesBounds = this.getPixelBounds();
 
     var background = this.getCreated('background');
@@ -2371,7 +2512,7 @@ anychart.stockModule.Plot.prototype.ensureBoundsDistributed_ = function() {
       this.xAxis_.suspendSignalsDispatching();
       // we need this to tell xAxis about new width by Y axes
       this.xAxis_.parentBounds(seriesBounds.left, seriesBounds.top,
-          seriesBounds.width, /** @type {number} */(seriesBounds.height + this.xAxis_.height()));
+        seriesBounds.width, /** @type {number} */(seriesBounds.height + this.xAxis_.height()));
       this.xAxis_.resumeSignalsDispatching(false);
       seriesBounds = this.xAxis_.getRemainingBounds();
     }
@@ -2595,7 +2736,7 @@ anychart.stockModule.Plot.prototype.prepareHighlight = function(value) {
   return goog.array.map(this.series_, function(series) {
     return {
       'series': series,
-      'point': series && series.enabled() && series.prepareHighlight(value) || null
+      'point': series && series.enabled() && series.getClosestPointByX(value) || null
     };
   });
 };
@@ -2626,7 +2767,7 @@ anychart.stockModule.Plot.prototype.highlight = function(value, rawValue, hlSour
     var chartOffset = this.container().getStage().getClientPosition();
     // Apply no pixelshift for y value because scale use it for transform.
     // We need this value as is.
-    opt_y = (this.seriesBounds_.height - pointYRatio * this.seriesBounds_.height) + this.seriesBounds_.top + chartOffset.y;
+    opt_y = pointYRatio * this.seriesBounds_.height + this.seriesBounds_.top + chartOffset.y;
   }
 
   this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
@@ -2707,15 +2848,32 @@ anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
 
 
 /**
+ * Extracts 'touches' field from touch events.
+ *
+ * @param {goog.events.Event} e - Incoming touch-event wrapper.
+ * @return {IArrayLike<Object>|null} - 'Touches' field.
+ */
+anychart.stockModule.Plot.prototype.extractTouches_ = function(e) {
+  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e.getOriginalEvent());
+
+  // TODO I don't know why, but 'touches' field is in this path.
+  var originalEvent = /** @type {goog.events.BrowserEvent} */ (acgraphBrowserEvent.getOriginalEvent());
+  var touchEvent = originalEvent.getBrowserEvent();
+  return touchEvent['touches'];
+};
+
+
+/**
  * Handles touch start.
- * @param {acgraph.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
-  var googEvent = e.getOriginalEvent();
-  var touches = googEvent.getBrowserEvent()['touches'];
+  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e.getOriginalEvent());
+  var touches = this.extractTouches_(e);
+
   if (touches && touches.length > 1) {
-    this.dragger_.endDrag(googEvent);
+    this.dragger_.endDrag(acgraphBrowserEvent);
     if (touches.length == 2) {
       var coords = [];
       var ids = {};
@@ -2741,11 +2899,12 @@ anychart.stockModule.Plot.prototype.handleTouchStart_ = function(e) {
 
 /**
  * Handles touchMove in zooming.
- * @param {goog.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
-  var touches = e.getBrowserEvent()['touches'];
+  var touches = this.extractTouches_(e);
+
   if (this.zooming_ && touches && touches.length > 1) {
     var coords = [];
     for (var i = 0; i < touches.length; i++) {
@@ -2775,20 +2934,23 @@ anychart.stockModule.Plot.prototype.handleZoomMove_ = function(e) {
 
 /**
  * Handles touch start.
- * @param {acgraph.events.BrowserEvent} e
+ * @param {goog.events.Event} e
  * @private
  */
 anychart.stockModule.Plot.prototype.handleTouchEnd_ = function(e) {
-  var googEvent = e.getOriginalEvent();
-  var browserEvent = googEvent.getBrowserEvent();
-  var touches = browserEvent['touches'];
+  var touches = this.extractTouches_(e);
+
   if (touches.length == 1) {
     goog.events.unlisten(anychart.document, goog.events.EventType.TOUCHMOVE, this.handleZoomMove_, {
       capture: true,
       passive: false
     }, this);
     var touch = touches[0];
+
+    var acgraphBrowserEvent = e.getOriginalEvent();
+    var browserEvent = acgraphBrowserEvent.getBrowserEvent();
     var newEvent = new goog.events.BrowserEvent(browserEvent);
+
     newEvent.clientX = touch['clientX'] !== undefined ? touch['clientX']: touch['pageX'];
     newEvent.clientY = touch['clientY'] !== undefined ? touch['clientY']: touch['pageY'];
     newEvent.screenX = touch['screenX'] || 0;
@@ -2812,11 +2974,12 @@ anychart.stockModule.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
     var y = e['clientY'] - stageReferencePoint.y - this.seriesBounds_.top;
     // testing that the point is inside series area
     if (x >= 0 && x <= this.seriesBounds_.width &&
-        y >= 0 && y <= this.seriesBounds_.height) {
-      this.frameHighlightRatio_ = x / this.seriesBounds_.width;
-      this.frameHighlightYRatio_ = y / this.seriesBounds_.height;
-      this.frameHighlightX_ = e['clientX'];
-      this.frameHighlightY_ = e['clientY'];
+      y >= 0 && y <= this.seriesBounds_.height) {
+      var eventPosition = this.getPositionFromEvent_(/** @type {anychart.core.MouseEvent} */(e));
+      this.frameHighlightRatio_ = eventPosition.xRatio;
+      this.frameHighlightYRatio_ = eventPosition.yRatio;
+      this.frameHighlightX_ = eventPosition.x;
+      this.frameHighlightY_ = eventPosition.y;
       this.crosshair().xLabelAutoEnabled(this.isLastPlot_);
       if (!goog.isDef(this.frame_))
         this.frame_ = anychart.window.requestAnimationFrame(this.frameAction_);
@@ -2886,15 +3049,63 @@ anychart.stockModule.Plot.prototype.isLastPlot = function(opt_value) {
 
 /**
  * Whether plot is expanded by plot controls.
+ * Internal getter/setter.
+ *
  * @param {boolean=} opt_value
  * @return {anychart.stockModule.Plot|boolean}
  */
-anychart.stockModule.Plot.prototype.isExpanded = function(opt_value) {
+anychart.stockModule.Plot.prototype.isExpandedInternal = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.isExpanded_ = opt_value;
     return this;
   }
   return this.isExpanded_;
+};
+
+
+/**
+ * Whether plot is expanded by plot controls.
+ *
+ * @return {boolean}
+ */
+anychart.stockModule.Plot.prototype.isExpanded = function() {
+  return this.isExpanded_;
+};
+
+
+/**
+ * Moves current plot up in chart.
+ *
+ * @return {anychart.stockModule.Plot} - Self for chaining.
+ */
+anychart.stockModule.Plot.prototype.moveUp = function() {
+  var swapPlot = this.chart_.getPrevPlot(this);
+  this.chart_.swapPlots(this, swapPlot);
+  return this;
+};
+
+
+/**
+ * Moves current plot down in chart.
+ *
+ * @return {anychart.stockModule.Plot} - Self for chaining.
+ */
+anychart.stockModule.Plot.prototype.moveDown = function() {
+  var swapPlot = this.chart_.getNextPlot(this);
+  this.chart_.swapPlots(this, swapPlot);
+  return this;
+};
+
+
+/**
+ * Toggles expanded state of current plot.
+ *
+ * @return {anychart.stockModule.Plot} - Current plot for method chaining.
+ */
+anychart.stockModule.Plot.prototype.toggleExpandedState = function() {
+  var newState = !this.isExpanded();
+  this.chart_.expandPlot(this, newState);
+  return this;
 };
 
 
@@ -2948,7 +3159,7 @@ anychart.stockModule.Plot.prototype.annotations = function(opt_value) {
     anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Annotations']);
   } else if (!this.annotations_) {
     this.annotations_ = new this.chart_.annotationsModule['PlotController'](
-        /** @type {!anychart.annotationsModule.ChartController} */(this.chart_.annotations()), this);
+      /** @type {!anychart.annotationsModule.ChartController} */(this.chart_.annotations()), this);
     this.annotations_.listenSignals(this.annotationsInvalidated_, this);
     this.annotations_.setParentEventTarget(this);
     this.annotations_.setup(this.themeSettings['annotations']);
@@ -3276,34 +3487,34 @@ anychart.stockModule.Plot.prototype.isNoData = function() {
 /** @inheritDoc */
 anychart.stockModule.Plot.prototype.disposeInternal = function() {
   goog.disposeAll(
-      this.annotations_,
-      this.title_,
-      this.eventMarkers_,
-      this.background_,
-      this.xAxis_,
-      this.yAxes_,
-      this.noDataSettings_,
-      this.rootLayer_,
-      this.crosshair_,
-      this.defaultSeriesSettings_,
-      this.defaultGridSettings_,
-      this.defaultMinorGridSettings_,
-      this.defaultYAxisSettings_,
-      this.legend_,
-      this.xGrids_,
-      this.yGrids_,
-      this.xMinorGrids_,
-      this.yMinorGrids_,
-      this.series_,
-      this.dataArea_,
-      this.indicators_,
-      this.priceIndicators_,
-      this.lineAxesMarkers_,
-      this.rangeAxesMarkers_,
-      this.textAxesMarkers_,
-      this.palette_,
-      this.markerPalette_,
-      this.hatchFillPalette_);
+    this.annotations_,
+    this.title_,
+    this.eventMarkers_,
+    this.background_,
+    this.xAxis_,
+    this.yAxes_,
+    this.noDataSettings_,
+    this.rootLayer_,
+    this.crosshair_,
+    this.defaultSeriesSettings_,
+    this.defaultGridSettings_,
+    this.defaultMinorGridSettings_,
+    this.defaultYAxisSettings_,
+    this.legend_,
+    this.xGrids_,
+    this.yGrids_,
+    this.xMinorGrids_,
+    this.yMinorGrids_,
+    this.series_,
+    this.dataArea_,
+    this.indicators_,
+    this.priceIndicators_,
+    this.lineAxesMarkers_,
+    this.rangeAxesMarkers_,
+    this.textAxesMarkers_,
+    this.palette_,
+    this.markerPalette_,
+    this.hatchFillPalette_);
 
   this.annotations_ = null;
   this.title_ = null;
@@ -3917,4 +4128,9 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   proto['noData'] = proto.noData;
   proto['getStat'] = proto.getStat;
   proto['dataArea'] = proto.dataArea;
+
+  proto['moveUp'] = proto.moveUp;
+  proto['moveDown'] = proto.moveDown;
+  proto['toggleExpandedState'] = proto.toggleExpandedState;
+  proto['isExpanded'] = proto.isExpanded;
 })();

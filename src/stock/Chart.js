@@ -896,7 +896,7 @@ anychart.stockModule.Chart.prototype.swapPlots = function(plot1, plot2) {
  * @param {boolean} expand Expand or collapse (true - for expand, false - collapse)
  */
 anychart.stockModule.Chart.prototype.expandPlot = function(plot, expand) {
-  plot.isExpanded(expand);
+  plot.isExpandedInternal(expand);
   this.suspendSignalsDispatching();
   for (var i = 0; i < this.plots_.length; i++) {
     var thePlot = this.plots_[i];
@@ -2351,6 +2351,16 @@ anychart.stockModule.Chart.prototype.getScrollerIndexByKey = function(key) {
 };
 
 
+ /**
+ * Aligns passed timestamp to current registry points set.
+ * @param {number} value
+ * @return {number}
+ */
+anychart.stockModule.Chart.prototype.alignValue = function(value) {
+  return this.dataController_.alignHighlight(value);
+};
+
+
 //endregion
 //region Annotations
 //----------------------------------------------------------------------------------------------------------------------
@@ -2618,30 +2628,14 @@ anychart.stockModule.Chart.prototype.getClosestSeriesInfo_ = function(sourcePlot
    */
   for (var i = 0; i < sourcePlotInfo.length; i++) {
     var inf = sourcePlotInfo[i];
-    var ser = inf['series'];
-    var pt = inf['point'];
-    if (pt && ser) {
-      var scale = ser.yScale();
-
-      /*
-        Should consider that
-          - OHLC series returns 'close' as 'value'
-          - Range series returns 'high' as 'value'
-          - etc.
-       */
-      var value = anychart.utils.getFirstNotNullValue(pt.get('value'), pt.get('close'), pt.get('high'));
-      value = anychart.utils.toNumber(value);
-
-      if (!isNaN(value)) {
-        var ptYRatio = scale.transform(value);
-        var yR = scale.inverted() ? yRatio : 1 - yRatio;
-        var d = Math.abs(ptYRatio - yR);
-        if (distance > d) {
-          distance = d;
-          pointYRatio = ptYRatio;
-          closestIndex = i;
-        }
-      }
+    var series = inf['series'];
+    var plot = /** @type {anychart.stockModule.Plot} */(inf['series'].plot);
+    var distanceToSeries = plot.getDistanceToSeries(series, inf['point'], yRatio);
+    var d = distanceToSeries.distance;
+    if (distance > d) {
+      distance = d;
+      pointYRatio = distanceToSeries.ratio;
+      closestIndex = i;
     }
   }
 
@@ -3428,7 +3422,9 @@ anychart.stockModule.Chart.prototype.limitDragRatio = function(ratio, anchor) {
  * @return {boolean}
  */
 anychart.stockModule.Chart.prototype.askDragStart = function() {
-  var res = !this.inMarquee() && this.dispatchRangeChange_(
+  var res = !this.inMarquee() &&
+    !!this.interactivity().getOption('allowPlotDrag') &&
+    this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   if (res) {
