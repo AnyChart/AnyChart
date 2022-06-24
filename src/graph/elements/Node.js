@@ -125,16 +125,6 @@ anychart.graphModule.elements.Node.prototype.provideMeasurements = function() {
 
 
 /**
- * Returns id of element.
- * @param {anychart.graphModule.Chart.Node} node
- * @return {string} id of element.
- */
-anychart.graphModule.elements.Node.prototype.getElementId = function(node) {
-  return node.id;
-};
-
-
-/**
  * @param {anychart.graphModule.Chart.Node} node
  * @param {string} setting
  * @return {*}

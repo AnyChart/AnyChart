@@ -30,9 +30,9 @@ anychart.graphModule.elements.Base = function(chart) {
   /**
    * Pool of path elements.
    * @type {Array.<acgraph.vector.Path>}
-   * @private
+   * @protected
    */
-  this.pathPool_ = [];
+  this.pathPool = [];
 
   /**
    * Pool of text elements.
@@ -231,7 +231,7 @@ anychart.graphModule.elements.Base.prototype.getType = function() {
 anychart.graphModule.elements.Base.prototype.resolveLabelSettings = function(element) {
   var state = /** @type {anychart.SettingsState} */(this.state(element));
   var stringState = anychart.utils.pointStateToName(state);
-  var id = this.getElementId(element);
+  var id = element.id;
   var dataRow = element.dataRow;
 
   var groupSettings = this.chart_.group(/** @type {string} */(element.groupId));
@@ -320,32 +320,12 @@ anychart.graphModule.elements.Base.prototype.labelsInvalidated_ = function(event
  * @return {acgraph.vector.Path}
  */
 anychart.graphModule.elements.Base.prototype.getPath = function() {
-  var path = this.pathPool_.pop();
+  var path = this.pathPool.pop();
   if (!path) {
     path = acgraph.path();
   }
   path.clear();
   return path;
-};
-
-
-/**
- * Create path for every element.
- */
-anychart.graphModule.elements.Base.prototype.createPathes = function() {
-  /**
-   * @type {Array.<(anychart.graphModule.Chart.Node | anychart.graphModule.Chart.Edge)>}
-   */
-  var elements;
-  if (this.getType() == anychart.graphModule.Chart.Element.NODE) {
-    elements = this.chart_.getNodesArray();
-  } else {
-    elements = this.chart_.getEdgesArray();
-  }
-  for (var i = 0, length = elements.length; i < length; i++) {
-    var element = elements[i];
-    this.createPath(element);
-  }
 };
 
 
@@ -478,18 +458,9 @@ anychart.graphModule.elements.Base.prototype.isLabelEnabled = function(element) 
 anychart.graphModule.elements.Base.prototype.createTag = function(element) {
   var tag = /** @type {anychart.graphModule.Chart.Tag} */({});
   tag.type = this.getType();
-  tag.id = this.getElementId(element);
+  tag.id = element.id;
   tag.currentState = /** @type {anychart.SettingsState} */(this.state(element));
   return tag;
-};
-
-
-/**
- * Return array of nodes.
- * @return {Array<anychart.graphModule.Chart.Edge>}
- */
-anychart.graphModule.elements.Base.prototype.getElementsArray = function() {
-  return this.chart_.getEdgesArray();
 };
 
 
@@ -604,17 +575,8 @@ anychart.graphModule.elements.Base.prototype.clear = function(element) {
     path.tag = null;
     path.clear();
     path.parent(null);
-    this.pathPool_.push(path);
+    this.pathPool.push(path);
     element.path = null;
-  }
-
-  path = element.hoverPath;
-  if (path) {
-    path.tag = null;
-    path.clear();
-    path.parent(null);
-    this.pathPool_.push(path);
-    element.hoverPath = null;
   }
 
   var optimizedText = element.optimizedText;
@@ -622,18 +584,6 @@ anychart.graphModule.elements.Base.prototype.clear = function(element) {
     element.optimizedText = null;
     optimizedText.renderTo(null);
     this.textPool_.push(optimizedText);
-  }
-};
-
-
-/**
- * Reset dom of all elements.
- */
-anychart.graphModule.elements.Base.prototype.clearAll = function() {
-  var elements = this.getElementsArray();
-  for (var i = 0; i < elements.length; i++) {
-    var element = elements[i];
-    this.clear(element);
   }
 };
 
@@ -670,12 +620,12 @@ anychart.graphModule.elements.Base.prototype.disposeInternal = function() {
   for (i = 0; i < this.textPool_.length; i++) {
     this.textPool_[i].dispose();
   }
-  for (i = 0; i < this.pathPool_.length; i++) {
-    this.pathPool_[i].disposeInternal();
+  for (i = 0; i < this.pathPool.length; i++) {
+    this.pathPool[i].disposeInternal();
   }
 
   this.textPool_.length = 0;
-  this.pathPool_.length = 0;
+  this.pathPool.length = 0;
 
   this.resetLabelSettings();
 };
