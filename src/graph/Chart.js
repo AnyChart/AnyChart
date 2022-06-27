@@ -1729,16 +1729,14 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
             startX = x;
             startY = y;
             if (!nodesForDrag.length) {
-              this.updateNodePosition(node, dx, dy);
-              this.nodes_.updateNodeDOMElementPosition(node);
+              nodesForDrag.push(node);
+            }
+
+            for (var i = 0; i < nodesForDrag.length; i++) {
+              var dragNode = nodesForDrag[i];
+              this.updateNodePosition(dragNode, dx, dy);
+              this.nodes_.updateNodeDOMElementPosition(dragNode);
               this.edges_.drawEdges();
-            } else {
-              for (var i = 0; i < nodesForDrag.length; i++) {
-                var dragNode = nodesForDrag[i];
-                this.updateNodePosition(dragNode, dx, dy);
-                this.nodes_.updateNodeDOMElementPosition(dragNode);
-                this.edges_.drawEdges();
-              }
             }
           }
         } else {

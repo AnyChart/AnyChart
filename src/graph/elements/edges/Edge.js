@@ -616,6 +616,8 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
  * Reset dom of all elements.
  */
 anychart.graphModule.elements.Edge.prototype.clearAll = function() {
+  this.path_.clear();
+
   var edges = this.chart_.getEdgesArray();
   for (var i = 0; i < edges.length; i++) {
     this.clear(edges[i]);
@@ -631,7 +633,6 @@ anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
   this.path_.parent(this.layerForEdges_);
 
   this.clearAll();
-  this.path_.clear();
 
   for (var i = 0; i < edges.length; i++) {
     this.drawEdge(edges[i]);
