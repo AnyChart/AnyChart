@@ -654,38 +654,6 @@ anychart.graphModule.Chart.prototype.handleMouseWheel_ = function(event) {
 
 
 /**
- * Update path data of each edge connected to node.
- * @param {anychart.graphModule.Chart.Node} node
- */
-anychart.graphModule.Chart.prototype.updateEdgesConnectedToNode = function(node) {
-  var edge;
-  var path;
-  var from, to;
-  var i, length;
-  if (this.interactivity_.getOption('edges')) {
-    path = this.edges_.getEdgePath();
-    path.clear();
-    for (i = 0, length = node.connectedEdges.length; i < length; i++) {
-      edge = this.getEdgeById(node.connectedEdges[i]);
-      this.edges_.drawEdge(edge);
-      this.edges_.updateLabel(edge);
-    }
-  } else {
-    this.edges_.drawEdges();
-    for (i = 0, length = node.connectedEdges.length; i < length; i++) {
-      edge = this.getEdgeById(node.connectedEdges[i]);
-
-      from = this.getNodeById(edge.from).position;
-      to = this.getNodeById(edge.to).position;
-
-      this.edges_.updateLabel(edge);
-    }
-  }
-
-};
-
-
-/**
  * Fit graph into bounds.
  * Calculate most values and offset graph depend on it.
  */
@@ -1446,7 +1414,6 @@ anychart.graphModule.Chart.prototype.interactivity = function(opt_value) {
   if (!this.interactivity_) {
     this.interactivity_ = new anychart.graphModule.elements.Interactivity();
     this.setupCreated('interactivity', this.interactivity_);
-    this.interactivity_.listenSignals(this.edges().onInteractivitySignal, this.edges());
     this.interactivity_.listenSignals(this.onInteractivitySignal_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1764,13 +1731,13 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
             if (!nodesForDrag.length) {
               this.updateNodePosition(node, dx, dy);
               this.nodes_.updateNodeDOMElementPosition(node);
-              this.updateEdgesConnectedToNode(node);
+              this.edges_.drawEdges();
             } else {
               for (var i = 0; i < nodesForDrag.length; i++) {
                 var dragNode = nodesForDrag[i];
                 this.updateNodePosition(dragNode, dx, dy);
                 this.nodes_.updateNodeDOMElementPosition(dragNode);
-                this.updateEdgesConnectedToNode(dragNode);
+                this.edges_.drawEdges();
               }
             }
           }
@@ -1796,7 +1763,7 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
                 this.nodes_.stickNode(node);
                 this.nodes_.updateNodeDOMElementPosition(node);
               }
-              this.updateEdgesConnectedToNode(node);
+              this.edges_.drawEdges();
             }
           }
         }

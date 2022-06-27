@@ -81,13 +81,6 @@ goog.inherits(anychart.graphModule.elements.Edge, anychart.graphModule.elements.
 anychart.graphModule.elements.Edge.prototype.SUPPORTED_SIGNALS = anychart.graphModule.elements.Base.prototype.SUPPORTED_SIGNALS;
 
 
-/**
- * Supported consistency states
- * @type {anychart.ConsistencyState|number}
- */
-anychart.graphModule.elements.Edge.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.APPEARANCE;
-
-
 //endregion
 //region Labels
 /** @inheritDoc */
@@ -461,14 +454,14 @@ anychart.graphModule.elements.Edge.prototype.clear = function(edge) {
  * @param {anychart.graphModule.Chart.Edge} edge
  */
 anychart.graphModule.elements.Edge.prototype.populateEdgeByDrawingElements = function(edge) {
-  edge.path = this.getEdgePath();
+  edge.path = this.getPath();
   edge.path.tag = this.createTag(edge);
   edge.currentState = /** @type {anychart.SettingsState} */(this.state(edge));
 
   if (this.chart_.interactivity().getOption('edges')) {
     var thickness = this.getEdgeThickness(edge) + /** @type {number} */(this.chart_.interactivity().getOption('hoverGap'));
 
-    edge.hoverPath = this.getEdgePath();
+    edge.hoverPath = this.getPath();
     edge.hoverPath.tag = edge.path.tag;
     edge.hoverPath.fill(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER));
     edge.hoverPath.stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), thickness);
@@ -483,23 +476,6 @@ anychart.graphModule.elements.Edge.prototype.populateEdgeByDrawingElements = fun
     edge.arrow = this.arrows().getArrow();
     edge.arrow.edge(edge);
   }
-};
-
-
-/**
- * Return path object for edge.
- * @return {acgraph.vector.Path}
- */
-anychart.graphModule.elements.Edge.prototype.getEdgePath = function() {
-  if (this.chart_.interactivity().getOption('edges')) {
-    return this.getPath();
-  }
-
-  if (!this.path_) {
-    this.path_ = acgraph.path();
-  }
-
-  return this.path_;
 };
 
 
@@ -576,17 +552,6 @@ anychart.graphModule.elements.Edge.prototype.getIterator = function() {
 
 
 /**
- * Interactivity signal handler.
- * @param {anychart.SignalEvent} event
- */
-anychart.graphModule.elements.Edge.prototype.onInteractivitySignal = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
-  }
-};
-
-
-/**
  * Return thickness of the edge
  * @param {anychart.graphModule.Chart.Edge} edge
  * @return {number}
@@ -615,35 +580,16 @@ anychart.graphModule.elements.Edge.prototype.getNodePosition = function(nodeId) 
 //endregion
 // region drawing
 /**
- * @param {Array.<anychart.graphModule.Chart.Edge>} edges
- * @return {string}
- */
-anychart.graphModule.elements.Edge.prototype.getPathData = function(edges) {
-  var pathData = [];
-  for (var i = 0, length = edges.length; i < length; i++) {
-    var edge = edges[i];
-    var from = this.chart_.getNodeById(edge.from).position;
-    var to = this.chart_.getNodeById(edge.to).position;
-    pathData.push('M', from.x, from.y, 'L', to.x, to.y);
-  }
-  pathData = pathData.join(' ');
-  return pathData;
-};
-
-
-/**
  * Append all nodes on layer.
  * @param {anychart.graphModule.Chart.Edge} edge Edge
  */
 anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
-  var edges = this.chart_.getEdgesArray();
+  var from = this.chart_.getNodeById(edge.from);
+  var to = this.chart_.getNodeById(edge.to);
 
   if (this.chart_.interactivity().getOption('edges')) {
     this.clear(edge);
     this.populateEdgeByDrawingElements(edge);
-
-    var from = this.chart_.getNodeById(edge.from);
-    var to = this.chart_.getNodeById(edge.to);
 
     edge.path.moveTo(from.position.x, from.position.y);
     edge.path.lineTo(to.position.x, to.position.y);
@@ -653,24 +599,15 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
     edge.hoverPath.lineTo(to.position.x, to.position.y);
     edge.hoverPath.parent(this.layerForEdges_);
 
-    var stroke = this.getStroke(edge);
-    edge.path.stroke(stroke);
+    edge.path.stroke(this.getStroke(edge));
 
     if (edge.arrow) {
       edge.arrow.draw();
     }
   } else {
-    var path = this.getEdgePath();
-    var domElement = path.domElement();
-    if (!domElement) { //at first draw we have no dom element here.
-      path.createDom(true);
-      domElement = path.domElement();
-    }
-    var pathData = this.getPathData(edges);
-    domElement.setAttribute('d', pathData);
-    path.parent(this.layerForEdges_);
-    path.clearDirtyState(acgraph.vector.Element.DirtyState.DATA);
-    path.stroke(this.getStroke(edge));
+    this.path_.moveTo(from.position.x, from.position.y);
+    this.path_.lineTo(to.position.x, to.position.y);
+    this.path_.stroke(this.getStroke(edge));
   }
 };
 
@@ -691,15 +628,10 @@ anychart.graphModule.elements.Edge.prototype.clearAll = function() {
 anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
   var edges = this.chart_.getEdgesArray();
 
-  this.path = this.chart_.mainLayer_.path();
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.clearAll();
-    var dom = this.path_.domElement();
-    if (dom) {
-      dom.removeAttribute('d');
-    }
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
+  this.path_.parent(this.layerForEdges_);
+
+  this.clearAll();
+  this.path_.clear();
 
   for (var i = 0; i < edges.length; i++) {
     this.drawEdge(edges[i]);
