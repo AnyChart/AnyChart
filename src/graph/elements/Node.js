@@ -451,7 +451,9 @@ anychart.graphModule.elements.Node.prototype.stickNode = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
-  return /** @type {number} */(this.resolveSettings(node, 'height'));
+  var height = anychart.utils.toNumber(this.resolveSettings(node, 'height'));
+
+  return isNaN(height) ? this.getOption('height') : height;
 };
 
 
@@ -461,12 +463,13 @@ anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getWidth = function(node) {
-  var shape = this.resolveSettings(node, 'shape');
-  if (shape == anychart.enums.normalizeMarkerType(shape)) {
+  if (this.resolveSettings(node, 'shape') !== 'rectangle') {
     return this.getHeight(node);
-  } else {
-    return /** @type {number} */(this.resolveSettings(node, 'width'));
   }
+
+  var width = anychart.utils.toNumber(this.resolveSettings(node, 'width'));
+
+  return isNaN(width) ? this.getOption('width') : width;
 };
 
 
