@@ -865,7 +865,6 @@ anychart.graphModule.Chart.prototype.updateNodeStateById = function(id, state) {
 anychart.graphModule.Chart.prototype.updateEdge = function(edge, state) {
   this.edges_.state(edge, state);
   this.edges_.drawEdge(edge);
-  this.edges_.updateLabelStyle(edge);
 };
 
 

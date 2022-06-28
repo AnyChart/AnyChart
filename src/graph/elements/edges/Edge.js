@@ -616,6 +616,7 @@ anychart.graphModule.elements.Edge.prototype.clearAll = function() {
  * Draw edges.
  */
 anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
+  this.layerForEdges_.suspend();
   var edges = this.chart_.getEdgesArray();
 
   this.path_.parent(this.layerForEdges_);
@@ -625,6 +626,7 @@ anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
   for (var i = 0; i < edges.length; i++) {
     this.drawEdge(edges[i]);
   }
+  this.layerForEdges_.resume();
 };
 
 
