@@ -1650,8 +1650,6 @@ anychart.graphModule.Chart.prototype.getEdgeById = function(id) {
 
 //endregion
 // region Draw
-
-
 /**
  * Init dragger
  * @param {acgraph.events.BrowserEvent} event

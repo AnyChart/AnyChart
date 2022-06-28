@@ -226,26 +226,6 @@ anychart.graphModule.elements.Edge.prototype.rotateLabel = function(edge, bounds
 
 
 /**
- * Update label style for current edge.
- * @param {anychart.graphModule.Chart.Edge} edge
- */
-anychart.graphModule.elements.Edge.prototype.updateLabelStyle = function(edge) {
-  var enabled = this.resolveLabelSettings(edge).enabled();
-  if (enabled && !edge.optimizedText) {
-    this.getTextOptimizedText(edge);
-  }
-
-  if (edge.optimizedText) {
-    edge.optimizedText.resetComplexity();//drop all old settings
-    this.setupText(edge);
-    edge.optimizedText.renderTo(this.labelsLayerEl_);
-    edge.optimizedText.prepareBounds();
-    this.drawLabel(edge);
-  }
-};
-
-
-/**
  * Calculate position for label
  * @param {anychart.graphModule.Chart.Edge} edge
  * @return {{x: number, y:number}}
@@ -454,11 +434,11 @@ anychart.graphModule.elements.Edge.prototype.clear = function(edge) {
  * @param {anychart.graphModule.Chart.Edge} edge
  */
 anychart.graphModule.elements.Edge.prototype.populateEdgeByDrawingElements = function(edge) {
-  edge.path = this.getPath();
-  edge.path.tag = this.createTag(edge);
-  edge.currentState = /** @type {anychart.SettingsState} */(this.state(edge));
-
   if (this.chart_.interactivity().getOption('edges')) {
+    edge.path = this.getPath();
+    edge.path.tag = this.createTag(edge);
+    edge.currentState = /** @type {anychart.SettingsState} */(this.state(edge));
+
     var thickness = this.getEdgeThickness(edge) + /** @type {number} */(this.chart_.interactivity().getOption('hoverGap'));
 
     edge.hoverPath = this.getPath();
@@ -587,10 +567,10 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
   var from = this.chart_.getNodeById(edge.from);
   var to = this.chart_.getNodeById(edge.to);
 
-  if (this.chart_.interactivity().getOption('edges')) {
-    this.clear(edge);
-    this.populateEdgeByDrawingElements(edge);
+  this.clear(edge);
+  this.populateEdgeByDrawingElements(edge);
 
+  if (edge.path) {
     edge.path.moveTo(from.position.x, from.position.y);
     edge.path.lineTo(to.position.x, to.position.y);
     edge.path.parent(this.layerForEdges_);
@@ -600,14 +580,22 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
     edge.hoverPath.parent(this.layerForEdges_);
 
     edge.path.stroke(this.getStroke(edge));
-
-    if (edge.arrow) {
-      edge.arrow.draw();
-    }
   } else {
     this.path_.moveTo(from.position.x, from.position.y);
     this.path_.lineTo(to.position.x, to.position.y);
     this.path_.stroke(this.getStroke(edge));
+  }
+
+  if (edge.arrow) {
+    edge.arrow.draw();
+  }
+
+  if (edge.optimizedText) {
+    edge.optimizedText.resetComplexity();
+    this.setupText(edge);
+    edge.optimizedText.renderTo(this.labelsLayerEl_);
+    edge.optimizedText.prepareBounds();
+    this.drawLabel(edge);
   }
 };
 
