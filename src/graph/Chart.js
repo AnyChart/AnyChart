@@ -1733,8 +1733,8 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
               var dragNode = nodesForDrag[i];
               this.updateNodePosition(dragNode, dx, dy);
               this.nodes_.updateNodeDOMElementPosition(dragNode);
-              this.edges_.drawEdges();
             }
+            this.edges_.drawEdges();
           }
         } else {
           dx = (x - startX) / scale; //slowdown drag when zoom are used
@@ -1843,6 +1843,7 @@ anychart.graphModule.Chart.prototype.rotateNodes_ = function() {
 
 /**
  * Draw graph edges.
+ *
  * @private
  */
 anychart.graphModule.Chart.prototype.drawEdges_ = function() {

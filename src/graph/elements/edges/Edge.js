@@ -73,15 +73,6 @@ goog.inherits(anychart.graphModule.elements.Edge, anychart.graphModule.elements.
 
 
 //endregion
-//region Signals.
-/**
- * Supported signals.
- * @type {number}
- */
-anychart.graphModule.elements.Edge.prototype.SUPPORTED_SIGNALS = anychart.graphModule.elements.Base.prototype.SUPPORTED_SIGNALS;
-
-
-//endregion
 //region Labels
 /** @inheritDoc */
 anychart.graphModule.elements.Edge.prototype.provideMeasurements = function() {
@@ -222,6 +213,23 @@ anychart.graphModule.elements.Edge.prototype.rotateLabel = function(edge, bounds
 
   var domElement = edge.optimizedText.getDomElement();
   domElement.setAttribute('transform', 'rotate(' + rotate + ')');
+};
+
+
+/**
+ * Update label style for current edge.
+ * @param {anychart.graphModule.Chart.Edge} edge
+ *
+ * @private
+ */
+anychart.graphModule.elements.Edge.prototype.updateLabelStyle_ = function(edge) {
+  if (edge.optimizedText) {
+    edge.optimizedText.resetComplexity();//drop all old settings
+    this.setupText(edge);
+    edge.optimizedText.renderTo(this.labelsLayerEl_);
+    edge.optimizedText.prepareBounds();
+    this.drawLabel(edge);
+  }
 };
 
 
@@ -590,13 +598,7 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
     edge.arrow.draw();
   }
 
-  if (edge.optimizedText) {
-    edge.optimizedText.resetComplexity();
-    this.setupText(edge);
-    edge.optimizedText.renderTo(this.labelsLayerEl_);
-    edge.optimizedText.prepareBounds();
-    this.drawLabel(edge);
-  }
+  this.updateLabelStyle_(edge);
 };
 
 
@@ -612,12 +614,14 @@ anychart.graphModule.elements.Edge.prototype.clearAll = function() {
   }
 };
 
+
 /**
  * Draw edges.
  */
 anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
-  this.layerForEdges_.suspend();
   var edges = this.chart_.getEdgesArray();
+
+  this.layerForEdges_.suspend();
 
   this.path_.parent(this.layerForEdges_);
 
@@ -626,6 +630,7 @@ anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
   for (var i = 0; i < edges.length; i++) {
     this.drawEdge(edges[i]);
   }
+
   this.layerForEdges_.resume();
 };
 

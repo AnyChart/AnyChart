@@ -463,7 +463,9 @@ anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getWidth = function(node) {
-  if (this.resolveSettings(node, 'shape') !== 'rectangle') {
+  // Default anychart markers must be not stretched.
+  var shape = this.resolveSettings(node, 'shape');
+  if (shape === anychart.enums.normalizeMarkerType(shape)) {
     return this.getHeight(node);
   }
 
@@ -530,6 +532,8 @@ anychart.graphModule.elements.Node.prototype.getShapeDrawer = function(node) {
  * @param {anychart.graphModule.Chart.Node} node
  */
 anychart.graphModule.elements.Node.prototype.updatePathShape = function(node) {
+  var drawer = this.getShapeDrawer(node);
+
   var width = this.getWidth(node);
   var height = this.getHeight(node);
 
@@ -544,7 +548,7 @@ anychart.graphModule.elements.Node.prototype.updatePathShape = function(node) {
 
   width /= 2;
   height /= 2;
-  var drawer = this.getShapeDrawer(node);
+
   drawer(path, x, y, height, width);
 };
 
