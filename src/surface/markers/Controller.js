@@ -544,6 +544,10 @@ anychart.surfaceModule.markers.Controller.prototype.serialize = function() {
     rv['data'] = data.serialize();
   }
 
+  if (this.droplines_) {
+    rv['droplines'] = this.droplines_.serialize();
+  }
+
   return rv;
 };
 
@@ -554,6 +558,11 @@ anychart.surfaceModule.markers.Controller.prototype.setupByJSON = function(json,
   var data = json['data'];
   if (data) {
     this.data(data);
+  }
+
+  var droplines = json['droplines'];
+  if (droplines) {
+    this.droplines(droplines);
   }
 };
 
