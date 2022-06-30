@@ -229,6 +229,8 @@ anychart.surfaceModule.markers.Controller.prototype.draw = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
+  this.rootLayer_.removeChildren();
+
   var marker;
   var markers = this.getMarkers();
 
