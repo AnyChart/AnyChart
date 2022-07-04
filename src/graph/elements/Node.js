@@ -43,30 +43,6 @@ anychart.graphModule.elements.Node = function(chart) {
    */
   this.iterator_;
 
-  /**
-   *
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.mainLayer_ = acgraph.layer();
-
-  /**
-   *
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.layerForNodes_ = acgraph.layer();
-
-  /**
-   *
-   * @type {acgraph.vector.UnmanagedLayer}
-   * @private
-   */
-  this.layerForNodesLabels_ = this.getLabelsLayer();
-
-  this.layerForNodes_.parent(this.mainLayer_);
-  this.layerForNodesLabels_.parent(this.mainLayer_);
-
   anychart.measuriator.register(this);
 };
 goog.inherits(anychart.graphModule.elements.Node, anychart.graphModule.elements.Base);
@@ -76,19 +52,6 @@ goog.inherits(anychart.graphModule.elements.Node, anychart.graphModule.elements.
  *  Supported signals.
  */
 anychart.graphModule.elements.Node.prototype.SUPPORTED_SIGNALS = anychart.graphModule.elements.Base.prototype.SUPPORTED_SIGNALS | anychart.Signal.NEEDS_REDRAW;
-
-
-/**
- * Getter for labels layer.
- * @return {acgraph.vector.UnmanagedLayer}
- */
-anychart.graphModule.elements.Node.prototype.getLabelsLayer = function() {
-  if (!this.labelsLayer_) {
-    this.labelsLayerEl_ = /** @type {Element} */(acgraph.getRenderer().createLayerElement());
-    this.labelsLayer_ = acgraph.unmanagedLayer(this.labelsLayerEl_);
-  }
-  return this.labelsLayer_;
-};
 
 
 /** @inheritDoc */
@@ -178,16 +141,8 @@ anychart.graphModule.elements.Node.prototype.getTooltipFormatContext = function(
 
   var siblings = goog.array.map(edges, function(edgeId) {
     var edge = this.chart_.getEdgeById(edgeId);
-    var from = edge.from;
-    var to = edge.to;
-    var siblingId;
-    if (from != element.id) {
-      siblingId = from;
-    } else {
-      siblingId = to;
-    }
 
-    return siblingId;
+    return edge.from != element.id ? edge.from : edge.to;
   }, this);
 
   context['siblings'] = {value: siblings, type: anychart.enums.TokenType.UNKNOWN};
@@ -204,16 +159,7 @@ anychart.graphModule.elements.Node.prototype.getTooltipFormatContext = function(
 anychart.graphModule.elements.Node.prototype.updateLabelStyle = function(node) {
   var enabled = this.resolveLabelSettings(node).enabled();
   if (enabled && !node.optimizedText) {
-    node.optimizedText = this.getText();
-  }
-  if (node.optimizedText) {
-    node.optimizedText.resetComplexity();
-    this.setupAutoAnchorAndPosition_(node);
-    this.setupText(node);
-    node.optimizedText.renderTo(this.labelsLayerEl_);
-    node.optimizedText.prepareBounds();
-    this.drawLabel(node);
-    // node.optimizedText.resetComplexity();
+    node.optimizedText = this.labels().add()
   }
 };
 
@@ -333,8 +279,7 @@ anychart.graphModule.elements.Node.prototype.getLabelBounds = function(node) {
       top = coordinate.y -= dy;
     }
   }
-  //this.chart_.mainLayer_.path().moveTo(center.x, center.y).lineTo(left, top);
-  //this.chart_.mainLayer_.circle(left, top, 1)
+
   var bounds = anychart.math.rect(left, top, nodeWidth, nodeHeight);
 
   var result = padding.tightenBounds(bounds);
@@ -354,7 +299,6 @@ anychart.graphModule.elements.Node.prototype.rotateLabel = function(node, bounds
     var dom = node.optimizedText.getDomElement();
     dom.removeAttribute('transform');
     if (labelSettings.getOption('autoRotate')) {
-      // this.chart_.mainLayer_.rect(bounds.left, bounds.top, bounds.width, bounds.height);
       var center = this.chart_.nodesCenter;
       var angle = goog.math.angle(center.x, center.y, node.position.x, node.position.y);
       if (angle >= 90 && angle <= 270) {
@@ -479,7 +423,7 @@ anychart.graphModule.elements.Node.prototype.getWidth = function(node) {
  * Update shape and colors for node.
  * @param {anychart.graphModule.Chart.Node} node
  */
-anychart.graphModule.elements.Node.prototype.updateNodeAppearance = function(node) {
+anychart.graphModule.elements.Node.prototype.updateNodeAppearance_ = function(node) {
   this.updatePathShape(node);
   this.updateNodeColors(node);
 };
@@ -566,12 +510,32 @@ anychart.graphModule.elements.Node.prototype.updateNodeColors = function(node) {
 
 
 /**
+ * Create path element for node and return it.
+ * @param {anychart.graphModule.Chart.Node} node
+
+ */
+anychart.graphModule.elements.Node.prototype.populateNodeByDrawingObjects = function(node) {
+  if (!node.path) {
+    node.path = this.getPath();
+    node.path.parent(this.container());
+  }
+
+
+  console.log(this.createFormatProvider(node), this.getLabelPosition(node))
+  node.label = this.labels().add(this.createFormatProvider(node), this.getLabelPosition(node));
+  node.path.tag = this.createTag(node);
+  node.path.currentState = /** @type {anychart.SettingsState} */(this.state(node));
+};
+
+
+/**
  * Append passed node into DOM.
  * @param {anychart.graphModule.Chart.Node} node
  */
 anychart.graphModule.elements.Node.prototype.drawNode = function(node) {
-  var path = this.createPath(node);
-  path.parent(this.layerForNodes_);
+  this.populateNodeByDrawingObjects(node);
+
+  this.updateNodeAppearance_(node);
 };
 
 
@@ -579,29 +543,13 @@ anychart.graphModule.elements.Node.prototype.drawNode = function(node) {
  * Append all nodes on layer
  */
 anychart.graphModule.elements.Node.prototype.drawNodes = function() {
+  this.labels().container(this.container());
   var nodes = this.chart_.getNodesArray();
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
     this.drawNode(node);
   }
-  // this.nodes_.needsMeasureLabels();
-};
-
-
-/**
- * Update appearance of all nodes.
- * @param {anychart.graphModule.Chart.Node=} opt_node
- */
-anychart.graphModule.elements.Node.prototype.updateAppearance = function(opt_node) {
-  if (goog.isDef(opt_node)) {
-    this.updateNodeAppearance(opt_node);
-  } else {
-    var nodes = this.chart_.getNodesArray();
-    for (var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
-      this.updateNodeAppearance(node);
-    }
-  }
+  this.labels().draw();
 };
 
 
@@ -620,41 +568,6 @@ anychart.graphModule.elements.Node.prototype.updateNodeDOMElementPosition = func
   y -= (height / 2);
 
   node.path.setPosition(x, y);
-
-  if (this.isLabelEnabled(node)) {
-    var stage = this.chart_.container().getStage();
-    node.optimizedText.renderTo(this.labelsLayerEl_);
-    node.optimizedText.getDomElement().removeAttribute('transform');
-    node.optimizedText.putAt(this.getLabelBounds(node), stage);
-    node.optimizedText.finalizeComplexity();
-  }
-};
-
-
-/**
- * Return layer for edges.
- * @return {acgraph.vector.Layer}
- */
-anychart.graphModule.elements.Node.prototype.getLayer = function() {
-  return this.mainLayer_;
-};
-
-
-/**
- * Create path element for node and return it.
- * @param {anychart.graphModule.Chart.Node} node
- * @return {acgraph.vector.Path}
- */
-anychart.graphModule.elements.Node.prototype.createPath = function(node) {
-  if (!node.path) {
-    node.path = this.getPath();
-  }
-  var path = node.path;
-
-  path.tag = this.createTag(node);
-  node.currentState = /** @type {anychart.SettingsState} */(this.state(node));
-  node.path = path;
-  return path;
 };
 
 

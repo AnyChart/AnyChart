@@ -840,8 +840,7 @@ anychart.graphModule.Chart.prototype.handleMouseOut = function(event) {
  */
 anychart.graphModule.Chart.prototype.updateNode = function(node, state) {
   this.nodes_.state(node, state);
-  this.nodes_.updateAppearance(node);
-  this.nodes_.updateLabelStyle(node);
+  this.nodes_.drawNode(node);
 };
 
 
@@ -1849,15 +1848,6 @@ anychart.graphModule.Chart.prototype.rotateNodes_ = function() {
 anychart.graphModule.Chart.prototype.drawEdges_ = function() {
   if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES)) {
     this.edges_.drawEdges();
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE)) {
-      this.edges_.applyLabelsStyle();
-    }
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS)) {
-      anychart.measuriator.measure();
-    }
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED)) {
-      this.edges_.drawLabels();
-    }
 
     this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES);
   }
@@ -1872,19 +1862,6 @@ anychart.graphModule.Chart.prototype.drawEdges_ = function() {
 anychart.graphModule.Chart.prototype.drawNodes_ = function() {
   if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.NODES)) {
     this.nodes_.drawNodes();
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE)) {
-      this.nodes_.updateAppearance();
-    }
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE)) {
-      this.nodes_.applyLabelsStyle();
-    }
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS)) {
-      anychart.measuriator.measure();
-    }
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED)) {
-      this.nodes_.drawLabels();
-    }
-
     this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES);
   }
 };
@@ -1930,18 +1907,10 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
       this.initTouchHandlers();
     }
 
-    this.layerForElements_ = acgraph.layer();
+    this.layerForElements_ = this.mainLayer_.layer();
 
-    this.nodesLayer_ = acgraph.layer();
-    this.edgesLayer_ = acgraph.layer();
-
-    this.layerWithEdges = this.edges_.getLayer();
-    this.layerWithNodes = this.nodes_.getLayer();
-
-    this.layerWithEdges.parent(this.edgesLayer_);
-    this.layerWithNodes.parent(this.nodesLayer_);
-    this.edgesLayer_.parent(this.layerForElements_);
-    this.nodesLayer_.parent(this.layerForElements_);
+    this.edges_.container(this.layerForElements_.layer());
+    this.nodes_.container(this.layerForElements_.layer());
 
     this.layerForElements_.parent(this.mainLayer_);
 

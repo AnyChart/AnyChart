@@ -44,29 +44,6 @@ anychart.graphModule.elements.Edge = function(chart) {
    */
   this.path_ = acgraph.path();
 
-  /**
-   *
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.mainLayer_ = acgraph.layer();
-
-  /**
-   *
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.layerForEdges_ = acgraph.layer();
-  /**
-   *
-   * @type {acgraph.vector.UnmanagedLayer}
-   * @private
-   */
-  this.layerForEdgesLabels_ = this.getLabelsLayer();
-
-  this.layerForEdges_.parent(this.mainLayer_);
-  this.layerForEdgesLabels_.parent(this.mainLayer_);
-
   anychart.measuriator.register(this);
 };
 goog.inherits(anychart.graphModule.elements.Edge, anychart.graphModule.elements.Base);
@@ -327,7 +304,7 @@ anychart.graphModule.elements.Edge.prototype.arrows = function(opt_config) {
   if (!this.arrowsController_) {
     this.arrowsController_ = new anychart.graphModule.elements.arrows.Controller(this);
     this.setupCreated('arrows', this.arrowsController_);
-    this.arrowsController_.container(this.layerForEdges_);
+    this.arrowsController_.container(this.container());
     this.arrowsController_.listenSignals(this.onArrowsSignal_, this);
   }
 
@@ -581,11 +558,11 @@ anychart.graphModule.elements.Edge.prototype.drawEdge = function(edge) {
   if (edge.path) {
     edge.path.moveTo(from.position.x, from.position.y);
     edge.path.lineTo(to.position.x, to.position.y);
-    edge.path.parent(this.layerForEdges_);
+    edge.path.parent(this.container());
 
     edge.hoverPath.moveTo(from.position.x, from.position.y);
     edge.hoverPath.lineTo(to.position.x, to.position.y);
-    edge.hoverPath.parent(this.layerForEdges_);
+    edge.hoverPath.parent(this.container());
 
     edge.path.stroke(this.getStroke(edge));
   } else {
@@ -621,9 +598,9 @@ anychart.graphModule.elements.Edge.prototype.clearAll = function() {
 anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
   var edges = this.chart_.getEdgesArray();
 
-  this.layerForEdges_.suspend();
+  this.container().suspend();
 
-  this.path_.parent(this.layerForEdges_);
+  this.path_.parent(this.container());
 
   this.clearAll();
 
@@ -631,16 +608,7 @@ anychart.graphModule.elements.Edge.prototype.drawEdges = function() {
     this.drawEdge(edges[i]);
   }
 
-  this.layerForEdges_.resume();
-};
-
-
-/**
- * Return layer for edges.
- * @return {acgraph.vector.Layer}
- */
-anychart.graphModule.elements.Edge.prototype.getLayer = function() {
-  return this.mainLayer_;
+  this.container().resume();
 };
 
 

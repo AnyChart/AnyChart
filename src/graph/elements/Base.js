@@ -82,9 +82,6 @@ anychart.graphModule.elements.Base = function(chart) {
   this.hovered_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.HOVER);
   this.selected_ = new anychart.core.StateSettings(this, descriptorsMeta, anychart.PointState.SELECT);
 
-  this.normal_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME);
-  this.hovered_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME);
-  this.selected_.setOption(anychart.core.StateSettings.LABELS_FACTORY_CONSTRUCTOR, anychart.core.StateSettings.OPTIMIZED_LABELS_CONSTRUCTOR_NO_THEME);
 
   function labelsCallback(labels) {
     labels.setParentEventTarget(/** @type {goog.events.EventTarget} */ (this));
@@ -126,9 +123,7 @@ anychart.graphModule.elements.Base.prototype.setupElements = function() {
   this.setupCreated('hovered', this.hovered_);
   this.setupCreated('selected', this.selected_);
 
-  this.normal_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.chart_.labels()));
-  this.hovered_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal_.labels()));
-  this.selected_.labels().parent(/** @type {anychart.core.ui.LabelsSettings} */(this.normal_.labels()));
+
 };
 
 
@@ -252,31 +247,31 @@ anychart.graphModule.elements.Base.prototype.resolveLabelSettings = function(ele
     }
 
     var finalLblSetting = this[stringState]()['labels']();
-    if (!finalLblSetting.parent()) {
-      if (state == anychart.SettingsState.NORMAL) {
-        finalLblSetting.parent(this.chart_.labels());
-      } else {
-        finalLblSetting.parent(this.normal_.labels());
-      }
-    }
-
-    //settings for nodes from groups.
-    var groupLabelSettings = groupSettings ? groupSettings[stringState]()['labels']() : void 0;
-    if (groupLabelSettings) {
-      if (!groupLabelSettings.parent()) {
-        if (state == anychart.SettingsState.NORMAL) {
-          groupLabelSettings.parent(this.chart_.nodes().labels());
-        } else {
-          groupLabelSettings.parent(groupSettings.normal().labels());
-        }
-      }
-      finalLblSetting = groupLabelSettings;
-    }
-    if (specificLblSettings) {
-      finalLblSetting = specificLblSettings.parent(finalLblSetting);
-    }
-    finalLblSetting.resolutionChainCache(null);//reset resolution chain.
-    finalLblSetting.listenSignals(this.labelsInvalidated_, this);
+    // if (!finalLblSetting.parent()) {
+    //   if (state == anychart.SettingsState.NORMAL) {
+    //     finalLblSetting.parent(this.chart_.labels());
+    //   } else {
+    //     finalLblSetting.parent(this.normal_.labels());
+    //   }
+    // }
+    //
+    // //settings for nodes from groups.
+    // var groupLabelSettings = groupSettings ? groupSettings[stringState]()['labels']() : void 0;
+    // if (groupLabelSettings) {
+    //   if (!groupLabelSettings.parent()) {
+    //     if (state == anychart.SettingsState.NORMAL) {
+    //       groupLabelSettings.parent(this.chart_.nodes().labels());
+    //     } else {
+    //       groupLabelSettings.parent(groupSettings.normal().labels());
+    //     }
+    //   }
+    //   finalLblSetting = groupLabelSettings;
+    // }
+    // if (specificLblSettings) {
+    //   finalLblSetting = specificLblSettings.parent(finalLblSetting);
+    // }
+    // finalLblSetting.resolutionChainCache(null);//reset resolution chain.
+    // finalLblSetting.listenSignals(this.labelsInvalidated_, this);
 
     this.settingsForLabels[stringState][id] = finalLblSetting;
   }
@@ -380,9 +375,6 @@ anychart.graphModule.elements.Base.prototype.needsMeasureLabels = function() {
 anychart.graphModule.elements.Base.prototype.getTooltipFormatContext = function(element) {
   var context = {};
 
-  var iterator = this.getIterator();
-  iterator.select(element.dataRow);
-  this.formatProvider_.dataSource(iterator);
   context['type'] = {value: this.getType(), type: anychart.enums.TokenType.STRING};
   context['id'] = {value: element.id, type: anychart.enums.TokenType.STRING};
 
@@ -398,6 +390,10 @@ anychart.graphModule.elements.Base.prototype.createFormatProvider = function(ele
   if (!this.formatProvider_) {
     this.formatProvider_ = new anychart.format.Context();
   }
+
+  var iterator = this.getIterator();
+  iterator.select(element.dataRow);
+  this.formatProvider_.dataSource(iterator);
 
   var context = this.getTooltipFormatContext(element);
   return /** @type {anychart.format.Context} */(this.formatProvider_.propagate(context));
@@ -438,6 +434,19 @@ anychart.graphModule.elements.Base.prototype.setupText = function(element) {
   }
 };
 
+/**
+ * Getter/Setter for container.
+ *
+ * @param {acgraph.vector.Layer=} opt_container
+ * @return {acgraph.vector.Layer}
+ */
+anychart.graphModule.elements.Base.prototype.container = function(opt_container) {
+  if (goog.isDef(opt_container)) {
+    this.container_ = opt_container;
+  }
+
+  return this.container_;
+};
 
 /**
  * Return enabled state for element.
