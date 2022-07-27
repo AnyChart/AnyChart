@@ -163,27 +163,32 @@ anychart.annotationsModule.Label.prototype.resolveOption = function(name, state,
 /** @inheritDoc */
 anychart.annotationsModule.Label.prototype.createPositionProviders = function() {
   var res = [];
+  /*
+    DVF-4666
+    Make providers for anchors return 0 instead of NaN for proper path
+    'd'-attribute rendering in case of NaN.
+   */
   res.push(
-      {
-        'x': this.coords['xAnchor'],
-        'y': this.coords['valueAnchor']
-      },
-      {
-        'x': this.backgroundBounds.left,
-        'y': this.backgroundBounds.top
-      },
-      {
-        'x': this.backgroundBounds.getRight(),
-        'y': this.backgroundBounds.top
-      },
-      {
-        'x': this.backgroundBounds.getRight(),
-        'y': this.backgroundBounds.getBottom()
-      },
-      {
-        'x': this.backgroundBounds.left,
-        'y': this.backgroundBounds.getBottom()
-      }
+    {
+      'x': this.coords['xAnchor'] || 0,
+      'y': this.coords['valueAnchor'] || 0
+    },
+    {
+      'x': this.backgroundBounds.left || 0,
+      'y': this.backgroundBounds.top || 0
+    },
+    {
+      'x': this.backgroundBounds.getRight() || 0,
+      'y': this.backgroundBounds.top || 0
+    },
+    {
+      'x': this.backgroundBounds.getRight() || 0,
+      'y': this.backgroundBounds.getBottom() || 0
+    },
+    {
+      'x': this.backgroundBounds.left || 0,
+      'y': this.backgroundBounds.getBottom() || 0
+    }
   );
   return goog.array.map(res, function(item) {
     return {'value': item};
@@ -193,6 +198,11 @@ anychart.annotationsModule.Label.prototype.createPositionProviders = function() 
 
 /** @inheritDoc */
 anychart.annotationsModule.Label.prototype.checkVisible = function() {
+  /*
+    DVF-4666
+    To ensure the text element is created for applying styles to calculate bounds.
+  */
+  this.ensureCreated();
   if (this.hasInvalidationState(anychart.ConsistencyState.ANNOTATIONS_SHAPES)) {
     this.applyTextSettings(this.state);
     this.calculateBounds_(0, 0);
