@@ -243,7 +243,7 @@ anychart.graphModule.Chart.Node;
  *  to: string,
  *  currentState: anychart.SettingsState,
  *  path: (acgraph.vector.Path|undefined),
- *  arrow: (anychart.graphModule.elements.arrows.Arrow),
+ *  arrow: (anychart.graphModule.elements.arrows.Arrow|undefined),
  *  hoverPath: (acgraph.vector.Path|undefined),
  *  optimizedText: (anychart.core.ui.OptimizedText|undefined),
  *  labelDx: (number|undefined),
@@ -654,38 +654,6 @@ anychart.graphModule.Chart.prototype.handleMouseWheel_ = function(event) {
 
 
 /**
- * Update path data of each edge connected to node.
- * @param {anychart.graphModule.Chart.Node} node
- */
-anychart.graphModule.Chart.prototype.updateEdgesConnectedToNode = function(node) {
-  var edge;
-  var path;
-  var from, to;
-  var i, length;
-  if (this.interactivity_.getOption('edges')) {
-    path = this.edges_.getEdgePath();
-    path.clear();
-    for (i = 0, length = node.connectedEdges.length; i < length; i++) {
-      edge = this.getEdgeById(node.connectedEdges[i]);
-      this.edges_.drawEdge(edge);
-      this.edges_.updateLabel(edge);
-    }
-  } else {
-    this.edges_.drawEdges();
-    for (i = 0, length = node.connectedEdges.length; i < length; i++) {
-      edge = this.getEdgeById(node.connectedEdges[i]);
-
-      from = this.getNodeById(edge.from).position;
-      to = this.getNodeById(edge.to).position;
-
-      this.edges_.updateLabel(edge);
-    }
-  }
-
-};
-
-
-/**
  * Fit graph into bounds.
  * Calculate most values and offset graph depend on it.
  */
@@ -896,8 +864,7 @@ anychart.graphModule.Chart.prototype.updateNodeStateById = function(id, state) {
  */
 anychart.graphModule.Chart.prototype.updateEdge = function(edge, state) {
   this.edges_.state(edge, state);
-  this.edges_.updateAppearance(edge);
-  this.edges_.updateLabelStyle(edge);
+  this.edges_.drawEdge(edge);
 };
 
 
@@ -1135,8 +1102,6 @@ anychart.graphModule.Chart.prototype.proceedEdges_ = function() {
         edge.to = to.id;
         edge.dataRow = iterator.getIndex();
         edge.currentState = anychart.SettingsState.NORMAL;
-        edge.arrow = this.edges().arrows().getArrow();
-        edge.arrow.edge(edge);
 
         var sibling;
 
@@ -1286,7 +1251,13 @@ anychart.graphModule.Chart.prototype.dropCurrentData_ = function() {
  */
 anychart.graphModule.Chart.prototype.onElementSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE)) {
-    this.invalidateState(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidateMultiState(anychart.enums.Store.GRAPH,
+      [
+        anychart.enums.State.EDGES,
+        anychart.enums.State.APPEARANCE
+      ],
+      anychart.Signal.NEEDS_REDRAW
+    );
   }
 };
 
@@ -1442,7 +1413,6 @@ anychart.graphModule.Chart.prototype.interactivity = function(opt_value) {
   if (!this.interactivity_) {
     this.interactivity_ = new anychart.graphModule.elements.Interactivity();
     this.setupCreated('interactivity', this.interactivity_);
-    this.interactivity_.listenSignals(this.edges().onInteractivitySignal, this.edges());
     this.interactivity_.listenSignals(this.onInteractivitySignal_, this);
   }
   if (goog.isDef(opt_value)) {
@@ -1679,8 +1649,6 @@ anychart.graphModule.Chart.prototype.getEdgeById = function(id) {
 
 //endregion
 // region Draw
-
-
 /**
  * Init dragger
  * @param {acgraph.events.BrowserEvent} event
@@ -1758,17 +1726,15 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
             startX = x;
             startY = y;
             if (!nodesForDrag.length) {
-              this.updateNodePosition(node, dx, dy);
-              this.nodes_.updateNodeDOMElementPosition(node);
-              this.updateEdgesConnectedToNode(node);
-            } else {
-              for (var i = 0; i < nodesForDrag.length; i++) {
-                var dragNode = nodesForDrag[i];
-                this.updateNodePosition(dragNode, dx, dy);
-                this.nodes_.updateNodeDOMElementPosition(dragNode);
-                this.updateEdgesConnectedToNode(dragNode);
-              }
+              nodesForDrag.push(node);
             }
+
+            for (var i = 0; i < nodesForDrag.length; i++) {
+              var dragNode = nodesForDrag[i];
+              this.updateNodePosition(dragNode, dx, dy);
+              this.nodes_.updateNodeDOMElementPosition(dragNode);
+            }
+            this.edges_.drawEdges();
           }
         } else {
           dx = (x - startX) / scale; //slowdown drag when zoom are used
@@ -1792,7 +1758,7 @@ anychart.graphModule.Chart.prototype.initDragger_ = function(event) {
                 this.nodes_.stickNode(node);
                 this.nodes_.updateNodeDOMElementPosition(node);
               }
-              this.updateEdgesConnectedToNode(node);
+              this.edges_.drawEdges();
             }
           }
         }
@@ -1875,6 +1841,55 @@ anychart.graphModule.Chart.prototype.rotateNodes_ = function() {
 };
 
 
+/**
+ * Draw graph edges.
+ *
+ * @private
+ */
+anychart.graphModule.Chart.prototype.drawEdges_ = function() {
+  if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES)) {
+    this.edges_.drawEdges();
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE)) {
+      this.edges_.applyLabelsStyle();
+    }
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS)) {
+      anychart.measuriator.measure();
+    }
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED)) {
+      this.edges_.drawLabels();
+    }
+
+    this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES);
+  }
+};
+
+
+/**
+ * Draw graph nodes.
+ *
+ * @private
+ */
+anychart.graphModule.Chart.prototype.drawNodes_ = function() {
+  if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.NODES)) {
+    this.nodes_.drawNodes();
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE)) {
+      this.nodes_.updateAppearance();
+    }
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE)) {
+      this.nodes_.applyLabelsStyle();
+    }
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS)) {
+      anychart.measuriator.measure();
+    }
+    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED)) {
+      this.nodes_.drawLabels();
+    }
+
+    this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES);
+  }
+};
+
+
 /** @inheritDoc */
 anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
   if (this.isConsistent())
@@ -1950,13 +1965,11 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.updateBoundsOfElements_(bounds);
-    if (this.isfixed || this.layout().type() == anychart.enums.LayoutType.FORCED) {
+    if (this.isfixed || this.layout().getOption('type') === anychart.enums.LayoutType.FORCED) {
       this.fitNodesCoordinatesIntoContentBounds();
     } else {
       this.moveNodesToCenter();
     }
-    this.edges_.drawEdges();
-    this.nodes_.drawNodes();
 
     this.invalidateMultiState(anychart.enums.Store.GRAPH, [
       anychart.enums.State.EDGES,
@@ -1970,11 +1983,8 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE)) {
-    this.edges_.updateAppearance();
-    this.nodes_.updateAppearance();
-    this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.APPEARANCE);
-  }
+  this.drawEdges_();
+  this.drawNodes_();
 
   if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION)) {
     this.deselectAllElements_();
@@ -1983,40 +1993,12 @@ anychart.graphModule.Chart.prototype.drawContent = function(bounds) {
     this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.SELECTION);
   }
 
-  if (this.hasMultiStateInvalidation(anychart.enums.Store.GRAPH,
-    [
-      anychart.enums.State.LABELS_STYLE,
-      anychart.enums.State.LABELS_BOUNDS,
-      anychart.enums.State.LABELS_ENABLED
-    ])) {
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE)) {
-      if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.NODES)) {
-        this.nodes_.applyLabelsStyle();
-      }
-
-      if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES)) {
-        this.edges_.applyLabelsStyle();
-      }
-      this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_STYLE);
-    }
-
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS)) {
-      anychart.measuriator.measure();
-      this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_BOUNDS);
-    }
-
-    if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED)) {
-      if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.EDGES)) {
-        this.edges_.drawLabels();
-      }
-
-      if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.NODES)) {
-        this.nodes_.drawLabels();
-      }
-      this.markStateConsistent(anychart.enums.Store.GRAPH, anychart.enums.State.LABELS_ENABLED);
-    }
-    this.markMultiStateConsistent(anychart.enums.Store.GRAPH, [anychart.enums.State.EDGES, anychart.enums.State.NODES]);
-  }
+  this.markMultiStateConsistent(anychart.enums.Store.GRAPH, [
+    anychart.enums.State.APPEARANCE,
+    anychart.enums.State.LABELS_STYLE,
+    anychart.enums.State.LABELS_BOUNDS,
+    anychart.enums.State.LABELS_ENABLED
+  ]);
 
   if (this.hasStateInvalidation(anychart.enums.Store.GRAPH, anychart.enums.State.TRANSFORM)) {
     this.updateTransformationMatrixForLayer_();

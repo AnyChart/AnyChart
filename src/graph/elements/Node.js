@@ -125,16 +125,6 @@ anychart.graphModule.elements.Node.prototype.provideMeasurements = function() {
 
 
 /**
- * Returns id of element.
- * @param {anychart.graphModule.Chart.Node} node
- * @return {string} id of element.
- */
-anychart.graphModule.elements.Node.prototype.getElementId = function(node) {
-  return node.id;
-};
-
-
-/**
  * @param {anychart.graphModule.Chart.Node} node
  * @param {string} setting
  * @return {*}
@@ -461,7 +451,9 @@ anychart.graphModule.elements.Node.prototype.stickNode = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
-  return /** @type {number} */(this.resolveSettings(node, 'height'));
+  var height = anychart.utils.toNumber(this.resolveSettings(node, 'height'));
+
+  return isNaN(height) ? /**@type{number}*/(this.getOption('height')) : height;
 };
 
 
@@ -471,12 +463,15 @@ anychart.graphModule.elements.Node.prototype.getHeight = function(node) {
  * @return {number}
  */
 anychart.graphModule.elements.Node.prototype.getWidth = function(node) {
+  // Default anychart markers must be not stretched.
   var shape = this.resolveSettings(node, 'shape');
-  if (shape == anychart.enums.normalizeMarkerType(shape)) {
+  if (shape === anychart.enums.normalizeMarkerType(shape)) {
     return this.getHeight(node);
-  } else {
-    return /** @type {number} */(this.resolveSettings(node, 'width'));
   }
+
+  var width = anychart.utils.toNumber(this.resolveSettings(node, 'width'));
+
+  return isNaN(width) ? /**@type{number}*/(this.getOption('width')) : width;
 };
 
 
@@ -537,6 +532,8 @@ anychart.graphModule.elements.Node.prototype.getShapeDrawer = function(node) {
  * @param {anychart.graphModule.Chart.Node} node
  */
 anychart.graphModule.elements.Node.prototype.updatePathShape = function(node) {
+  var drawer = this.getShapeDrawer(node);
+
   var width = this.getWidth(node);
   var height = this.getHeight(node);
 
@@ -551,7 +548,7 @@ anychart.graphModule.elements.Node.prototype.updatePathShape = function(node) {
 
   width /= 2;
   height /= 2;
-  var drawer = this.getShapeDrawer(node);
+
   drawer(path, x, y, height, width);
 };
 
