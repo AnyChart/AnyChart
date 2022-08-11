@@ -93,6 +93,6 @@ anychart.stockModule.math.aroonOscillator.createComputer = function(mapping, opt
 //exports
 goog.exportSymbol('anychart.math.aroonOscillator.initContext', anychart.stockModule.math.aroonOscillator.initContext);
 goog.exportSymbol('anychart.math.aroonOscillator.startFunction', anychart.stockModule.math.aroonOscillator.startFunction);
-goog.exportSymbol('anychart.math.aroonOscillator.calculate', anychart.stockModule.math.aroonOscillator.calculationFunction);
+goog.exportSymbol('anychart.math.aroonOscillator.calculate', anychart.stockModule.math.aroonOscillator.calculate);
 goog.exportSymbol('anychart.math.aroonOscillator.calculationFunction', anychart.stockModule.math.aroonOscillator.calculationFunction);
 goog.exportSymbol('anychart.math.aroonOscillator.createComputer', anychart.stockModule.math.aroonOscillator.createComputer);
