@@ -1972,6 +1972,7 @@ anychart.enums.StockIndicatorTypes = {
   CCI: 'cci',
   CHO: 'cho',
   CMF: 'cmf',
+  COPPOCK_CURVE: 'coppock-curve',
   DMI: 'dmi',
   EMA: 'ema',
   ENV: 'env',
@@ -1997,7 +1998,8 @@ anychart.enums.StockIndicatorTypes = {
   TRIX: 'trix',
   VWAP: 'vwap',
   VOLUME_MA: 'volume-ma',
-  WILLIAMS_R: 'williams-r'
+  WILLIAMS_R: 'williams-r',
+  WMA: 'wma'
 };
 
 
@@ -2012,7 +2014,8 @@ anychart.enums.StockIndicatorTypes = {
  */
 anychart.enums.MovingAverageType = {
   SMA: 'sma',
-  EMA: 'ema'
+  EMA: 'ema',
+  WMA: 'wma'
 };
 
 

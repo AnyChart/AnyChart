@@ -15,6 +15,7 @@ goog.require('anychart.stockModule.indicators.BBandsWidth');
 goog.require('anychart.stockModule.indicators.CCI');
 goog.require('anychart.stockModule.indicators.CHO');
 goog.require('anychart.stockModule.indicators.CMF');
+goog.require('anychart.stockModule.indicators.CoppockCurve');
 goog.require('anychart.stockModule.indicators.DMI');
 goog.require('anychart.stockModule.indicators.EMA');
 goog.require('anychart.stockModule.indicators.ENV');
@@ -40,6 +41,7 @@ goog.require('anychart.stockModule.indicators.Stochastic');
 goog.require('anychart.stockModule.indicators.TRIX');
 goog.require('anychart.stockModule.indicators.VWAP');
 goog.require('anychart.stockModule.indicators.VolumeMA');
+goog.require('anychart.stockModule.indicators.WMA');
 goog.require('anychart.stockModule.indicators.WilliamsR');
 
 /**
@@ -66,6 +68,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.CCI] = anychart.stockModule.indicators.CCI;
   res[anychart.enums.StockIndicatorTypes.CHO] = anychart.stockModule.indicators.CHO;
   res[anychart.enums.StockIndicatorTypes.CMF] = anychart.stockModule.indicators.CMF;
+  res[anychart.enums.StockIndicatorTypes.COPPOCK_CURVE] = anychart.stockModule.indicators.CoppockCurve;
   res[anychart.enums.StockIndicatorTypes.DMI] = anychart.stockModule.indicators.DMI;
   res[anychart.enums.StockIndicatorTypes.EMA] = anychart.stockModule.indicators.EMA;
   res[anychart.enums.StockIndicatorTypes.ENV] = anychart.stockModule.indicators.ENV;
@@ -92,6 +95,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.VWAP] = anychart.stockModule.indicators.VWAP;
   res[anychart.enums.StockIndicatorTypes.VOLUME_MA] = anychart.stockModule.indicators.VolumeMA;
   res[anychart.enums.StockIndicatorTypes.WILLIAMS_R] = anychart.stockModule.indicators.WilliamsR;
+  res[anychart.enums.StockIndicatorTypes.WMA] = anychart.stockModule.indicators.WMA;
   return res;
 })();
 
