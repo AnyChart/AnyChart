@@ -4095,6 +4095,7 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   //proto['adl'] = proto.adl;
   //proto['ama'] = proto.ama;
   //proto['aroon'] = proto.aroon;
+  //proto['aroonOscillator'] = proto.aroonOscillator;
   //proto['atr'] = proto.atr;
   //proto['bbands'] = proto.bbands;
   //proto['bbandsB'] = proto.bbandsB;

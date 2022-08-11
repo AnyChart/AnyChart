@@ -1964,6 +1964,7 @@ anychart.enums.StockIndicatorTypes = {
   AMA: 'ama',
   AO: 'ao',
   AROON: 'aroon',
+  AROON_OSCILLATOR: 'aroon-oscillator',
   ATR: 'atr',
   BBANDS: 'bbands',
   BBANDS_B: 'bbands-b',

@@ -8,6 +8,7 @@ goog.require('anychart.stockModule.indicators.AMA');
 goog.require('anychart.stockModule.indicators.AO');
 goog.require('anychart.stockModule.indicators.ATR');
 goog.require('anychart.stockModule.indicators.Aroon');
+goog.require('anychart.stockModule.indicators.AroonOscillator');
 goog.require('anychart.stockModule.indicators.BBands');
 goog.require('anychart.stockModule.indicators.BBandsB');
 goog.require('anychart.stockModule.indicators.BBandsWidth');
@@ -57,6 +58,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.AMA] = anychart.stockModule.indicators.AMA;
   res[anychart.enums.StockIndicatorTypes.AO] = anychart.stockModule.indicators.AO;
   res[anychart.enums.StockIndicatorTypes.AROON] = anychart.stockModule.indicators.Aroon;
+  res[anychart.enums.StockIndicatorTypes.AROON_OSCILLATOR] = anychart.stockModule.indicators.AroonOscillator;
   res[anychart.enums.StockIndicatorTypes.ATR] = anychart.stockModule.indicators.ATR;
   res[anychart.enums.StockIndicatorTypes.BBANDS] = anychart.stockModule.indicators.BBands;
   res[anychart.enums.StockIndicatorTypes.BBANDS_B] = anychart.stockModule.indicators.BBandsB;
