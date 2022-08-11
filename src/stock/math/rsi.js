@@ -23,7 +23,7 @@ anychart.stockModule.math.rsi.Context;
 anychart.stockModule.math.rsi.initContext = function(opt_period) {
   var period = anychart.utils.normalizeToNaturalNumber(opt_period, 14, false);
   return {
-    queue: anychart.math.cycledQueue(period),
+    queue: anychart.math.cycledQueue(period + 1),
     period: period,
     upwardChange: NaN,
     downwardChange: NaN,
@@ -68,13 +68,13 @@ anychart.stockModule.math.rsi.calculationFunction = function(row, context) {
   var prev;
   /** @type {number} */
   var curr;
-  if (missing || context.queue.getLength() < context.period) { // not ready yet
+  if (missing || context.queue.getLength() < context.period + 1) { // not ready yet
     result = NaN;
   } else {
     if (isNaN(context.upwardChange)) { // first calculation
       var up = 0, down = 0;
       curr = /** @type {number} */(context.queue.get(0));
-      for (var i = 1; i < context.period; i++) {
+      for (var i = 1; i < context.period + 1; i++) {
         prev = curr;
         curr = /** @type {number} */(context.queue.get(i));
         if (curr > prev)
