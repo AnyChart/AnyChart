@@ -517,9 +517,7 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
         currentDiff = NaN;
     for (var q = minCount; q <= maxCount; q++) {
       var count = q - 1; // it should be valid here
-      currentInterval = anychart.math.specialRound(range / count);
-      if (currentInterval == 0)
-        currentInterval = anychart.math.specialRound(range / count, 10);
+      currentInterval = range / count;
 
       // Here we can add other interval rounding options and choose the best
       // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
