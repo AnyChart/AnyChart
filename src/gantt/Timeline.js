@@ -5504,7 +5504,7 @@ anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cu
   var labelFinalRight = Math.min(hardRightRestraint, curTagLabelBounds.getRight());
   var labelFinalLeft = Math.max(hardLeftRestraint, curTagLabelBounds.getLeft());
 
-  var newWidth = labelFinalRight - labelFinalLeft;
+  var newWidth = Math.max(labelFinalRight - labelFinalLeft, 0);
 
   var needsLabelSizeLimitation = false;
   var curTagLabelAnchor = cur.label.getFinalSettings('anchor').split('-')[0];
@@ -5515,10 +5515,7 @@ anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cu
     needsLabelSizeLimitation = true;
   }
 
-  // Minimum allowed width for labels, currently is not configurable.
-  var minimumAllowedWidth = 20;
-
-  if (newWidth >= minimumAllowedWidth && newWidth < curTagLabelBounds.width) {
+  if (newWidth < curTagLabelBounds.width) {
     if (next) {
       var nextTagLabelBounds = this.getTagLabelBounds_(next.label);
       var minTop = Math.min(curTagLabelBounds.top, nextTagLabelBounds.top);
@@ -5529,8 +5526,6 @@ anychart.ganttModule.TimeLine.prototype.cropCurrentTagLabel_ = function(prev, cu
       cur.label.width(newWidth);
       cur.label.height(curTagLabelBounds.height);
     }
-  } else if (newWidth < minimumAllowedWidth) {
-    cur.label.enabled(false);
   }
 };
 
