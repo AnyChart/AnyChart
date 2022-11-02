@@ -1600,6 +1600,9 @@ anychart.enums.EventType = {
   WORKING_CANCEL: 'workingcancel',
   WORKING_FINISH: 'workingfinish',
 
+  // Gantt specific event: scrolled to the end, needs to load more data.
+  NEEDS_DATA_LOAD: 'needsdataload',
+
   // stateful activities
   STATE_CHANGE: 'statechange'
 };

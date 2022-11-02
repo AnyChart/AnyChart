@@ -1247,10 +1247,13 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
     stage.suspend();
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
-  if (this.dataGrid_)
+  if (this.dataGrid_) {
     this.dataGrid_.drawInternal(this.positionRecalculated_);
-  if (this.timeline_)
+  }
+
+  if (this.timeline_) {
     this.timeline_.drawInternal(this.positionRecalculated_);
+  }
 
   if (this.verticalScrollBar_) {
     this.verticalScrollBar_.suspendSignalsDispatching();
@@ -1282,6 +1285,21 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
         .draw()
         .handlePositionChange(true)
         .resumeSignalsDispatching(false);
+  }
+
+  if (this.endIndex_ >= this.heightCache_.length - 2) {
+    var dispatcher = this.getDispatcher();
+    if (dispatcher) {
+      // TODO (alexander.kudryavtsev): More fields?
+      var ev = {
+        'type': anychart.enums.EventType.NEEDS_DATA_LOAD,
+        'totalListLength': this.heightCache_.length,
+        'startListIndex': this.startIndex_,
+        'endListIndex': this.endIndex_
+      };
+
+      dispatcher.dispatchDetachedEvent(ev);
+    }
   }
 
   if (stage)
