@@ -1760,6 +1760,7 @@ anychart.standalones.dataGrid = function() {
   proto['draw'] = proto.draw;
   proto['buttons'] = proto.buttons;
   proto['getColumnsCount'] = proto.getColumnsCount;
+  proto['loadingMessage'] = proto.loadingMessage;
 
 
   proto = anychart.standalones.DataGrid.prototype;
