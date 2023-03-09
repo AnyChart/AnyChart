@@ -2160,6 +2160,7 @@ anychart.enums.GanttDataFields = {
   CONNECTOR: 'connector',
   CONNECT_TO: 'connectTo', // deprecated since 7.7.0
   CONNECTOR_TYPE: 'connectorType',
+  CONNECT_BY: 'connectBy',
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',

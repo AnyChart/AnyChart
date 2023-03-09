@@ -775,9 +775,23 @@ anychart.ganttModule.Controller.prototype.getVisibleData_ = function() {
           var conn = projConnectors[k];
           if (conn) {
             connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
+
+            var connectBy = conn[anychart.enums.GanttDataFields.CONNECT_BY];
+            if (goog.isString(connectBy) && connectBy) { // Not empty string.
+              // Will be faster on indexed 'connectBy' field.
+              var foundItemConnectTo = this.data_.find(connectBy, connectTo);
+              if (foundItemConnectTo) {
+                connectTo = foundItemConnectTo.get(anychart.enums.GanttDataFields.ID);
+              }
+            }
+
             itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+
             connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+
+            // itemConnectTo can be undefined here.
             taskMapItem = {'from': visItem, 'to': itemConnectTo};
+
             if (connType) taskMapItem['type'] = connType;
             taskMapItem['connSettings'] = conn;
             this.connectorsData_.push(taskMapItem);
