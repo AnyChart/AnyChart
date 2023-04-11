@@ -775,9 +775,23 @@ anychart.ganttModule.Controller.prototype.getVisibleData_ = function() {
           var conn = projConnectors[k];
           if (conn) {
             connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
+
+            var connectBy = conn[anychart.enums.GanttDataFields.CONNECT_BY];
+            if (goog.isString(connectBy) && connectBy) { // Not empty string.
+              // Will be faster on indexed 'connectBy' field.
+              var foundItemConnectTo = this.data_.find(connectBy, connectTo);
+              if (foundItemConnectTo) {
+                connectTo = foundItemConnectTo.get(anychart.enums.GanttDataFields.ID);
+              }
+            }
+
             itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+
             connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+
+            // itemConnectTo can be undefined here.
             taskMapItem = {'from': visItem, 'to': itemConnectTo};
+
             if (connType) taskMapItem['type'] = connType;
             taskMapItem['connSettings'] = conn;
             this.connectorsData_.push(taskMapItem);
@@ -1247,10 +1261,13 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
     stage.suspend();
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
-  if (this.dataGrid_)
+  if (this.dataGrid_) {
     this.dataGrid_.drawInternal(this.positionRecalculated_);
-  if (this.timeline_)
+  }
+
+  if (this.timeline_) {
     this.timeline_.drawInternal(this.positionRecalculated_);
+  }
 
   if (this.verticalScrollBar_) {
     this.verticalScrollBar_.suspendSignalsDispatching();
@@ -1282,6 +1299,21 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
         .draw()
         .handlePositionChange(true)
         .resumeSignalsDispatching(false);
+  }
+
+  if (this.endIndex_ >= this.heightCache_.length - 2) {
+    var dispatcher = this.getDispatcher();
+    if (dispatcher) {
+      // TODO (alexander.kudryavtsev): More fields?
+      var ev = {
+        'type': anychart.enums.EventType.NEEDS_DATA_LOAD,
+        'totalListLength': this.heightCache_.length,
+        'startListIndex': this.startIndex_,
+        'endListIndex': this.endIndex_
+      };
+
+      dispatcher.dispatchDetachedEvent(ev);
+    }
   }
 
   if (stage)

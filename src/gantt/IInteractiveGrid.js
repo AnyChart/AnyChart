@@ -165,3 +165,10 @@ anychart.ganttModule.IInteractiveGrid.prototype.lockInteractivity = function(loc
  */
 anychart.ganttModule.IInteractiveGrid.prototype.selection = function() {};
 
+/**
+ * Dispatches an event (or event like object) with setTimeout.
+ *
+ * @param {goog.events.EventLike} e Event object.
+ */
+anychart.ganttModule.IInteractiveGrid.prototype.dispatchDetachedEvent = function(e) {};
+

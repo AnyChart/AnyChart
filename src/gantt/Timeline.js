@@ -419,7 +419,8 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
     ['weekendsFill', 0, 0, 0, function() {
       var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('weekendsFill'));
       this.getWeekendsPath_().fill(fill);
-    }]
+    }],
+    ['connectBy', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW]
   ]);
 
   this.controller.timeline(this);
@@ -646,7 +647,8 @@ anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'workingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'weekendsFill', anychart.core.settings.fillNormalizer]
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'weekendsFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectBy', anychart.core.settings.stringNormalizer]
   ]);
   return map;
 })();

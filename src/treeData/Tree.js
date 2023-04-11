@@ -728,6 +728,19 @@ anychart.treeDataModule.Tree.prototype.searchItems = function(field, value, opt_
 
 
 /**
+ * Performs a data search. Returns an exact single value or null.
+ * NOTE: It will be faster if the field is indexed with tree.createIndexOn().
+ *
+ * @param {string} field - Field for search. Literally means the name of field of data item.
+ * @param {?} value - Value to be found.
+ * @return {anychart.treeDataModule.Tree.DataItem|undefined} - Array of found tree data items.
+ */
+anychart.treeDataModule.Tree.prototype.find = function (field, value) {
+  return this.searchItems(field, value)[0];
+};
+
+
+/**
  * Filters tree data items by filter-function.
  * NOTE: filter performs full data passage. It means that filtering is way slower than searching on indexed field
  *  with correctly implemented comparison function.
@@ -2020,6 +2033,7 @@ anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
   proto['removeIndexOn'] = proto.removeIndexOn;
   proto['search'] = proto.search;
   proto['searchItems'] = proto.searchItems;
+  proto['find'] = proto.find;
   proto['filter'] = proto.filter;
   proto['addChild'] = proto.addChild;
   proto['addChildAt'] = proto.addChildAt;

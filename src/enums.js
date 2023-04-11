@@ -1600,6 +1600,9 @@ anychart.enums.EventType = {
   WORKING_CANCEL: 'workingcancel',
   WORKING_FINISH: 'workingfinish',
 
+  // Gantt specific event: scrolled to the end, needs to load more data.
+  NEEDS_DATA_LOAD: 'needsdataload',
+
   // stateful activities
   STATE_CHANGE: 'statechange'
 };
@@ -2157,6 +2160,7 @@ anychart.enums.GanttDataFields = {
   CONNECTOR: 'connector',
   CONNECT_TO: 'connectTo', // deprecated since 7.7.0
   CONNECTOR_TYPE: 'connectorType',
+  CONNECT_BY: 'connectBy',
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',

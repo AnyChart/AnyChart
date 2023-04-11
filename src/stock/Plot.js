@@ -1372,6 +1372,7 @@ anychart.stockModule.Plot.prototype.yScale = function(opt_value) {
       this.yScale_.resumeSignalsDispatching(dispatch);
       if (!dispatch) {
         this.invalidateRedrawable(false);
+        this.chart_.invalidate(anychart.ConsistencyState.STOCK_SCALES);
         this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
       }
     }
