@@ -403,7 +403,9 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
       var period = periods[i];
       var periodStart = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START);
       var periodStartVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.START]);
-      if (!goog.isNull(periodStartVal)) {
+      if (goog.isNull(periodStartVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, null);
+      } else {
         periodStartVal = +periodStartVal;
         item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, periodStartVal);
         periodStart = periodStartVal;
@@ -411,9 +413,11 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
 
       var periodEnd = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END);
       var periodEndVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.END]);
-      if (!goog.isNull(periodEndVal)) {
+      if (goog.isNull(periodEndVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, null);
+      } else {
         periodEndVal = +periodEndVal;
-        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, +periodEndVal);
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, periodEndVal);
         periodEnd = periodEndVal;
       }
 
