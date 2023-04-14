@@ -1603,6 +1603,9 @@ anychart.enums.EventType = {
   // Gantt specific event: scrolled to the end, needs to load more data.
   NEEDS_DATA_LOAD: 'needsdataload',
 
+  // Gantt specific event: when data should not to be loaded
+  NO_DATA_LOADING_NEEDED: 'nodataloadingneeded',
+
   // stateful activities
   STATE_CHANGE: 'statechange'
 };

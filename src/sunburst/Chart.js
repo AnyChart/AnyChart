@@ -1712,7 +1712,7 @@ anychart.sunburstModule.Chart.prototype.calculateStatsForHiddenLevels = function
     var nextVisibleLevel = this.currentLevels[nextVisibleLevelDepth];
 
     goog.object.forEach(level.statsByRoot, function(rootStats, rootIndex) {
-      var nextVisibleLevelStats = nextVisibleLevel ? nextVisibleLevel.statsByRoot[rootIndex] : null;
+      var nextVisibleLevelStats = nextVisibleLevel && nextVisibleLevel.statsByRoot ? nextVisibleLevel.statsByRoot[rootIndex] : null;
       for (var i = 0; i < rootStats.nodes.length; i++) {
         var node = rootStats.nodes[i];
 
