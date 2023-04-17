@@ -538,7 +538,7 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
       var metaBaselineStart = child.meta(anychart.enums.GanttDataFields.BASELINE_START);
       var childBaselineStart = /** @type {number} */ ((goog.isNumber(metaBaselineStart) && !isNaN(metaBaselineStart)) ? metaBaselineStart : (child.meta('autoBaselineStart') || NaN));
-      
+
       var metaBaselineEnd = child.meta(anychart.enums.GanttDataFields.BASELINE_END);
       var childBaselineEnd = /** @type {number} */ ((goog.isNumber(metaBaselineEnd) && !isNaN(metaBaselineEnd)) ? metaBaselineEnd : (child.meta('autoBaselineEnd') || metaBaselineStart));
 
@@ -1305,19 +1305,22 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
         .resumeSignalsDispatching(false);
   }
 
-  if (this.endIndex_ >= this.heightCache_.length - 2) {
-    var dispatcher = this.getDispatcher();
-    if (dispatcher) {
-      // TODO (alexander.kudryavtsev): More fields?
-      var ev = {
-        'type': anychart.enums.EventType.NEEDS_DATA_LOAD,
-        'totalListLength': this.heightCache_.length,
-        'startListIndex': this.startIndex_,
-        'endListIndex': this.endIndex_
-      };
+  var dispatcher = this.getDispatcher();
+  if (dispatcher) {
+    // TODO (alexander.kudryavtsev): More fields?
+    var ev = {
+      'totalListLength': this.heightCache_.length,
+      'startListIndex': this.startIndex_,
+      'endListIndex': this.endIndex_,
+    };
 
-      dispatcher.dispatchDetachedEvent(ev);
+    if (this.endIndex_ >= this.heightCache_.length - 2) {
+      ev['type'] = anychart.enums.EventType.NEEDS_DATA_LOAD;
+    } else {
+      ev['type'] = anychart.enums.EventType.NO_DATA_LOADING_NEEDED;
     }
+
+    dispatcher.dispatchDetachedEvent(ev);
   }
 
   if (stage)
