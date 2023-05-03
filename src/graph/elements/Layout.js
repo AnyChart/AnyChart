@@ -187,7 +187,6 @@ anychart.graphModule.elements.Layout.prototype.attractive_ = function(x1, y1, x2
  * @private
  */
 anychart.graphModule.elements.Layout.prototype.forceLayout_ = function() {
-
   var nodes = this.chart_.getNodesArray();
   var subgraphs = this.chart_.getSubGraphsMap();
   var length, node, node2, i, j, force;

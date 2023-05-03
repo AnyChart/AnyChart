@@ -199,10 +199,10 @@ anychart.surfaceModule.markers.Controller.prototype.getMarkers = function() {
       var iterator = this.data_.getIterator();
 
       while (iterator.advance()) {
-        var x = iterator.get('x');
-        var y = iterator.get('y');
-        var z = iterator.get('z');
-        if (goog.isNumber(x) && goog.isNumber(y) && goog.isNumber(z)) {
+        var x = +iterator.get('x');
+        var y = +iterator.get('y');
+        var z = +iterator.get('z');
+        if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
           var marker = this.getMarker({
             index: iterator.getIndex(),
             data: [x, y, z]
@@ -228,6 +228,8 @@ anychart.surfaceModule.markers.Controller.prototype.draw = function(bounds) {
     this.rootLayer_.parent(/**@type {acgraph.vector.Layer}*/(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+  this.rootLayer_.removeChildren();
 
   var marker;
   var markers = this.getMarkers();
@@ -544,6 +546,10 @@ anychart.surfaceModule.markers.Controller.prototype.serialize = function() {
     rv['data'] = data.serialize();
   }
 
+  if (this.droplines_) {
+    rv['droplines'] = this.droplines_.serialize();
+  }
+
   return rv;
 };
 
@@ -554,6 +560,11 @@ anychart.surfaceModule.markers.Controller.prototype.setupByJSON = function(json,
   var data = json['data'];
   if (data) {
     this.data(data);
+  }
+
+  var droplines = json['droplines'];
+  if (droplines) {
+    this.droplines(droplines);
   }
 };
 

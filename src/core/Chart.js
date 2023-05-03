@@ -3730,6 +3730,27 @@ anychart.core.Chart.prototype.populateCsvRow = function(row, names, iterator, he
 
 
 /**
+ * Add headers for csv.
+ *
+ * @param {Array<string>} headers - Array with headers.
+ * @param {Array<{data: function():anychart.data.IDataSource}>} dataHolders - Dataholders to serialize.
+ * @param {Array<string>} names - Field names to serialize.
+ * @param {number} currentHolderIndex - Index of current dataholder.
+ *
+ * @protected
+ */
+anychart.core.Chart.prototype.populateCsvHeaders = function(headers, dataHolders, names, currentHolderIndex) {
+  if (dataHolders.length > 1) {
+    for (var j = 0; j < names.length; j++) {
+      headers.push(this.prefixCsvColumnName(names[j], dataHolders[currentHolderIndex], currentHolderIndex + 1, names.length));
+    }
+  } else {
+    headers.push.apply(headers, names);
+  }
+};
+
+
+/**
  * Gets data for DEFAULT toCsv mode.
  * @param {anychart.enums.ChartDataExportMode} mode
  * @return {{headers: Array.<string>, data: Array.<Array.<*>>}}
@@ -3738,7 +3759,6 @@ anychart.core.Chart.prototype.getCsvData = function(mode) {
   var dataHolders = this.getDataHolders();
   var headers = this.getCsvGrouperColumn();
   var xValues = {};
-  var j;
   var data = [];
   for (var i = 0; i < dataHolders.length; i++) {
     var dataHolder = dataHolders[i];
@@ -3762,13 +3782,7 @@ anychart.core.Chart.prototype.getCsvData = function(mode) {
           this.populateCsvRow(row, names, iterator, headers);
         }
       }
-      if (dataHolders.length > 1) {
-        for (j = 0; j < names.length; j++) {
-          headers.push(this.prefixCsvColumnName(names[j], dataHolder, i + 1, names.length));
-        }
-      } else {
-        headers.push.apply(headers, names);
-      }
+      this.populateCsvHeaders(headers, dataHolders, names, i);
     }
   }
   return {headers: headers, data: data};

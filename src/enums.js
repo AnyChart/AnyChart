@@ -1600,6 +1600,12 @@ anychart.enums.EventType = {
   WORKING_CANCEL: 'workingcancel',
   WORKING_FINISH: 'workingfinish',
 
+  // Gantt specific event: scrolled to the end, needs to load more data.
+  NEEDS_DATA_LOAD: 'needsdataload',
+
+  // Gantt specific event: when data should not to be loaded
+  NO_DATA_LOADING_NEEDED: 'nodataloadingneeded',
+
   // stateful activities
   STATE_CHANGE: 'statechange'
 };
@@ -1964,6 +1970,7 @@ anychart.enums.StockIndicatorTypes = {
   AMA: 'ama',
   AO: 'ao',
   AROON: 'aroon',
+  AROON_OSCILLATOR: 'aroon-oscillator',
   ATR: 'atr',
   BBANDS: 'bbands',
   BBANDS_B: 'bbands-b',
@@ -1971,6 +1978,7 @@ anychart.enums.StockIndicatorTypes = {
   CCI: 'cci',
   CHO: 'cho',
   CMF: 'cmf',
+  COPPOCK_CURVE: 'coppock-curve',
   DMI: 'dmi',
   EMA: 'ema',
   ENV: 'env',
@@ -1996,7 +2004,8 @@ anychart.enums.StockIndicatorTypes = {
   TRIX: 'trix',
   VWAP: 'vwap',
   VOLUME_MA: 'volume-ma',
-  WILLIAMS_R: 'williams-r'
+  WILLIAMS_R: 'williams-r',
+  WMA: 'wma'
 };
 
 
@@ -2011,7 +2020,8 @@ anychart.enums.StockIndicatorTypes = {
  */
 anychart.enums.MovingAverageType = {
   SMA: 'sma',
-  EMA: 'ema'
+  EMA: 'ema',
+  WMA: 'wma'
 };
 
 
@@ -2153,6 +2163,7 @@ anychart.enums.GanttDataFields = {
   CONNECTOR: 'connector',
   CONNECT_TO: 'connectTo', // deprecated since 7.7.0
   CONNECTOR_TYPE: 'connectorType',
+  CONNECT_BY: 'connectBy',
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
   LABEL: 'label',
