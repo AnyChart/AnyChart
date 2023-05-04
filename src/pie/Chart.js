@@ -4069,6 +4069,19 @@ anychart.pieModule.Chart.prototype.getExplode = function(opt_pointState, opt_ign
   return explodeValue;
 };
 
+//TODO(anton.kagakin): implement for proper CSV. Check other charts as well
+/*anychart.pieModule.Chart.prototype.getCsvGrouperColumn = function() {
+  return ['x'];
+}
+
+anychart.pieModule.Chart.prototype.getCsvGrouperValue = function(iterator) {
+  return iterator.get('x');
+}
+
+anychart.pieModule.Chart.prototype.getCsvGrouperAlias = function(iterator) {
+  var res = iterator.get('name');
+  return goog.isString(res) ? res : null;
+};*/
 
 //endregion
 //region --- Legend

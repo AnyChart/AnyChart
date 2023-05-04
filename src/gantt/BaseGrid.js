@@ -820,11 +820,12 @@ anychart.ganttModule.BaseGrid.getPeriodInfo = function(item, periodIndex) {
   var metaPeriod = item.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex);
   var start = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.START] : void 0;
   var end = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.END] : void 0;
-  var milestoneTimestamp = goog.isDef(start) ? start : end;
 
   // By idea, start and end can be only number or undefined, but let this check be.
   var isValidStart = goog.isDefAndNotNull(start) && !isNaN(start);
   var isValidEnd = goog.isDefAndNotNull(end) && !isNaN(end);
+
+  var milestoneTimestamp = isValidStart ? start : (isValidEnd ? end : null);
 
   return /** @type {anychart.ganttModule.BaseGrid.PeriodData} */ ({
     start: start,

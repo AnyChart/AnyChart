@@ -403,7 +403,9 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
       var period = periods[i];
       var periodStart = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START);
       var periodStartVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.START]);
-      if (!goog.isNull(periodStartVal)) {
+      if (goog.isNull(periodStartVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, null);
+      } else {
         periodStartVal = +periodStartVal;
         item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, periodStartVal);
         periodStart = periodStartVal;
@@ -411,9 +413,11 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
 
       var periodEnd = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END);
       var periodEndVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.END]);
-      if (!goog.isNull(periodEndVal)) {
+      if (goog.isNull(periodEndVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, null);
+      } else {
         periodEndVal = +periodEndVal;
-        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, +periodEndVal);
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, periodEndVal);
         periodEnd = periodEndVal;
       }
 
@@ -534,7 +538,7 @@ anychart.ganttModule.Controller.prototype.autoCalcItem_ = function(item, current
 
       var metaBaselineStart = child.meta(anychart.enums.GanttDataFields.BASELINE_START);
       var childBaselineStart = /** @type {number} */ ((goog.isNumber(metaBaselineStart) && !isNaN(metaBaselineStart)) ? metaBaselineStart : (child.meta('autoBaselineStart') || NaN));
-      
+
       var metaBaselineEnd = child.meta(anychart.enums.GanttDataFields.BASELINE_END);
       var childBaselineEnd = /** @type {number} */ ((goog.isNumber(metaBaselineEnd) && !isNaN(metaBaselineEnd)) ? metaBaselineEnd : (child.meta('autoBaselineEnd') || metaBaselineStart));
 
@@ -775,9 +779,23 @@ anychart.ganttModule.Controller.prototype.getVisibleData_ = function() {
           var conn = projConnectors[k];
           if (conn) {
             connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
+
+            var connectBy = conn[anychart.enums.GanttDataFields.CONNECT_BY];
+            if (goog.isString(connectBy) && connectBy) { // Not empty string.
+              // Will be faster on indexed 'connectBy' field.
+              var foundItemConnectTo = this.data_.find(connectBy, connectTo);
+              if (foundItemConnectTo) {
+                connectTo = foundItemConnectTo.get(anychart.enums.GanttDataFields.ID);
+              }
+            }
+
             itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+
             connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+
+            // itemConnectTo can be undefined here.
             taskMapItem = {'from': visItem, 'to': itemConnectTo};
+
             if (connType) taskMapItem['type'] = connType;
             taskMapItem['connSettings'] = conn;
             this.connectorsData_.push(taskMapItem);
@@ -1247,10 +1265,13 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
     stage.suspend();
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
-  if (this.dataGrid_)
+  if (this.dataGrid_) {
     this.dataGrid_.drawInternal(this.positionRecalculated_);
-  if (this.timeline_)
+  }
+
+  if (this.timeline_) {
     this.timeline_.drawInternal(this.positionRecalculated_);
+  }
 
   if (this.verticalScrollBar_) {
     this.verticalScrollBar_.suspendSignalsDispatching();
@@ -1282,6 +1303,24 @@ anychart.ganttModule.Controller.prototype.remainingInvalidationProcessor_ = func
         .draw()
         .handlePositionChange(true)
         .resumeSignalsDispatching(false);
+  }
+
+  var dispatcher = this.getDispatcher();
+  if (dispatcher) {
+    // TODO (alexander.kudryavtsev): More fields?
+    var ev = {
+      'totalListLength': this.heightCache_.length,
+      'startListIndex': this.startIndex_,
+      'endListIndex': this.endIndex_,
+    };
+
+    if (this.endIndex_ >= this.heightCache_.length - 2) {
+      ev['type'] = anychart.enums.EventType.NEEDS_DATA_LOAD;
+    } else {
+      ev['type'] = anychart.enums.EventType.NO_DATA_LOADING_NEEDED;
+    }
+
+    dispatcher.dispatchDetachedEvent(ev);
   }
 
   if (stage)

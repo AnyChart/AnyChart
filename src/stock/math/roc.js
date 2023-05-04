@@ -44,18 +44,16 @@ anychart.stockModule.math.roc.startFunction = function(context) {
 
 
 /**
- * Calculates RoC.
- * @param {anychart.stockModule.data.TableComputer.RowProxy} row
+ * Calculates RoC value.
+ * To use this function you need a setup queue with length equal to period.
  * @param {anychart.stockModule.math.roc.Context} context
- * @this {anychart.stockModule.math.roc.Context}
+ * @param {number} value
+ * @return {number}
  */
-anychart.stockModule.math.roc.calculationFunction = function(row, context) {
-  var currValue = row.get('value');
-  currValue = goog.isDef(currValue) ? currValue : row.get('close');
-  currValue = anychart.utils.toNumber(currValue);
-  var missing = isNaN(currValue);
+anychart.stockModule.math.roc.calculate = function(context, value) {
+  var missing = isNaN(value);
   if (!missing)
-    context.queue.enqueue(currValue);
+    context.queue.enqueue(value);
   /** @type {number} */
   var result;
   if (missing || context.queue.getLength() <= context.period) {
@@ -65,6 +63,21 @@ anychart.stockModule.math.roc.calculationFunction = function(row, context) {
     var lastValue = /** @type {number} */(context.queue.get(-1));
     result = 100 * (lastValue - firstValue) / firstValue;
   }
+  return result;
+};
+
+
+/**
+ * Calculates RoC.
+ * @param {anychart.stockModule.data.TableComputer.RowProxy} row
+ * @param {anychart.stockModule.math.roc.Context} context
+ * @this {anychart.stockModule.math.roc.Context}
+ */
+anychart.stockModule.math.roc.calculationFunction = function(row, context) {
+  var value = row.get('value');
+  value = goog.isDef(value) ? value : row.get('close');
+  value = anychart.utils.toNumber(value);
+  var result = anychart.stockModule.math.roc.calculate(context, value);
   row.set('result', result);
 };
 
@@ -89,4 +102,5 @@ anychart.stockModule.math.roc.createComputer = function(mapping, opt_period) {
 goog.exportSymbol('anychart.math.roc.initContext', anychart.stockModule.math.roc.initContext);
 goog.exportSymbol('anychart.math.roc.startFunction', anychart.stockModule.math.roc.startFunction);
 goog.exportSymbol('anychart.math.roc.calculationFunction', anychart.stockModule.math.roc.calculationFunction);
+goog.exportSymbol('anychart.math.roc.calculate', anychart.stockModule.math.roc.calculate);
 goog.exportSymbol('anychart.math.roc.createComputer', anychart.stockModule.math.roc.createComputer);

@@ -271,6 +271,79 @@ anychart.surfaceModule.Chart.prototype.isNoData = function() {
 
 
 /**
+ * Process array data. Detect which data use as surface which as surface markers.
+ *
+ * @param {Array<Array<number|string>>} data - Data to process.
+ *
+ * @return {{
+ *   surfaceData: Array<Array<number|string>>,
+ *   markersData: Array<Array<number|string>>,
+ * }}
+ */
+anychart.surfaceModule.Chart.prototype.processArrayData_ = function(data) {
+  var surfaceOrMarkersData = [];
+  var markersData = [];
+
+  var hasHeaderRow = goog.array.some(data[0], function(header) {
+    return isNaN(+header);
+  });
+
+  goog.array.forEach(data, function(pointCoordinates) {
+    surfaceOrMarkersData.push(pointCoordinates.slice(0, 3));
+    markersData.push(pointCoordinates.slice(3, 6));
+  });
+
+  function skipRowsWithNullsAndEmpties(coordinates) {
+    return coordinates.length && goog.array.every(coordinates, function(coordinate) {
+      return coordinate !== null && coordinate !== '';
+    });
+  }
+
+  surfaceOrMarkersData = goog.array.filter(surfaceOrMarkersData, skipRowsWithNullsAndEmpties);
+  markersData = goog.array.filter(markersData, skipRowsWithNullsAndEmpties);
+
+  var isMarkersOnly = !markersData.length && hasHeaderRow && goog.array.some(surfaceOrMarkersData[0], function(header) {
+    return goog.string.contains(header, 'marker');
+  });
+
+  if (hasHeaderRow) {
+    surfaceOrMarkersData.splice(0, 1);
+    markersData.splice(0, 1);
+  }
+
+  if (isMarkersOnly) {
+    return {
+      surfaceData: [],
+      markersData: surfaceOrMarkersData
+    };
+  }
+
+  return {
+    surfaceData: surfaceOrMarkersData,
+    markersData: markersData,
+  };
+};
+
+
+/**
+ * Process chart string data. Csv values mostly.
+ *
+ * @param {string} csvString - Csv string values.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings - Optional csv parsing options.
+ *
+ * @return {{
+ *   surfaceData: Array<Array<number|string>>,
+ *   markersData: Array<Array<number|string>>
+ * }}
+ *
+ * @private
+ */
+anychart.surfaceModule.Chart.prototype.processStringData_ = function(csvString, opt_csvSettings) {
+   return this.processArrayData_(anychart.data.parseText(csvString, opt_csvSettings));
+};
+
+
+/**
  * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value
  * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings
@@ -289,9 +362,21 @@ anychart.surfaceModule.Chart.prototype.data = function(opt_value, opt_csvSetting
         this.data_ = (/** @type {anychart.data.View} */ (opt_value)).derive();
       else if (anychart.utils.instanceOf(opt_value, anychart.data.Set))
         this.data_ = (/** @type {anychart.data.Set} */ (opt_value)).mapAs();
-      else
-        this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(
-            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
+      else {
+        var chartData = null;
+        if (goog.isString(opt_value)) {
+          chartData = this.processStringData_(opt_value, opt_csvSettings);
+        } else if (goog.isArray(opt_value)) {
+          chartData = this.processArrayData_(opt_value);
+        }
+
+        if (chartData && chartData.markersData.length) {
+          this.markers().enabled(true);
+          this.markers().data(chartData.markersData);
+        }
+
+        this.data_ = (this.parentViewToDispose_ = new anychart.data.Set(chartData ? chartData.surfaceData : chartData)).mapAs();
+      }
       this.data_.listenSignals(this.dataInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.SURFACE_DATA |
               anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
@@ -1612,7 +1697,45 @@ anychart.surfaceModule.Chart.prototype.disposeInternal = function() {
 
 /** @inheritDoc */
 anychart.surfaceModule.Chart.prototype.getDataHolders = function() {
-  return /** @type {Array.<{data: function():anychart.data.IDataSource}>} */([this]);
+  var holders = /** @type {Array.<{data: function():anychart.data.IDataSource}>} */([]);
+
+  if (this.data().getRowsCount()) {
+    holders.push(/** @type {{data: function():anychart.data.IDataSource}} */(this));
+  }
+
+  if (this.markers_ && this.markers_.data() && this.markers_.data().getRowsCount()) {
+    holders.push(/** @type {{data: function():anychart.data.IDataSource}} */(this.markers_));
+  }
+
+  return holders;
+};
+
+
+/** @inheritDoc */
+anychart.surfaceModule.Chart.prototype.getCsvExportRow = function(x, xAlias, data, xValues, id, index, seriesXValues) {
+  var row = [];
+
+  data.push(row);
+
+  return row;
+};
+
+
+/** @override */
+anychart.surfaceModule.Chart.prototype.populateCsvHeaders = function(headers, dataHolders, names, i) {
+  for (var j = 0; j < names.length; j++) {
+    headers.push(this.prefixCsvColumnName(names[j], dataHolders[i], i + 1, names.length));
+  }
+};
+
+
+/** @inheritDoc */
+anychart.surfaceModule.Chart.prototype.prefixCsvColumnName = function(name, dataHolder, index, columnsCount) {
+  if (anychart.utils.instanceOf(dataHolder, anychart.surfaceModule.Chart)) {
+    return name;
+  }
+
+  return 'marker ' + name;
 };
 
 

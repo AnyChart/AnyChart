@@ -8,12 +8,14 @@ goog.require('anychart.stockModule.indicators.AMA');
 goog.require('anychart.stockModule.indicators.AO');
 goog.require('anychart.stockModule.indicators.ATR');
 goog.require('anychart.stockModule.indicators.Aroon');
+goog.require('anychart.stockModule.indicators.AroonOscillator');
 goog.require('anychart.stockModule.indicators.BBands');
 goog.require('anychart.stockModule.indicators.BBandsB');
 goog.require('anychart.stockModule.indicators.BBandsWidth');
 goog.require('anychart.stockModule.indicators.CCI');
 goog.require('anychart.stockModule.indicators.CHO');
 goog.require('anychart.stockModule.indicators.CMF');
+goog.require('anychart.stockModule.indicators.CoppockCurve');
 goog.require('anychart.stockModule.indicators.DMI');
 goog.require('anychart.stockModule.indicators.EMA');
 goog.require('anychart.stockModule.indicators.ENV');
@@ -39,6 +41,7 @@ goog.require('anychart.stockModule.indicators.Stochastic');
 goog.require('anychart.stockModule.indicators.TRIX');
 goog.require('anychart.stockModule.indicators.VWAP');
 goog.require('anychart.stockModule.indicators.VolumeMA');
+goog.require('anychart.stockModule.indicators.WMA');
 goog.require('anychart.stockModule.indicators.WilliamsR');
 
 /**
@@ -57,6 +60,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.AMA] = anychart.stockModule.indicators.AMA;
   res[anychart.enums.StockIndicatorTypes.AO] = anychart.stockModule.indicators.AO;
   res[anychart.enums.StockIndicatorTypes.AROON] = anychart.stockModule.indicators.Aroon;
+  res[anychart.enums.StockIndicatorTypes.AROON_OSCILLATOR] = anychart.stockModule.indicators.AroonOscillator;
   res[anychart.enums.StockIndicatorTypes.ATR] = anychart.stockModule.indicators.ATR;
   res[anychart.enums.StockIndicatorTypes.BBANDS] = anychart.stockModule.indicators.BBands;
   res[anychart.enums.StockIndicatorTypes.BBANDS_B] = anychart.stockModule.indicators.BBandsB;
@@ -64,6 +68,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.CCI] = anychart.stockModule.indicators.CCI;
   res[anychart.enums.StockIndicatorTypes.CHO] = anychart.stockModule.indicators.CHO;
   res[anychart.enums.StockIndicatorTypes.CMF] = anychart.stockModule.indicators.CMF;
+  res[anychart.enums.StockIndicatorTypes.COPPOCK_CURVE] = anychart.stockModule.indicators.CoppockCurve;
   res[anychart.enums.StockIndicatorTypes.DMI] = anychart.stockModule.indicators.DMI;
   res[anychart.enums.StockIndicatorTypes.EMA] = anychart.stockModule.indicators.EMA;
   res[anychart.enums.StockIndicatorTypes.ENV] = anychart.stockModule.indicators.ENV;
@@ -90,6 +95,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.VWAP] = anychart.stockModule.indicators.VWAP;
   res[anychart.enums.StockIndicatorTypes.VOLUME_MA] = anychart.stockModule.indicators.VolumeMA;
   res[anychart.enums.StockIndicatorTypes.WILLIAMS_R] = anychart.stockModule.indicators.WilliamsR;
+  res[anychart.enums.StockIndicatorTypes.WMA] = anychart.stockModule.indicators.WMA;
   return res;
 })();
 

@@ -1372,6 +1372,7 @@ anychart.stockModule.Plot.prototype.yScale = function(opt_value) {
       this.yScale_.resumeSignalsDispatching(dispatch);
       if (!dispatch) {
         this.invalidateRedrawable(false);
+        this.chart_.invalidate(anychart.ConsistencyState.STOCK_SCALES);
         this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
       }
     }
@@ -1752,13 +1753,14 @@ anychart.stockModule.Plot.prototype.getDistanceToSeries = function(series, point
   if (point && series) {
     var scale = series.yScale();
 
-    /*
-      Should consider that
-        - OHLC series returns 'close' as 'value'
-        - Range series returns 'high' as 'value'
-        - etc.
-     */
-    var value = anychart.utils.getFirstNotNullValue(point.get('value'), point.get('close'), point.get('high'));
+    var value;
+    if (series.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
+      value = anychart.utils.getFirstNotNullValue(point.get('close'), point.get('high'), point.get('low'), point.get('open'));
+    } else if (series.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED)) {
+      value = point.get('high');
+    } else {
+      value = point.get('value');
+    }
     value = anychart.utils.toNumber(value);
     if (!isNaN(value)) {
       var drawableAreaBounds = this.seriesBounds_;
@@ -2286,7 +2288,7 @@ anychart.stockModule.Plot.prototype.getPositionFromEvent_ = function(event) {
 /**
  * Extract object for each series that contains info about series and nearest point.
  *
- * @param {{xRatio: number, x: number, yRatio: number, y: number}} eventPositionInfo
+ * @param {anychart.core.MouseEvent} event
  *
  * @return {Array.<{
  *   series: anychart.stockModule.Series,
@@ -2296,10 +2298,10 @@ anychart.stockModule.Plot.prototype.getPositionFromEvent_ = function(event) {
  *   }
  * }>}
  */
-anychart.stockModule.Plot.prototype.getSeriesStatus = function(eventPositionInfo) {
-  var y = eventPositionInfo.y;
-  var xRatio = eventPositionInfo.xRatio;
-  var yRatio = eventPositionInfo.yRatio;
+anychart.stockModule.Plot.prototype.getSeriesStatus = function(event) {
+  var y = event.offsetY;
+  var xRatio = (event.offsetX - this.seriesBounds_.left) / this.seriesBounds_.width;
+  var yRatio = (event.offsetY - this.seriesBounds_.top) / this.seriesBounds_.height;
 
   var rawValue = this.chart_.xScale().inverseTransform(xRatio);
   var alignedValue = this.chart_.alignValue(rawValue);
@@ -2323,11 +2325,12 @@ anychart.stockModule.Plot.prototype.getSeriesStatus = function(eventPositionInfo
       var high = point.meta('high');
       var low = point.meta('low');
 
-      // DVF-4607
-      var insideRangeSeries =
-        ((y >= Math.min(value, zero) && y <= Math.max(value, zero)) || // Column, area
-        (y >= Math.min(high, low) && y <= Math.max(high, low))) && // Ohlc, candlestick, range series
-        !series.isLineBased();
+      var isNotLineBasedSeries = !series.isLineBased();
+
+      var eventOverColumnOrAreaSeries = (y >= Math.min(value, zero) && y <= Math.max(value, zero)) && isNotLineBasedSeries;
+      var eventOverOHLCOrCandlestickSeries = (y >= Math.min(high, low) && y <= Math.max(high, low));
+
+      var insideRangeSeries = eventOverColumnOrAreaSeries || eventOverOHLCOrCandlestickSeries;
 
       var distance = insideRangeSeries ? 0 : this.getDistanceToSeries(series, point, yRatio).distance * this.seriesBounds_.height;
 
@@ -2348,9 +2351,8 @@ anychart.stockModule.Plot.prototype.getSeriesStatus = function(eventPositionInfo
 /** @inheritDoc */
 anychart.stockModule.Plot.prototype.makeBrowserEvent = function(e) {
   var event = anychart.stockModule.Plot.base(this, 'makeBrowserEvent', e);
-  var eventPositionInfo = this.getPositionFromEvent_(event);
 
-  event['seriesStatus'] = this.getSeriesStatus(eventPositionInfo);
+  event['seriesStatus'] = this.getSeriesStatus(event);
 
   return event;
 };
@@ -4095,6 +4097,7 @@ anychart.stockModule.Plot.Dragger.prototype.limitY = function(y) {
   //proto['adl'] = proto.adl;
   //proto['ama'] = proto.ama;
   //proto['aroon'] = proto.aroon;
+  //proto['aroonOscillator'] = proto.aroonOscillator;
   //proto['atr'] = proto.atr;
   //proto['bbands'] = proto.bbands;
   //proto['bbandsB'] = proto.bbandsB;

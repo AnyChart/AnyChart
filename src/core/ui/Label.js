@@ -111,6 +111,7 @@ anychart.standalones.label = function() {
   var proto = anychart.core.ui.Label.prototype;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
+  proto['draw'] = proto.draw;
 
   proto = anychart.standalones.Label.prototype;
   goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);

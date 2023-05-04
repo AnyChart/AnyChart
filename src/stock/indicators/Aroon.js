@@ -20,7 +20,7 @@ anychart.stockModule.indicators.Aroon = function(args) {
    * @type {number}
    * @private
    */
-  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 20, false);
+  this.period_ = anychart.utils.normalizeToNaturalNumber(args[2], 25, false);
 
   this.opt_upSeriesType = args[3];
   this.opt_downSeriesType = args[4];

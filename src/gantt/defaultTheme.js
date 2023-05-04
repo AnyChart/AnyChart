@@ -530,7 +530,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'layout': 'vertical',
       'zIndex': 2
     },
-    'zoomOnMouseWheel': false
+    'zoomOnMouseWheel': false,
+    'connectBy': '',
   },
 
   // merge with chart
