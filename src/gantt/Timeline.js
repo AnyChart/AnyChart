@@ -3492,7 +3492,7 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
     var isFullValidBaseline = anychart.ganttModule.BaseGrid.isBaseline(item, info);
-    var isGroupOrLoadable = anychart.ganttModule.BaseGrid.isGroupingTask(item, info) || item.get(anychart.enums.GanttDataFields.IS_LOADABLE);
+    var isGroupOrLoadable = anychart.ganttModule.BaseGrid.isGroupingTask(item, info);
     var isProjectMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
     var isProjectBaselineMilestone = anychart.ganttModule.BaseGrid.isProjectBaselineMilestone(item, info);
     var isBaselineLike = !isProjectBaselineMilestone && anychart.ganttModule.BaseGrid.isBaselineLike(item, info);
