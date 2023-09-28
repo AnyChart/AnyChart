@@ -1095,6 +1095,11 @@ anychart.mapModule.Chart.prototype.handleMouseDown = function(event) {
   }
 };
 
+/** @inheritDoc */
+anychart.mapModule.Chart.prototype.getMouseDownContext = function () {
+  return this.currentScene || this;
+};
+
 
 /** @inheritDoc */
 anychart.mapModule.Chart.prototype.onMouseDown = function(event) {

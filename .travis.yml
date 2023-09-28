@@ -15,8 +15,10 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/anychart-deploy-key.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - pyenv install 2.7.16
 
 install:
+  - pyenv local 2.7.16
   - git submodule update --init
   - pip install requests --user --upgrade
   - pip install maxcdn --user --upgrade
