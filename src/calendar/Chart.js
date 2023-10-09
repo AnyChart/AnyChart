@@ -32,7 +32,7 @@ anychart.calendarModule.Chart = function(opt_data, opt_csvSettings) {
     this.handleMouseOut,            // override from anychart.core.Chart
     null,                           // click handler
     this.handleMouseOverAndMove,    // override from anychart.core.Chart
-    null,                           // all handler
+    this.handleAll,                 // all handler
     null);                          // anychart.core.Chart
 
   /**
@@ -694,36 +694,132 @@ anychart.calendarModule.Chart.prototype.checkIfColorRange = function(target) {
 };
 
 
-/** @inheritDoc */
-anychart.calendarModule.Chart.prototype.handleMouseOverAndMove = function(event) {
+/**
+ * Puts obfuscated tag's fields to human readable fields of event.
+ * 
+ * @param {Object} event - Incoming event.
+ * @param {Object} tag - Tag data.
+ */
+anychart.calendarModule.Chart.prototype.mapTagToEvent_ = function (event, tag) {
+  event['dataIndex'] = tag.dataIndex;
+  event['x'] = tag.x;
+  event['value'] = tag.value;
+  event['timestamp'] = tag.timestamp;
+  event['weekNumber'] = tag.weekNumber;
+  event['day'] = tag.day;
+  event['month'] = tag.month;
+  event['year'] = tag.year;
+  event['point'] = tag.point;
+};
+
+
+/**
+ * Creates new event object to be dispatched.
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ * @return {?Object} - New event object to be dispatched.
+ */
+anychart.calendarModule.Chart.prototype.getInteractivityEvent = function (event) {
+  var type = event.type;
+  
   var domTarget = /** @type {acgraph.vector.Path} */ (event['domTarget']);
   var tag = /** @type {Object} */ (domTarget.tag);
-  this.hoverPath_.tag = tag;
-  var tooltip = this.tooltip();
 
-  // we do not want to interact with color range for now
   if (tag && !this.checkIfColorRange(tag)) {
-    var d = domTarget.attr('d');
-    this.hoverPath_.attr('d', d);
-    this.colorizePoint(this.hoverPath_, anychart.PointState.HOVER);
-    tooltip.showFloat(event['clientX'], event['clientY'], this.createContextProvider(tag));
-  } else {
-    this.hoverPath_
-      .clear()
-      .fill('none')
-      .stroke('none');
-    tooltip.hide();
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.POINT_MOUSE_OUT;
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.POINT_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+      case acgraph.events.EventType.TOUCHMOVE:
+        type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+      case acgraph.events.EventType.TOUCHSTART:
+        type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+      case acgraph.events.EventType.TOUCHEND:
+        type = anychart.enums.EventType.POINT_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.POINT_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.POINT_DBLCLICK;
+        break;
+    }
+
+    var newEvent = {
+      'type': type,
+      'actualTarget': event.target,
+      'target': this,
+      'originalEvent': event,
+    };
+
+    this.mapTagToEvent_(newEvent, tag);
+
+    return newEvent;
+  }
+
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.calendarModule.Chart.prototype.handleMouseOverAndMove = function(event) {
+  var evt = this.getInteractivityEvent(event);
+
+  if (evt && this.dispatchEvent(evt)) {
+    // Default behavior.
+    var domTarget = /** @type {acgraph.vector.Path} */ (event['domTarget']);
+    var tag = /** @type {Object} */ (domTarget.tag);
+    this.hoverPath_.tag = tag;
+    var tooltip = this.tooltip();
+
+    // we do not want to interact with color range for now
+    if (tag && !this.checkIfColorRange(tag)) {
+      var d = domTarget.attr('d');
+      this.hoverPath_.attr('d', d);
+      this.colorizePoint(this.hoverPath_, anychart.PointState.HOVER);
+      tooltip.showFloat(event['clientX'], event['clientY'], this.createContextProvider(tag));
+    } else {
+      this.hoverPath_
+        .clear()
+        .fill('none')
+        .stroke('none');
+      tooltip.hide();
+    }
   }
 };
 
 
 /** @inheritDoc */
 anychart.calendarModule.Chart.prototype.handleMouseOut = function(event) {
-  this.tooltip().hide();
-  this.hoverPath_
-    .clear()
-    .fill('none')
-    .stroke('none');
+  var evt = this.getInteractivityEvent(event);
+
+  if (evt && this.dispatchEvent(evt)) {
+    // Default behavior.
+    this.tooltip().hide();
+    this.hoverPath_
+      .clear()
+      .fill('none')
+      .stroke('none');
+  }
+};
+
+/** 
+ * All remaining events handler.
+ * 
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ */
+anychart.calendarModule.Chart.prototype.handleAll = function (event) {
+  var evt = this.getInteractivityEvent(event);
+  if (evt) {
+    this.dispatchEvent(evt);
+  }
 };
 
 
@@ -906,6 +1002,7 @@ anychart.calendarModule.Chart.prototype.drawContent = function(bounds) {
   if (!this.hoverPath_) {
     this.hoverPath_ = this.rootLayer.path();
     this.hoverPath_.zIndex(9999);
+    this.hoverPath_.disablePointerEvents(true);
   }
 
   this.calculate();
