@@ -3429,6 +3429,11 @@ anychart.pyramidFunnelModule.Chart.prototype.setupStateSettings = function() {
   this.selected_.setupInternal(true, {});
 };
 
+/** @inheritDoc */
+anychart.pyramidFunnelModule.Chart.prototype.getCsvColumns = function (dataHolder) {
+  return ['name', 'value'];
+};
+
 
 //exports
 (function() {

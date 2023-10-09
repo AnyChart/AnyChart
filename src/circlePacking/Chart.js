@@ -16,6 +16,7 @@ goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('anychart.palettes.RangeColors');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.treeDataModule.utils');
 goog.require('anychart.utils');
 
 
@@ -746,6 +747,12 @@ anychart.circlePackingModule.Chart.prototype.setupByJSON = function(config, opt_
     this.palette(config['palette']);
 };
 
+/** @inheritDoc */
+anychart.circlePackingModule.Chart.prototype.toCsv = function (opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.treeDataModule.utils.toCsv(
+      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
+};
+
 
 //region --- Exports
 //exports
@@ -761,7 +768,7 @@ anychart.circlePackingModule.Chart.prototype.setupByJSON = function(config, opt_
   // proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['getType'] = proto.getType;
   // proto['getPoint'] = proto.getPoint;
-  // proto['toCsv'] = proto.toCsv;
+  proto['toCsv'] = proto.toCsv;
 
   // proto['hover'] = proto.hover;
   // proto['unhover'] = proto.unhover;
