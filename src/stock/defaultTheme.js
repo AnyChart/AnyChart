@@ -411,7 +411,8 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'scale': 0,
         'ticks': {
           'enabled': false,
-          'position': 'center'
+          'position': 'inside',
+          'length': '20%'
         },
         'labels': {
           'enabled': true,
@@ -717,12 +718,14 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
           }
         },
         'ticks': {
-          'position': 'center'
+          'position': 'center',
+          'length': '100%'
         },
         'minorTicks': {
           'enabled': true,
           'stroke': '#cecece',
-          'position': 'center'
+          'position': 'center',
+          'length': '100%'
         },
         'zIndex': 75,
         'showHelperLabel': true

@@ -181,7 +181,10 @@ anychart.core.AxisTicks.prototype.drawTopTick = function(ratio, bounds, lineBoun
   x = anychart.utils.applyPixelShift(x, /** @type {number} */(this.path.strokeThickness()));
 
   var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
-  var length = /** @type {number} */(this.getOption('length'));
+  var length = anychart.utils.normalizeSize(
+    /** @type {number|string} */(this.getOption('length')),
+    bounds.height
+  );
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     y -= lineThickness / 2;
@@ -219,7 +222,10 @@ anychart.core.AxisTicks.prototype.drawRightTick = function(ratio, bounds, lineBo
   y = anychart.utils.applyPixelShift(y, /** @type {number} */(this.path.strokeThickness()));
 
   var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
-  var length = /** @type {number} */(this.getOption('length'));
+  var length = anychart.utils.normalizeSize(
+    /** @type {number|string} */(this.getOption('length')),
+    bounds.width
+  );
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     x += lineThickness / 2;
@@ -256,7 +262,10 @@ anychart.core.AxisTicks.prototype.drawBottomTick = function(ratio, bounds, lineB
   x = anychart.utils.applyPixelShift(x, /** @type {number} */(this.path.strokeThickness()));
 
   var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
-  var length = /** @type {number} */(this.getOption('length'));
+  var length = anychart.utils.normalizeSize(
+    /** @type {number|string} */(this.getOption('length')),
+    bounds.height
+  );
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     y += lineThickness / 2;
@@ -294,7 +303,10 @@ anychart.core.AxisTicks.prototype.drawLeftTick = function(ratio, bounds, lineBou
   y = anychart.utils.applyPixelShift(y, /** @type {number} */(this.path.strokeThickness()));
 
   var position = /** @type {anychart.enums.SidePosition} */(this.getOption('position'));
-  var length = /** @type {number} */(this.getOption('length'));
+  var length = anychart.utils.normalizeSize(
+    /** @type {number|string} */(this.getOption('length')),
+    bounds.width
+  );
 
   if (position == anychart.enums.SidePosition.OUTSIDE) {
     x -= lineThickness / 2;

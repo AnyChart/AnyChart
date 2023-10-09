@@ -744,13 +744,11 @@ anychart.stockModule.Axis.prototype.draw = function() {
       }
 
       if (ticks) {
-        ticks.length(bounds.height);
         ticks.container(this.rootLayer_);
         ticks.draw();
       }
 
       if (minorTicks) {
-        minorTicks.length(bounds.height);
         minorTicks.container(this.rootLayer_);
         minorTicks.draw();
       }
