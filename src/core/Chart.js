@@ -2624,14 +2624,32 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
 
 
 /**
+ * Gets context (this) for anychart.core.Chart.prototype.onMouseDown because of
+ * https://anychart.atlassian.net/browse/DVF-4673.
+ * 
+ * Represents current temporary quick solution for this issue. 
+ * Probably will be fixed in future.
+ * 
+ * In current implementation only anychart.mapModule.Chart overrides it.
+ * 
+ * @return {anychart.core.Chart}
+ * 
+ */
+anychart.core.Chart.prototype.getMouseDownContext = function() {
+  return this;
+};
+
+/**
  * Logic for mouse down. It needs for inherited classes.
  * @protected
  * @param {anychart.core.MouseEvent} event Event object.
  */
 anychart.core.Chart.prototype.onMouseDown = function(event) {
-  if (this.preventMouseDownInteractivity)
+  var context = this.getMouseDownContext();
+
+  if (context.preventMouseDownInteractivity)
     return;
-  var interactivity = this.getCreated('interactivity', true, this.interactivity);
+  var interactivity = context.getCreated('interactivity', true, context.interactivity);
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
   var controlKeyPressed = event.ctrlKey || event.metaKey;
@@ -2641,7 +2659,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
 
   var tag = anychart.utils.extractTag(event['domTarget']);
 
-  var isColorRange = this.checkIfColorRange(event['target']);
+  var isColorRange = context.checkIfColorRange(event['target']);
   var isLegend = anychart.utils.instanceOf(event['target'], anychart.core.ui.Legend);
   var isLabelsFactory = anychart.utils.instanceOf(event['target'], anychart.core.ui.LabelsFactory);
   var isMarkersFactory = anychart.utils.instanceOf(event['target'], anychart.core.ui.MarkersFactory);
@@ -2692,12 +2710,12 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
             (multiSelectKeyPressed && interactivity.getOption('selectionMode') != anychart.enums.SelectionMode.MULTI_SELECT));
 
         if (unselect) {
-          this.unselect();
-          if (this.prevSelectSeriesStatus)
-            this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
+          context.unselect();
+          if (context.prevSelectSeriesStatus)
+            context.dispatchEvent(context.makeInteractivityPointEvent('selected', event, context.prevSelectSeriesStatus, true));
         } else if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
-          if (this.prevSelectSeriesStatus)
-            this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
+          if (context.prevSelectSeriesStatus)
+            context.dispatchEvent(context.makeInteractivityPointEvent('selected', event, context.prevSelectSeriesStatus, true));
           series.unselect();
           if (goog.isArray(index))
             index = index[index.length - 1];
@@ -2706,7 +2724,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         if (goog.isFunction(series.selectPoint))
           series.selectPoint(/** @type {number} */ (index), event);
 
-        allSeries = this.getAllSeries();
+        allSeries = context.getAllSeries();
         eventSeriesStatus = [];
         for (i = 0; i < allSeries.length; i++) {
           s = allSeries[i];
@@ -2729,21 +2747,21 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           });
         }
 
-        this.dispatchEvent(this.makeInteractivityPointEvent('selected', evt, eventSeriesStatus));
+        context.dispatchEvent(context.makeInteractivityPointEvent('selected', evt, eventSeriesStatus));
 
         if (equalsSelectedPoints)
-          this.prevSelectSeriesStatus = null;
+          context.prevSelectSeriesStatus = null;
         else
-          this.prevSelectSeriesStatus = eventSeriesStatus;
+          context.prevSelectSeriesStatus = eventSeriesStatus;
       }
     }
   } else if (interactivity.getOption('hoverMode') == anychart.enums.HoverMode.SINGLE && interactivity.getOption('unselectOnClickOutOfPoint')) {
     if (!isTargetLegendOrColorRange)
-      this.unselect();
+      context.unselect();
 
-    if (this.prevSelectSeriesStatus)
-      this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
-    this.prevSelectSeriesStatus = null;
+    if (context.prevSelectSeriesStatus)
+      context.dispatchEvent(context.makeInteractivityPointEvent('selected', event, context.prevSelectSeriesStatus, true));
+    context.prevSelectSeriesStatus = null;
   }
 
   if (interactivity.getOption('hoverMode') != anychart.enums.HoverMode.SINGLE) {
@@ -2751,7 +2769,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
       return;
 
     var j, len;
-    seriesStatus = this.getSeriesStatus(event);
+    seriesStatus = context.getSeriesStatus(event);
 
     if (seriesStatus && seriesStatus.length) {
       var dispatchEvent = false;
@@ -2796,7 +2814,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           });
 
 
-          allSeries = this.getAllSeries();
+          allSeries = context.getAllSeries();
           for (i = 0; i < allSeries.length; i++) {
             series = allSeries[i];
             if (series.selectionMode() == anychart.enums.SelectionMode.NONE)
@@ -2817,7 +2835,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
       } else {
         var emptySeries = [];
         if (!multiSelectKeyPressed) {
-          allSeries = this.getAllSeries();
+          allSeries = context.getAllSeries();
 
           for (i = 0; i < allSeries.length; i++) {
             s = allSeries[i];
@@ -2890,16 +2908,16 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
       }
 
       if (dispatchEvent) {
-        this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, eventSeriesStatus));
-        this.prevSelectSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
+        context.dispatchEvent(context.makeInteractivityPointEvent('selected', event, eventSeriesStatus));
+        context.prevSelectSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
       }
     } else {
       if (!isTargetLegendOrColorRange)
-        this.unselect();
+        context.unselect();
 
-      if (this.prevSelectSeriesStatus)
-        this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
-      this.prevSelectSeriesStatus = null;
+      if (context.prevSelectSeriesStatus)
+        context.dispatchEvent(context.makeInteractivityPointEvent('selected', event, context.prevSelectSeriesStatus, true));
+      context.prevSelectSeriesStatus = null;
     }
   }
 };

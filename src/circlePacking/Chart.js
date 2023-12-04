@@ -16,6 +16,7 @@ goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('anychart.palettes.RangeColors');
 goog.require('anychart.treeDataModule.Tree');
+goog.require('anychart.treeDataModule.utils');
 goog.require('anychart.utils');
 
 
@@ -37,7 +38,7 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
     this.handleMouseOut,
     this.handleMouseClick,
     this.handleMouseOverAndMove,
-    null,
+    this.handleAll,
     null);
 
   this.addThemes('circlePacking');
@@ -355,30 +356,127 @@ anychart.circlePackingModule.Chart.prototype.colorize_ = function(modelItem, sta
 };
 
 
-/** @inheritDoc */
-anychart.circlePackingModule.Chart.prototype.handleMouseOverAndMove = function(event) {
-  var domTarget = event['domTarget'];
-  var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
+/**
+ * Puts obfuscated modelItem's fields to human readable fields of event.
+ * 
+ * @param {Object} event - Incoming event.
+ * @param {anychart.circlePackingModule.model.Item} modelItem - Model item.
+ */
+anychart.circlePackingModule.Chart.prototype.mapModelItemToEvent_ = function (event, modelItem) {
+  event['index'] = modelItem.index;
+  event['isLeaf'] = modelItem.isLeaf;
+  event['weight'] = modelItem.weight;
+  event['name'] = modelItem.name;
+  event['value'] = modelItem.value;
+  event['point'] = modelItem.item; // Single renaming.
+  event['cx'] = modelItem.cx;
+  event['cy'] = modelItem.cy;
+  event['radius'] = modelItem.radius;
+  event['bounds'] = modelItem.bounds;
+  event['depth'] = modelItem.depth;
+};
+
+/**
+ * Creates new event object to be dispatched.
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ * @return {?Object} - New event object to be dispatched.
+ */
+anychart.circlePackingModule.Chart.prototype.getInteractivityEvent = function(event) {
+  var domTarget = /** @type {acgraph.vector.Element} */ (event['domTarget']);
+  var modelItem = /** @type {anychart.circlePackingModule.model.Item} */ (domTarget && domTarget.tag && domTarget.tag.modelItem);
+  var type = event.type;
+
   if (modelItem) {
-    if (!goog.array.contains(this.selections_, modelItem)) {
-      this.colorize_(modelItem, anychart.PointState.HOVER);
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.POINT_MOUSE_OUT;
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.POINT_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+      case acgraph.events.EventType.TOUCHMOVE:
+        type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+      case acgraph.events.EventType.TOUCHSTART:
+        type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+      case acgraph.events.EventType.TOUCHEND:
+        type = anychart.enums.EventType.POINT_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.POINT_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.POINT_DBLCLICK;
+        break;
     }
 
-    var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-    var formatProvider = this.createFormatProvider(modelItem);
-    tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
+    var newEvent = {
+      'type': type,
+      'actualTarget': event.target,
+      'target': this,
+      'originalEvent': event,
+    };
+
+    this.mapModelItemToEvent_(newEvent, modelItem);
+
+    return newEvent;
+  }
+
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.circlePackingModule.Chart.prototype.handleMouseOverAndMove = function(event) {
+  var evt = this.getInteractivityEvent(event);
+
+  if (evt && this.dispatchEvent(evt)) {
+    // Default behavior.
+    var domTarget = event['domTarget'];
+    var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
+    if (modelItem) {
+      if (!goog.array.contains(this.selections_, modelItem)) {
+        this.colorize_(modelItem, anychart.PointState.HOVER);
+      }
+
+      var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+      var formatProvider = this.createFormatProvider(modelItem);
+      tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
+    }
   }
 };
 
 
 /** @inheritDoc */
 anychart.circlePackingModule.Chart.prototype.handleMouseOut = function(event) {
-  var domTarget = event['domTarget'];
-  var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
-  if (modelItem && !goog.array.contains(this.selections_, modelItem)) {
-    this.colorize_(modelItem, anychart.PointState.NORMAL);
+  var evt = this.getInteractivityEvent(event);
+
+  if (evt && this.dispatchEvent(evt)) {
+    // Default behavior.
+    var domTarget = event['domTarget'];
+    var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
+    if (modelItem && !goog.array.contains(this.selections_, modelItem)) {
+      this.colorize_(modelItem, anychart.PointState.NORMAL);
+    }
+    this.tooltip().hide();
   }
-  this.tooltip().hide();
+};
+
+/** 
+ * All remaining events handler.
+ * 
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ */
+anychart.circlePackingModule.Chart.prototype.handleAll = function (event) {
+  var evt = this.getInteractivityEvent(event);
+  
+  if (evt) {
+    this.dispatchEvent(evt);
+  }
 };
 
 
@@ -427,27 +525,53 @@ anychart.circlePackingModule.Chart.prototype.deselectAll_ = function() {
  * @param {anychart.core.MouseEvent} event - Event object.
  */
 anychart.circlePackingModule.Chart.prototype.handleMouseClick = function(event) {
-  var domTarget = event['domTarget'];
-  var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
+  var clickEvent = this.getInteractivityEvent(event);
 
-  if (modelItem) {
-    if ((!goog.userAgent.MAC && event.ctrlKey) || (goog.userAgent.MAC && event.metaKey)) {
-      // Adding/removing from existing selection.
-      if (goog.array.contains(this.selections_, modelItem)) {
-        goog.array.remove(this.selections_, modelItem);
-        this.colorize_(modelItem, anychart.PointState.NORMAL);
+  if (clickEvent && this.dispatchEvent(clickEvent)) {
+    // Default behavior.
+    var domTarget = event['domTarget'];
+    var modelItem = domTarget && domTarget.tag && domTarget.tag.modelItem;
+
+    if (modelItem) {
+      if ((!goog.userAgent.MAC && event.ctrlKey) || (goog.userAgent.MAC && event.metaKey)) {
+        // Adding/removing from existing selection.
+        if (goog.array.contains(this.selections_, modelItem)) {
+          goog.array.remove(this.selections_, modelItem);
+          this.colorize_(modelItem, anychart.PointState.NORMAL);
+        } else {
+          this.selections_.push(modelItem);
+          this.colorize_(modelItem, anychart.PointState.SELECT);
+        }
       } else {
+        this.deselectAll_();
         this.selections_.push(modelItem);
         this.colorize_(modelItem, anychart.PointState.SELECT);
       }
     } else {
       this.deselectAll_();
-      this.selections_.push(modelItem);
-      this.colorize_(modelItem, anychart.PointState.SELECT);
     }
   } else {
     this.deselectAll_();
   }
+
+  this.dispatchSelectionChange_();
+};
+
+
+/**
+ * Selection change dispatcher since it can not be prevented directly.
+ */
+anychart.circlePackingModule.Chart.prototype.dispatchSelectionChange_ = function() {
+  var event = {
+    'type': anychart.enums.EventType.POINTS_SELECT,
+    'points': []
+  };
+
+  for (var i = 0; i < this.selections_.length; i++) {
+    event['points'].push(this.selections_[i].item);
+  }
+
+  this.dispatchEvent(event);
 };
 
 
@@ -746,6 +870,12 @@ anychart.circlePackingModule.Chart.prototype.setupByJSON = function(config, opt_
     this.palette(config['palette']);
 };
 
+/** @inheritDoc */
+anychart.circlePackingModule.Chart.prototype.toCsv = function (opt_chartDataExportMode, opt_csvSettings) {
+  return anychart.treeDataModule.utils.toCsv(
+      /** @type {anychart.treeDataModule.Tree|anychart.treeDataModule.View} */(this.data()), opt_csvSettings);
+};
+
 
 //region --- Exports
 //exports
@@ -761,7 +891,7 @@ anychart.circlePackingModule.Chart.prototype.setupByJSON = function(config, opt_
   // proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['getType'] = proto.getType;
   // proto['getPoint'] = proto.getPoint;
-  // proto['toCsv'] = proto.toCsv;
+  proto['toCsv'] = proto.toCsv;
 
   // proto['hover'] = proto.hover;
   // proto['unhover'] = proto.unhover;

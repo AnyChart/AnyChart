@@ -3492,7 +3492,7 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
     var isFullValidBaseline = anychart.ganttModule.BaseGrid.isBaseline(item, info);
-    var isGroupOrLoadable = anychart.ganttModule.BaseGrid.isGroupingTask(item, info) || item.get(anychart.enums.GanttDataFields.IS_LOADABLE);
+    var isGroupOrLoadable = anychart.ganttModule.BaseGrid.isGroupingTask(item, info);
     var isProjectMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
     var isProjectBaselineMilestone = anychart.ganttModule.BaseGrid.isProjectBaselineMilestone(item, info);
     var isBaselineLike = !isProjectBaselineMilestone && anychart.ganttModule.BaseGrid.isBaselineLike(item, info);
@@ -3859,7 +3859,16 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
         var baselineMilestonesPreview = /** @type {anychart.ganttModule.elements.BaselineMilestonesElement.Preview} */ (this.baselineMilestones().preview());
         var shouldDrawMilestonePreview = this.shouldDrawPreviewMilestone_(milestonesPreview, dataItem);
         var shouldDrawBaselineMilestonePreview = this.shouldDrawPreviewMilestone_(baselineMilestonesPreview, dataItem);
-        this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem), shouldDrawMilestonePreview, shouldDrawBaselineMilestonePreview);
+        this.iterateChildMilestones_(
+          0, 
+          dataItem, 
+          totalTop, 
+          itemHeight, 
+          goog.getUid(dataItem), 
+          shouldDrawMilestonePreview, 
+          shouldDrawBaselineMilestonePreview,
+          true
+        );
       }
       this.setRelatedBounds_(dataItem, actualBounds);
 
@@ -3976,7 +3985,16 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaselineLike_ = function(dataItem,
       var baselineMilestonesPreview = /** @type {anychart.ganttModule.elements.BaselineMilestonesElement.Preview} */ (this.baselineMilestones().preview());
       var shouldDrawMilestonePreview = this.shouldDrawPreviewMilestone_(milestonesPreview, dataItem);
       var shouldDrawBaselineMilestonePreview = this.shouldDrawPreviewMilestone_(baselineMilestonesPreview, dataItem);
-      this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem), shouldDrawMilestonePreview, shouldDrawBaselineMilestonePreview);
+      this.iterateChildMilestones_(
+        0, 
+        dataItem, 
+        totalTop, 
+        itemHeight, 
+        goog.getUid(dataItem), 
+        shouldDrawMilestonePreview, 
+        shouldDrawBaselineMilestonePreview,
+        true
+      );
     }
     this.setRelatedBounds_(dataItem, actualBounds);
 
@@ -4071,7 +4089,16 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
     var baselineMilestonesPreview = /** @type {anychart.ganttModule.elements.BaselineMilestonesElement.Preview} */ (this.baselineMilestones().preview());
     var shouldDrawMilestonePreview = this.shouldDrawPreviewMilestone_(milestonesPreview, dataItem);
     var shouldDrawBaselineMilestonePreview = this.shouldDrawPreviewMilestone_(baselineMilestonesPreview, dataItem);
-    this.iterateChildMilestones_(0, dataItem, totalTop, itemHeight, goog.getUid(dataItem), shouldDrawMilestonePreview, shouldDrawBaselineMilestonePreview);
+    this.iterateChildMilestones_(
+      0, 
+      dataItem, 
+      totalTop, 
+      itemHeight, 
+      goog.getUid(dataItem),
+      shouldDrawMilestonePreview, 
+      shouldDrawBaselineMilestonePreview,
+      false
+    );
 
     var actualStart = info.start;
     var actualEnd = info.end;
@@ -4133,6 +4160,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsParent_ = function(dataItem, total
  * @param {number} initializerUid - UID of item that has initialized the milestone preview drawing.
  * @param {boolean} shouldDrawMilestonePreview - .
  * @param {boolean} shouldDrawBaselineMilestonePreview - .
+ * @param {boolean} considerBaseline - Whether to consider baseline appearance for parent task. Fixes DVF-4652.
  * @private
  */
 anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(
@@ -4142,7 +4170,8 @@ anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(
   itemHeight, 
   initializerUid,
   shouldDrawMilestonePreview,
-  shouldDrawBaselineMilestonePreview
+  shouldDrawBaselineMilestonePreview,
+  considerBaseline
 ) {
   var info = anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
   var isProjectMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
@@ -4164,7 +4193,7 @@ anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(
   if (depthMatches || depthBaselineMatches) {
     var above = this.baselines().getOption('above');
     var halfHeight = itemHeight / 2;
-    var milestonePreviewTop = above ? totalTop + halfHeight : totalTop;
+    var milestonePreviewTop = considerBaseline && above ? totalTop + halfHeight : totalTop;
     var baselineMilestonePreviewTop = above ? totalTop : totalTop + halfHeight;
 
     if (processMilestone && shouldDrawMilestonePreview) {
@@ -4188,7 +4217,8 @@ anychart.ganttModule.TimeLine.prototype.iterateChildMilestones_ = function(
           itemHeight,
           initializerUid,
           shouldDrawMilestonePreview,
-          shouldDrawBaselineMilestonePreview
+          shouldDrawBaselineMilestonePreview,
+          considerBaseline
         );
       }
     }

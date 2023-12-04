@@ -1520,11 +1520,10 @@ anychart.ganttModule.DataGrid.prototype.addMouseDblClick = function(e) {
         bounds.top = /** @type {number} */ (startY);
         bounds.height = endY - startY;
       }
-      var val = '';
       if (this.editColumn_) {
         var colLabelTexts = this.editColumn_.getLabelTexts();
-        usedIndex = Math.min(hoveredIndex, colLabelTexts.length - 1);
-        val = colLabelTexts[usedIndex];
+
+        var val = colLabelTexts[index];
 
         var context = {
           'columnIndex': this.editColumn_.getIndex(),
@@ -1638,7 +1637,6 @@ anychart.ganttModule.DataGrid.prototype.serialize = function() {
 
   return json;
 };
-
 
 /** @inheritDoc */
 anychart.ganttModule.DataGrid.prototype.setupByJSON = function(config, opt_default) {

@@ -648,7 +648,8 @@ anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
  */
 anychart.ganttModule.BaseGrid.isGroupingTask = function(item, opt_info) {
   var info = opt_info || anychart.ganttModule.BaseGrid.getProjectItemInfo(item);
-  return !!item.numChildren() && info.isValidStart && info.isValidEnd;
+  var hasChildren = !!item.numChildren() || info.isLoadable;
+  return  hasChildren && info.isValidStart && info.isValidEnd;
 };
 
 

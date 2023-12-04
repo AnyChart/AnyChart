@@ -223,7 +223,7 @@ anychart.annotationsModule.Label.prototype.checkVisible = function() {
     left = coord - width;
     right = coord;
   }
-  return !((right < bounds.left) || (left > bounds.getRight()));
+  return !(isNaN(right) || isNaN(left) || (right < bounds.left) || (left > bounds.getRight()));
 };
 
 
