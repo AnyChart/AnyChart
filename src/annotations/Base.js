@@ -1339,6 +1339,8 @@ anychart.annotationsModule.Base.prototype.disposeInternal = function() {
 //exports
 (function() {
   var proto = anychart.annotationsModule.Base.prototype;
+  proto['getOption'] = proto.getOption;//doc|ex
+  proto['setOption'] = proto.setOption;//doc|ex
   proto['getType'] = proto.getType;
   proto['getChart'] = proto.getChart;
   proto['getPlot'] = proto.getPlot;
