@@ -909,6 +909,8 @@ anychart.core.settings.descriptors = (function() {
   map.FALLING_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'fallingFill', anychart.core.settings.fillOrFunctionNormalizer];
   map.LOW_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lowFill', anychart.core.settings.fillOrFunctionNormalizer];
   map.HIGH_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'highFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.WIN_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'winFill', anychart.core.settings.fillOrFunctionNormalizer];
+  map.LOSS_FILL = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'lossFill', anychart.core.settings.fillOrFunctionNormalizer];
 
   map.STROKE = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeNormalizer];
   map.STROKE_FUNCTION = [anychart.enums.PropertyHandlerType.MULTI_ARG, 'stroke', anychart.core.settings.strokeOrFunctionNormalizer];
