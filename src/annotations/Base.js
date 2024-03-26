@@ -17,6 +17,12 @@ goog.require('anychart.math.Rect');
 anychart.annotationsModule.Base = function(chartController) {
   anychart.annotationsModule.Base.base(this, 'constructor');
 
+  /**
+   * Own annotation data.
+   * @type {!Object}
+   */
+  this.data = {};
+
   this.addThemes('chart.defaultAnnotationSettings.base');
 
   /**
@@ -1254,6 +1260,45 @@ anychart.annotationsModule.Base.prototype.unselect = function() {
 
 
 //endregion
+//region Data storage
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Data storage
+//
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Returns true if the data was set to the object.
+ * @param {string} name
+ * @return {boolean}
+ */
+anychart.annotationsModule.Base.prototype.hasData = function(name) {
+  return goog.isDefAndNotNull(this.data[name]);
+};
+
+/**
+ * Returns data value by name.
+ * @param {string} name
+ * @return {*}
+ */
+anychart.annotationsModule.Base.prototype.getData = function(name) {
+  return this.data[name];
+};
+
+/**
+ * Sets data value to the instance.
+ * Returns instance to allow method chaining.
+ * @param {string} name
+ * @param {*} value
+ * @return {anychart.annotationsModule.Base}
+ */
+anychart.annotationsModule.Base.prototype.setData = function(name, value) {
+  this.data[name] = value;
+  return this;
+};
+
+
+//endregion
 //region IObjectWithSettings impl
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1328,6 +1373,7 @@ anychart.annotationsModule.Base.prototype.disposeInternal = function() {
   this.plotController_ = null;
   this.xScale_ = null;
   this.yScale_ = null;
+  delete this.data;
   delete this.ownSettings;
   delete this.themeSettings;
 
@@ -1339,6 +1385,9 @@ anychart.annotationsModule.Base.prototype.disposeInternal = function() {
 //exports
 (function() {
   var proto = anychart.annotationsModule.Base.prototype;
+  proto['hasData'] = proto.hasData;
+  proto['getData'] = proto.getData;
+  proto['setData'] = proto.setData;
   proto['getType'] = proto.getType;
   proto['getChart'] = proto.getChart;
   proto['getPlot'] = proto.getPlot;
