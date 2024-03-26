@@ -782,6 +782,7 @@ goog.exportSymbol('anychart.enums.AnnotationTypes.VERTICAL_LINE', anychart.enums
 goog.exportSymbol('anychart.enums.AnnotationTypes.HORIZONTAL_LINE', anychart.enums.AnnotationTypes.HORIZONTAL_LINE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.RECTANGLE', anychart.enums.AnnotationTypes.RECTANGLE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.ELLIPSE', anychart.enums.AnnotationTypes.ELLIPSE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.POSITION', anychart.enums.AnnotationTypes.POSITION);
 goog.exportSymbol('anychart.enums.AnnotationTypes.TRIANGLE', anychart.enums.AnnotationTypes.TRIANGLE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.TREND_CHANNEL', anychart.enums.AnnotationTypes.TREND_CHANNEL);
 goog.exportSymbol('anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK', anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK);
