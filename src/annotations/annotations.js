@@ -24,6 +24,7 @@ anychart.annotationsModule.PropertyDescriptor;
  *    2nd bit is for the first Y,
  *    3rd bit is for the second point,
  *    4th bit is for the third point
+ *    5th bit is for the fourth point
  * @enum {number}
  */
 anychart.annotationsModule.AnchorSupport = {
@@ -32,9 +33,11 @@ anychart.annotationsModule.AnchorSupport = {
   VALUE: 2,
   SECOND_POINT: 4,
   THIRD_POINT: 8,
+  FOURTH_POINT: 16,
   ONE_POINT: 3,
   TWO_POINTS: 7,
-  THREE_POINTS: 15
+  THREE_POINTS: 15,
+  FOUR_POINTS: 31
 };
 
 
@@ -56,6 +59,8 @@ anychart.annotationsModule.AnnotationTypes = {};
  *    secondValueAnchor: number,
  *    thirdXAnchor: number,
  *    thirdValueAnchor: number,
+ *    fourthXAnchor: number,
+ *    fourthValueAnchor: number,
  *    stroke: (acgraph.vector.Stroke|Function),
  *    trend: (acgraph.vector.Stroke|Function),
  *    grid: (acgraph.vector.Stroke|Function),
@@ -240,6 +245,41 @@ anychart.annotationsModule.THIRD_ANCHOR_POINT_DESCRIPTORS_META = (function() {
   return [
     ['thirdXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW],
     ['thirdValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
+  ];
+})();
+
+
+/**
+ * Properties that should be defined in annotation prototype to support fourth anchor point.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.annotationsModule.FOURTH_ANCHOR_POINT_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fourthXAnchor',
+      anychart.core.settings.asIsNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'fourthValueAnchor',
+      anychart.core.settings.asIsNormalizer);
+
+  return map;
+})();
+
+
+/**
+ * Properties meta.
+ * @type {!Array.<Array>}
+ */
+anychart.annotationsModule.FOURTH_ANCHOR_POINT_DESCRIPTORS_META = (function() {
+  return [
+    ['fourthXAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW],
+    ['fourthValueAnchor', anychart.ConsistencyState.ANNOTATIONS_ANCHORS | anychart.ConsistencyState.ANNOTATIONS_LAST_POINT, anychart.Signal.NEEDS_REDRAW]
   ];
 })();
 
