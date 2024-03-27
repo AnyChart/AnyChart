@@ -873,6 +873,20 @@ anychart.annotationsModule.PlotController.prototype.triangle = function(opt_conf
 
 
 /**
+ * Creates and returns a wave annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.Wave}
+ */
+anychart.annotationsModule.PlotController.prototype.wave = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.Wave} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.WAVE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
  * Creates and returns a trendChannel annotation.
  * @param {Object=} opt_config
  * @return {anychart.annotationsModule.TrendChannel}
