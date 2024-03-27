@@ -39,7 +39,7 @@ anychart.annotationsModule.Wave = function(chartController) {
   anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, anychart.annotationsModule.FOURTH_ANCHOR_POINT_DESCRIPTORS_META);
 };
 goog.inherits(anychart.annotationsModule.Wave, anychart.annotationsModule.Base);
-anychart.core.settings.populateAliases(anychart.annotationsModule.Wave, ['stroke'], 'normal');
+anychart.core.settings.populateAliases(anychart.annotationsModule.Wave, ['fill', 'stroke'], 'normal');
 anychart.core.settings.populate(anychart.annotationsModule.Wave, anychart.annotationsModule.X_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Wave, anychart.annotationsModule.VALUE_ANCHOR_DESCRIPTORS);
 anychart.core.settings.populate(anychart.annotationsModule.Wave, anychart.annotationsModule.SECOND_ANCHOR_POINT_DESCRIPTORS);
