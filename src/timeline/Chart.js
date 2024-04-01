@@ -1371,7 +1371,17 @@ anychart.timelineModule.Chart.prototype.handleMouseWheel_ = function(event) {
     rightDate = this.scale().inverseTransform((this.horizontalTranslate + this.dataBounds.width) / this.dataBounds.width);
 
     this.suspendSignalsDispatching();
-    var anchor = (mouseX - this.dataBounds.left) / this.dataBounds.width;
+    
+    /*
+      https://anychart.atlassian.net/browse/DVF-4685.
+      Calculation of X-anchor now considers the position
+      of chart container on the page.
+      this.dataBounds.left also considers such thinds as 
+      chart.padding().
+     */
+    var cp = this.container().getStage().getClientPosition();
+    var anchor = (mouseX - this.dataBounds.left - cp.x) / this.dataBounds.width;
+
     if (zoomIn) {
       this.zoomIn(1.2, anchor);
     } else {
