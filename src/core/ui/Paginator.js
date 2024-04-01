@@ -9,6 +9,8 @@ goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 
+goog.require('goog.dom');
+
 
 
 /**
@@ -916,6 +918,8 @@ anychart.core.ui.Paginator.prototype.disposeInternal = function() {
   this.margin_ = null;
   this.background_ = null;
   this.text_ = null;
+
+  goog.dom.removeNode(this.paginatorTextEl_);
 
   anychart.core.ui.Paginator.base(this, 'disposeInternal');
 };
