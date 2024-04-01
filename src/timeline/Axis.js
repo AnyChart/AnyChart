@@ -556,7 +556,15 @@ anychart.timelineModule.Axis.prototype.drawLabels = function() {
 
     text.text(textString);
     text.style(labelsSettings.flatten());
-    // text.prepareComplexity();
+
+    /*
+      https://anychart.atlassian.net/browse/DVF-4684
+      NOTE: text.prepareComplexity() call was commented during the RC in 2018-2019.
+      I don't know why.
+      Commenting this call disables useHtml(true) support.
+      Uncommented for a while, I don't know what will be affected.
+    */
+    text.prepareComplexity();
     text.applySettings();
 
     var tickRatio = scale.transform(tick['start']);
@@ -577,7 +585,15 @@ anychart.timelineModule.Axis.prototype.drawLabels = function() {
     width = endPx - startPx;
     var textBounds = padding.tightenBounds(new anychart.math.Rect(x, y, width, textHeight));
     text.putAt(textBounds, this.rootElement.getStage());
-    // text.finalizeComplexity();
+
+    /*
+      https://anychart.atlassian.net/browse/DVF-4684
+      NOTE: text.finalizeComplexity() call was commented during the RC in 2018-2019.
+      I don't know why.
+      Also uncommented text.prepareComplexity() above for same purposes.
+      Uncommented for a while, I don't know what will be affected.
+    */
+    text.finalizeComplexity();
   }
 
   for (var i = ticksArray.length; i < this.texts_.length; i++) {
