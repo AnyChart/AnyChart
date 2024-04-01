@@ -1562,8 +1562,9 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
 
   // calculate axes space first, the result is data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    var contentAreaBounds = this.getContentAreaBounds(bounds);
     // bounds of data area
-    this.dataBounds = this.getBoundsWithoutAxes(this.getContentAreaBounds(bounds));
+    this.dataBounds = this.getBoundsWithoutAxes(contentAreaBounds);
 
     // we do not invalidate series BOUNDS state, because it will be invalidate naturally in series drawing section
     this.invalidateAnnotations();

@@ -669,7 +669,8 @@ anychart.core.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
       var scaleTicksArr, ticksArrLen, labels, isLabels;
       labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
       isLabels = labels.enabled();
-      scaleTicksArr = scale.ticks().get();
+      var ticks = scale.ticks();
+      scaleTicksArr = ticks.get();
       ticksArrLen = scaleTicksArr.length;
 
       if (isLabels) {
@@ -1059,8 +1060,12 @@ anychart.core.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
  * @private
  */
 anychart.core.Axis.prototype.calcLabels_ = function(opt_bounds) {
-  return this.labels().enabled() || this.minorLabels().enabled() ?
-      this.getOption('staggerMode') ? this.applyStaggerMode_(opt_bounds) : this.getOverlappedLabels_(opt_bounds) :
+  var labelsEnabled = this.labels().enabled();
+  var minorLabelsEnabled = this.minorLabels().enabled();
+  var isStaggerMode = this.getOption('staggerMode');
+
+  return labelsEnabled || minorLabelsEnabled ?
+      isStaggerMode ? this.applyStaggerMode_(opt_bounds) : this.getOverlappedLabels_(opt_bounds) :
       true; //Means that here are no labels.
 };
 

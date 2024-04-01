@@ -4648,12 +4648,12 @@ anychart.pieModule.Chart.prototype.createTooltipContextProvider = function() {
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getCsvGrouperColumn = function () {
   return ['x'];
-}
+};
 
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getCsvGrouperValue = function (iterator) {
   return iterator.get('x');
-}
+};
 
 /** @inheritDoc */
 anychart.pieModule.Chart.prototype.getCsvGrouperAlias = function (iterator) {
