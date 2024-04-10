@@ -932,6 +932,157 @@ anychart.core.ChartWithOrthogonalScales.prototype.postProcessStacking = function
 
 
 /**
+ * TODO JSDoc. 
+ * 
+ * @param {*} data - .
+ * @param {number} firstIndex - . 
+ * @param {number} lastIndex - .
+ * @returns 
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.actualizeIndexesForMissingConnection_ = function(data, firstIndex, lastIndex) {
+  var p1 = data[firstIndex];
+  var p2 = data[lastIndex];
+
+  var v;
+
+  if (p1.meta['missing'] && p1.meta['notMissingStart']) {
+    v = p1.meta['notMissingStartIndex'];
+    firstIndex = isNaN(v) ? firstIndex : v;
+    // TODO WTH with firstInternalIndex?
+  }
+
+  if (!p1.meta['missing'] && p1.meta['hasPreviousMissingFromStart']) {
+    v = p1.meta['notMissingStartIndexForPreviousMissing'];
+    firstIndex = Math.min(firstIndex, isNaN(v) ? firstIndex : v);
+  }
+
+  if (p2.meta['missing'] && p2.meta['notMissingEnd']) {
+    v = p2.meta['notMissingEndIndex'];
+    lastIndex = isNaN(v) ? lastIndex : v;
+    // TODO WTH with firstInternalIndex?
+  }
+
+  if (!p2.meta['missing'] && p2.meta['hasPreviousMissingFromEnd']) {
+    v = p1.meta['notMissingEndIndexForPreviousMissing'];
+    lastIndex = Math.max(lastIndex, isNaN(v) ? lastIndex : v);
+  }
+
+  return [firstIndex, lastIndex];
+};
+
+/**
+ * Calculates indexes for scatter scale case.
+ * 
+ * @param {*} xPlans - .
+ * @param {anychart.scales.Base} xScale - .
+ * @return {Array.<number>} - [firstIndex, lastIndex, firstInternalIndex, lastInternalIndex].
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getScatterInitialIndexes_ = function(xPlans, xScale) {
+  var plan = xPlans[0];
+  var ser = plan.series;
+  var data = plan.data;
+  var dataLength = data.length;
+
+  var firstVal = /** @type {number} */(xScale.inverseTransform(0));
+  var lastVal = /** @type {number} */(xScale.inverseTransform(1));
+  if (dataLength) {
+    /**
+     * Comparator function.
+     * @param {number} target
+     * @param {Object} item
+     * @return {number}
+     */
+    var searcher = function (target, item) {
+      return target - item.data['x'];
+    };
+    var firstIndex = goog.array.binarySearch(data, firstVal, searcher);
+    if (firstIndex < 0) firstIndex = ~firstIndex - 1;
+    firstIndex = goog.math.clamp(firstIndex, 0, dataLength - 1);
+
+    var lastIndex = goog.array.binarySearch(data, lastVal, searcher);
+    if (lastIndex < 0) lastIndex = ~lastIndex;
+    lastIndex = goog.math.clamp(lastIndex, 0, dataLength - 1);
+
+    // swap indexes if scale is inverted
+    if (xScale['inverted']()) {
+      var tmp = firstIndex;
+      firstIndex = lastIndex;
+      lastIndex = tmp;
+    }
+  } else {
+    firstIndex = lastIndex = NaN;
+  }
+
+  return [firstIndex, lastIndex, firstIndex, lastIndex];
+};
+
+
+/**
+ * Calculates indexes for ordinal scale case.
+ * 
+ * @param {*} xPlans - X-drawing plans.
+ * @return {Array.<number>} - [firstIndex, lastIndex, firstInternalIndex, lastInternalIndex].
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getOrdinalInitialIndexes_ = function(xPlans) {
+  var plan = xPlans[0];
+  var ser = plan.series;
+  var data = plan.data;
+  var dataLength = data.length;
+
+  var zoomStartRatio = this.getZoomStartRatio();
+  var zoomEndRatio = this.getZoomEndRatio();
+
+  var firstIndex = goog.math.clamp(Math.floor(zoomStartRatio * dataLength - 1), 0, dataLength - 1);
+  var lastIndex = goog.math.clamp(Math.ceil(zoomEndRatio * dataLength + 1), 0, dataLength - 1);
+  var firstInternalIndex = goog.math.clamp(Math.floor(zoomStartRatio * dataLength + 0.5), 0, dataLength - 1);
+  var lastInternalIndex = goog.math.clamp(Math.floor(zoomEndRatio * dataLength - 0.5), 0, dataLength - 1);
+
+  return [firstIndex, lastIndex, firstInternalIndex, lastInternalIndex];
+};
+
+
+/**
+ * Gets indexes considering https://anychart.atlassian.net/browse/DVF-4681.
+ * 
+ * @param {*} xPlans - .
+ * @param {anychart.scales.Base} xScale - .
+ * @return {Array.<number>} - [firstIndex, lastIndex, firstInternalIndex, lastInternalIndex].
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getIndexes_ = function(xPlans, xScale) {
+  var isOrdinalScale = anychart.utils.instanceOf(xScale, anychart.scales.Ordinal);
+
+  var initialIndexes = isOrdinalScale ?
+    this.getOrdinalInitialIndexes_(xPlans) :
+    this.getScatterInitialIndexes_(xPlans, xScale);
+
+  var firstIndex = initialIndexes[0];
+  var lastIndex = initialIndexes[1];
+  var firstInternalIndex = initialIndexes[2];
+  var lastInternalIndex = initialIndexes[3];
+
+  for (var i = 0; i < xPlans.length; i++) {
+    var plan = xPlans[i];
+    var ser = plan.series;
+    var data = plan.data;
+    var dataLength = data.length;
+    var isSeriesConnectable = ser.check(anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING);
+
+    // If series is connectable and contains missing points.
+    if (isSeriesConnectable && plan.nonMissingCount !== data.length) {
+      var actualizedFirstAndLastIndexes = this.actualizeIndexesForMissingConnection_(data, firstIndex, lastIndex);
+      var first = actualizedFirstAndLastIndexes[0];
+      var last = actualizedFirstAndLastIndexes[1];
+
+      firstIndex = Math.min(firstIndex, first);
+      lastIndex = Math.max(lastIndex, last);
+    }
+  }
+
+  return [firstIndex, lastIndex, firstInternalIndex, lastInternalIndex];
+
+};
+
+/**
  * @protected
  */
 anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() {
@@ -948,51 +1099,15 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
         yScale.startAutoCalc();
     }
     for (var xScaleUid in this.drawingPlansByYAndXScale_) {
-      // calculating zoomed indexes
-      var firstIndex, lastIndex, firstInternalIndex, lastInternalIndex;
-      data = this.drawingPlansByXScale[xScaleUid][0].data;
-      var dataLength = data.length;
+      var xPlans = this.drawingPlansByXScale[xScaleUid];
       var xScale = this.xScales[xScaleUid];
-      if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal)) {
-        if (dataLength) {
-          firstIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength - 1), 0, dataLength - 1);
-          lastIndex = goog.math.clamp(Math.ceil(this.getZoomEndRatio() * dataLength + 1), 0, dataLength - 1);
-          firstInternalIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength + 0.5), 0, dataLength - 1);
-          lastInternalIndex = goog.math.clamp(Math.floor(this.getZoomEndRatio() * dataLength - 0.5), 0, dataLength - 1);
-        } else {
-          firstIndex = lastIndex = firstInternalIndex = lastInternalIndex = NaN;
-        }
-      } else {
-        var firstVal = /** @type {number} */(xScale.inverseTransform(0));
-        var lastVal = /** @type {number} */(xScale.inverseTransform(1));
-        if (dataLength) {
-          /**
-           * Comparator function.
-           * @param {number} target
-           * @param {Object} item
-           * @return {number}
-           */
-          var searcher = function(target, item) {
-            return target - item.data['x'];
-          };
-          firstIndex = goog.array.binarySearch(data, firstVal, searcher);
-          if (firstIndex < 0) firstIndex = ~firstIndex - 1;
-          firstIndex = goog.math.clamp(firstIndex, 0, dataLength - 1);
-          lastIndex = goog.array.binarySearch(data, lastVal, searcher);
-          if (lastIndex < 0) lastIndex = ~lastIndex;
-          lastIndex = goog.math.clamp(lastIndex, 0, dataLength - 1);
-          // swap indexes if scale is inverted
-          if (xScale['inverted']()) {
-            var tmp = firstIndex;
-            firstIndex = lastIndex;
-            lastIndex = tmp;
-          }
-        } else {
-          firstIndex = lastIndex = NaN;
-        }
-        firstInternalIndex = firstIndex;
-        lastInternalIndex = lastIndex;
-      }
+
+      var indexes = this.getIndexes_(xPlans, xScale);
+      var firstIndex = indexes[0];
+      var lastIndex = indexes[1];
+      var firstInternalIndex = indexes[2];
+      var lastInternalIndex = indexes[3];
+
       drawingPlansByYScale = this.drawingPlansByYAndXScale_[xScaleUid];
       for (var yScaleUid in drawingPlansByYScale) {
         drawingPlans = drawingPlansByYScale[yScaleUid];
@@ -1136,6 +1251,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
               // TODO(AntonKagakin): drawing plan should be rewritten to work with categories indexes after DVF-3893
               // TODO(AntonKagakin): (xMode scatter) cause now there can be several points in category.
               if (!point) continue;
+
               if (!anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                   anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 for (k = 0; k < names.length; k++) {

@@ -4426,14 +4426,18 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
   var pointMissing = this.considerMetaEmpty() ?
       0 :
       (Number(rowInfo.meta('missing')) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
-  if (!this.isPointVisible(rowInfo))
+
+  if (!this.isPointVisible(rowInfo)) {
     pointMissing |= anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+  }
+
   var xRatio = this.getXScale().transformInternal(
       rowInfo.getX(),
       rowInfo.getIndex(),
       this.getXPointPosition());
   // we write it here, because meta makers can rewrite this field (in radar/polar, for ex.)
   rowInfo.meta('xRatio', xRatio);
+
   if (pointMissing) {
     this.makeMissing(rowInfo, yNames, xRatio);
   } else {

@@ -767,7 +767,7 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
     index = this.drawingPlan.xHashMap[hash];
   }
   return (index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
-};
+  };
 
 
 //endregion
@@ -777,6 +777,98 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
 //  Drawing plan generation
 //
 //----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * https://anychart.atlassian.net/browse/DVF-4681.
+ * 
+ * Adds meta info about not-missing points to missing points
+ * to be drawn for zooming cases (see ticket).
+ * 
+ * How it works: 
+ * 1) Passes through the data array from start (to avoid double passage, from end too).
+ * 2) Takes current point (data[i]) and defines if it is a missing point.
+ * 3) If is missing, puts to its meta info about previously found not missing.
+ * 4) If is not missing, puts to its meta info if previous point is missing.
+ * 
+ * All of it allows to draw series with enabled connectMissingPoints option
+ * in coutinous way connecting not-missing points only even for case from the 
+ * ticket - it takes values not only from current zoom value (sides of visible area),
+ * it considers 'out-of-visible-area' not-missing points.
+ * 
+ * Also it allows not to recalculate yScale range for visible area only:
+ * @see anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales
+ * 
+ * @param {*} pointsData - Points data from drawing plan calculated.
+ */
+anychart.core.series.Cartesian.prototype.processMissingPointsConnection_ = function(pointsData) {
+  // Non missing point object from the start.
+  var notMissingStart = null;
+
+  // Non missing point object from the end.
+  var notMissingEnd = null;
+
+  // Index of notMissingStart point.
+  var notMissingStartIndex = NaN;
+
+  // Index of notMissingEnd point.
+  var notMissingEndIndex = NaN;
+
+  // Flag if previous point for not-missint point is missing.
+  var missingStart = false;
+
+  // Same for backward passage.
+  var missingEnd = false;
+
+  /*
+    This code just allows to skip double passage (from start and from end)
+    to define previous not missing point from left and from right.
+  */
+  for (var i = 0; i < pointsData.length; i++) {
+    var end = pointsData.length - i - 1;
+    var currPointFromStart = pointsData[i];
+    var currPointFromEnd = pointsData[end];
+
+    var isMissingStart = !!currPointFromStart.meta['missing'];
+    var isMissingEnd = !!currPointFromEnd.meta['missing'];
+
+    if (isMissingStart) {
+      missingStart = true;
+      currPointFromStart.meta['notMissingStart'] = notMissingStart;
+      currPointFromStart.meta['notMissingStartIndex'] = notMissingStartIndex;
+      if (notMissingStart) {
+        notMissingStart.meta['connectsMissingPointsStart'] = true;
+      }
+    } else {
+      currPointFromStart.meta['hasPreviousMissingFromStart'] = missingStart;
+      if (missingStart && i) {
+        currPointFromStart.meta['notMissingStartIndexForPreviousMissing'] = 
+          pointsData[i - 1].meta['notMissingStartIndex'];
+      }
+      missingStart = false;
+      notMissingStart = currPointFromStart;
+      notMissingStartIndex = i;
+    }
+
+    if (isMissingEnd) {
+      missingEnd = true;
+      currPointFromEnd.meta['notMissingEnd'] = notMissingEnd;
+      currPointFromEnd.meta['notMissingEndIndex'] = notMissingEndIndex;
+      if (notMissingEnd) {
+        notMissingEnd.meta['connectsMissingPointsEnd'] = true;
+      }
+    } else {
+      currPointFromEnd.meta['hasPreviousMissingFromEnd'] = missingEnd;
+      if (missingEnd && end < pointsData.length - 1) {
+        currPointFromStart.meta['notMissingEndIndexForPreviousMissing'] =
+          pointsData[end + 1].meta['notMissingEndIndex'];
+      }
+      missingEnd = false;
+      notMissingEnd = currPointFromEnd;
+      notMissingEndIndex = end;
+    }
+  }
+};
+
 /**
  * @param {Array} data
  * @param {Function} dataPusher
@@ -905,6 +997,16 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
     this.postProcessPoint(iterator, point, postProcessingMeta);
 
     dataPusher(data, point);
+  }
+
+  // https://anychart.atlassian.net/browse/DVF-4681
+  var processMissingPointsConnection = 
+    this.check(anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING) &&
+    !!this.getOption('connectMissingPoints') &&
+    nonMissingCount !== data.length;
+
+  if (processMissingPointsConnection) {
+      this.processMissingPointsConnection_(data);
   }
 
   // anychart.performance.end('Drawing plan calc');

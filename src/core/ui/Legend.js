@@ -1470,8 +1470,16 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
     textEl.textContent = item.text();
   }
 
-  var paginatorTextEl = this.renderer.createTextElement();
-  this.measurementG_.appendChild(paginatorTextEl);
+  var paginatorTextEl = this.paginator().paginatorTextElement();
+  
+  if (!paginatorTextEl) {
+    paginatorTextEl = this.renderer.createTextElement();
+    this.measurementG_.appendChild(paginatorTextEl);
+
+    // Provide paginator text DOM element reference.
+    this.paginator_.paginatorTextElement(paginatorTextEl);
+  }
+  
   sett = this.paginator().textSettings();
   style = anychart.utils.toStyleString(/** @type {Object} */ (sett));
   paginatorTextEl.style.cssText = style;
@@ -1482,9 +1490,6 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
     var bbox = textEl['getBBox']();
     item.predefinedBounds(new goog.math.Rect(bbox.x, bbox.y, bbox.width, bbox.height));
   }
-
-  // provide paginator text DOM element reference
-  this.paginator_.paginatorTextElement(paginatorTextEl);
 
   this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
