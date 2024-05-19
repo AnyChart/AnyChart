@@ -160,7 +160,6 @@ anychart.annotationsModule.Wave.prototype.colorize = function(state) {
   anychart.annotationsModule.Wave.base(this, 'colorize', state);
   this.paths_[0].stroke(this.strokeResolver_(this, state));
   this.paths_[1]
-      .fill(anychart.color.TRANSPARENT_HANDLER)
       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
 
