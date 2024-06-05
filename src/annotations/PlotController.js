@@ -12,6 +12,15 @@ goog.require('anychart.annotationsModule.InfiniteLine');
 goog.require('anychart.annotationsModule.Label');
 goog.require('anychart.annotationsModule.Line');
 goog.require('anychart.annotationsModule.Marker');
+<<<<<<< Updated upstream
+=======
+goog.require('anychart.annotationsModule.PatternCupHandle');
+goog.require('anychart.annotationsModule.PatternFlag');
+goog.require('anychart.annotationsModule.PatternPennant');
+goog.require('anychart.annotationsModule.PatternTriangle');
+goog.require('anychart.annotationsModule.PatternWedge');
+goog.require('anychart.annotationsModule.Position');
+>>>>>>> Stashed changes
 goog.require('anychart.annotationsModule.Ray');
 goog.require('anychart.annotationsModule.Rectangle');
 goog.require('anychart.annotationsModule.TrendChannel');
@@ -858,6 +867,93 @@ anychart.annotationsModule.PlotController.prototype.ellipse = function(opt_confi
 
 
 /**
+<<<<<<< Updated upstream
+=======
+ * Creates and returns a pattern-cup-handle annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.PatternCupHandle}
+ */
+anychart.annotationsModule.PlotController.prototype.patternCupHandle = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.PatternCupHandle} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.PATTERNCUPHANDLE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a pattern-flag annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.PatternFlag}
+ */
+anychart.annotationsModule.PlotController.prototype.patternFlag = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.PatternFlag} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.PATTERNFLAG));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a pattern-pennant annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.PatternPennant}
+ */
+anychart.annotationsModule.PlotController.prototype.patternPennant = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.PatternPennant} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.PATTERNPENNANT));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a pattern-triangle annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.PatternTriangle}
+ */
+anychart.annotationsModule.PlotController.prototype.patternTriangle = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.PatternTriangle} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.PATTERNTRIANGLE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a pattern-wedge annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.PatternWedge}
+ */
+anychart.annotationsModule.PlotController.prototype.patternWedge = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.PatternWedge} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.PATTERNWEDGE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+ * Creates and returns a position annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.Position}
+ */
+anychart.annotationsModule.PlotController.prototype.position = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.Position} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.POSITION));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
+>>>>>>> Stashed changes
  * Creates and returns a triangle annotation.
  * @param {Object=} opt_config
  * @return {anychart.annotationsModule.Triangle}
@@ -887,7 +983,7 @@ anychart.annotationsModule.PlotController.prototype.trendChannel = function(opt_
 
 /**
  * Creates and returns a finiteTrendChannel annotation.
- * @param {Object=} opt_config 
+ * @param {Object=} opt_config
  * @return {anychart.annotationsModule.FiniteTrendChannel}
  */
 anychart.annotationsModule.PlotController.prototype.finiteTrendChannel = function(opt_config) {
