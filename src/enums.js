@@ -3483,6 +3483,40 @@ anychart.enums.normalizeCrosshairDisplayMode = function(value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  CirclePackingLabelsMode
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Mode to display labels in circle packing chat
+ * @enum {string}
+ */
+anychart.enums.CirclePackingLabelsMode = {
+  ROOTS: "roots",
+  LEAVES: "leaves",
+};
+
+/**
+ * Normalizes value to CirclePackingLabelsMode enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.CirclePackingLabelsMode=} opt_default Default value, if input cannot be recognized. Defaults to HIDE.
+ * @return {anychart.enums.CirclePackingLabelsMode}
+ */
+anychart.enums.normalizeCirclePackingLabelsMode = function (
+  value,
+  opt_default
+) {
+  return /** @type {anychart.enums.CirclePackingLabelsMode} */ (
+    anychart.enums.normalize(
+      anychart.enums.CirclePackingLabelsMode,
+      value,
+      opt_default || anychart.enums.CirclePackingLabelsMode.ROOTS
+    )
+  );
+};
+
+
 /**
  * @enum {string}
  */

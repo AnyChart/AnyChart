@@ -19,14 +19,19 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
       'labels': {
         'format': '{%name}',
         'enabled': true,
-        'anchor': 'center-top',
-        'position': 'center-top',
+        'hAlign': 'center',
+        'vAlign': 'middle',
+        'position': 'center',
         'fontSize': 14,
         'fontColor': '#fff',
         'textShadow': '2px 2px 0px black',
-        'disablePointerEvents': true
+        'disablePointerEvents': true,
+        'width': null,
+        'height': null,
       }
     },
+
+    'labelsMode': 'roots',
 
     'hovered': {
       /**
