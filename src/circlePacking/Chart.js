@@ -24,7 +24,7 @@ goog.require('anychart.utils');
 
 /**
  * AnyChart Circle Packing chart.
- *
+ * 
  * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_data - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @extends {anychart.core.SeparateChart}
@@ -48,12 +48,12 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
    * @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors}
    * @private
    */
-  this.palette_ = null;
-
+   this.palette_ = null;
+  
 
   /**
    * Internal math model to be drawn.
-   *
+   * 
    * @type {anychart.circlePackingModule.model.Item|null}
    */
   this.model_ = null;
@@ -61,7 +61,7 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
 
   /**
    * TODO Describe.
-   *
+   * 
    * @type {Array.<number>}
    */
   this.currentView_ = [];
@@ -94,7 +94,7 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
     ['stroke', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
     ['labels', 0, 0]
   ]);
-  
+
   this.normal_ = new anychart.core.StateSettings(this, normalDescriptorsMeta, anychart.PointState.NORMAL);
   this.normal_.setOption(anychart.core.StateSettings.LABELS_AFTER_INIT_CALLBACK, anychart.core.StateSettings.DEFAULT_LABELS_AFTER_INIT_CALLBACK);
 
@@ -124,25 +124,25 @@ anychart.core.settings.populateAliases(anychart.circlePackingModule.Chart, ['fil
  * Supported signals.
  * @type {number}
  */
-anychart.circlePackingModule.Chart.prototype.SUPPORTED_SIGNALS =
-  anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS |
-  anychart.Signal.DATA_CHANGED;
+ anychart.circlePackingModule.Chart.prototype.SUPPORTED_SIGNALS =
+    anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.DATA_CHANGED;
 
 
 /**
- * Supported consistency states.
- * @type {number}
- */
+* Supported consistency states.
+* @type {number}
+*/
 anychart.circlePackingModule.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
-  anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-  anychart.ConsistencyState.TREE_DATA |
-  anychart.ConsistencyState.APPEARANCE |
-  anychart.ConsistencyState.CHART_LABELS;
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.TREE_DATA |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.CHART_LABELS;
 
 
 /**
  * Getter/setter for data.
- *
+ * 
  * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @return {anychart.treeDataModule.Tree|anychart.treeDataModule.View|anychart.circlePackingModule.Chart}
@@ -200,7 +200,7 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
 
 /**
  * Getter/setter for palette.
- *
+ * 
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.circlePackingModule.Chart)} .
  */
@@ -258,7 +258,7 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
 
 /**
  * Internal palette invalidation handler.
- *
+ * 
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
@@ -272,7 +272,7 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
 
 /**
  * Normal state settings.
- *
+ * 
  * @param {!Object=} opt_value
  * @return {anychart.core.StateSettings|anychart.circlePackingModule.Chart}
  */
@@ -287,7 +287,7 @@ anychart.circlePackingModule.Chart.prototype.setupStateSettings = function() {
 
 /**
  * Hovered state settings.
- *
+ * 
  * @param {!Object=} opt_value
  * @return {anychart.core.StateSettings|anychart.circlePackingModule.Chart}
  */
@@ -302,7 +302,7 @@ anychart.circlePackingModule.Chart.prototype.hovered = function(opt_value) {
 
 /**
  * Selected state settings.
- *
+ * 
  * @param {!Object=} opt_value
  * @return {anychart.core.StateSettings|anychart.circlePackingModule.Chart}
  */
@@ -317,7 +317,7 @@ anychart.circlePackingModule.Chart.prototype.selected = function(opt_value) {
 
 /**
  * Getter/setter for labels.
- *
+ * 
  * @param {(Object|boolean|null)=} opt_value .
  * @return {anychart.core.ui.LabelsFactory|anychart.circlePackingModule.Chart} .
  */
@@ -332,7 +332,7 @@ anychart.circlePackingModule.Chart.prototype.labels = function(opt_value) {
 
 /**
  * Listener for labels invalidation.
- *
+ * 
  * @param {anychart.SignalEvent} event - Invalidation event.
  * @private
  */
@@ -354,7 +354,7 @@ anychart.circlePackingModule.Chart.prototype.getAllSeries = function() {
 //region Interactivity
 /**
  * Internal implementation of hovering.
- *
+ * 
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item.
  * @param {anychart.PointState} state - State.
  */
@@ -373,7 +373,7 @@ anychart.circlePackingModule.Chart.prototype.colorize_ = function(modelItem, sta
 
 /**
  * Puts obfuscated modelItem's fields to human readable fields of event.
- *
+ * 
  * @param {Object} event - Incoming event.
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item.
  */
@@ -481,14 +481,14 @@ anychart.circlePackingModule.Chart.prototype.handleMouseOut = function(event) {
   }
 };
 
-/**
+/** 
  * All remaining events handler.
- *
+ * 
  * @param {anychart.core.MouseEvent} event - Incoming event.
  */
 anychart.circlePackingModule.Chart.prototype.handleAll = function (event) {
   var evt = this.getInteractivityEvent(event);
-
+  
   if (evt) {
     this.dispatchEvent(evt);
   }
@@ -607,7 +607,7 @@ anychart.circlePackingModule.Chart.prototype.calculate = function() {
 
 /**
  * Draws model on the screen.
- *
+ * 
  * @param {Array.<anychart.circlePackingModule.model.Item>|undefined} children - Model item to be drawn.
  */
 anychart.circlePackingModule.Chart.prototype.drawModel_ = function(children) {
@@ -634,7 +634,7 @@ anychart.circlePackingModule.Chart.prototype.drawModel_ = function(children) {
 
 /**
  * Draws model on the screen.
- *
+ * 
  * @param {Array.<anychart.circlePackingModule.model.Item>|undefined} children - Model item to be drawn.
  * @private
  */
@@ -656,7 +656,7 @@ anychart.circlePackingModule.Chart.prototype.drawModel_ = function(children) {
 
 /**
  * Creates format provider.
- *
+ * 
  * @param {anychart.circlePackingModule.model.Item} modelItem - .
  * @return {anychart.format.Context} - Context provider.
  */
@@ -682,7 +682,7 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
 
 /**
  * Draws labels.
- *
+ * 
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item to be drawn.
  */
  anychart.circlePackingModule.Chart.prototype.drawLabels_ = function(modelItem) {
@@ -692,35 +692,46 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
 
   if (labels.enabled()) {
     if (modelItem) {
-      var children = modelItem.children || [];
-      children = modelItem.isRoot ? children : goog.array.concat(modelItem, children);
+      var children = modelItem.children || [];      
 
-      for (var i = 0; i < children.length; i++) {        
+      // Lables behaviour according to labelsMode 
+      if (this.getOption('labelsMode') === 'leaves'){
+        children = this.concatChildren_(children);
+      } else {
+        children = modelItem.isRoot ?
+            children :
+            goog.array.concat(modelItem, children);
+      };
+
+      for (var i = 0; i < children.length; i++) {
         var child = children[i];
         var context = this.createFormatProvider(child);
         var label = labels.add(context, null);        
         var mergedSettings = label.getMergedSettings();
-        
-        // In case of enabling adjustFontSize() without any bounds set to labels       
-        mergedSettings['width'] = mergedSettings['width']
-        ? mergedSettings['width'] 
-        : mergedSettings['adjustByWidth'] 
-          ? '70%' // B≈A×0.7071 where A - diametr of the Circumscribing Circle and B - a side of Circumscribed square.          
-          : mergedSettings['width'];
-        
-        mergedSettings['height'] = mergedSettings['height']
-        ? mergedSettings['height'] 
-        : mergedSettings['adjustByHeight'] 
-          ? '70%' // B ≈ A * 0.7071 // where A - diametr of the Circumscribing Circle and B - a side of Circumscribed square.
-          : mergedSettings['height'];
-      
+
         /*
-        Truncate lables behaviour 
-        null - default, unrestricted width/height of label
-        100 - maximum label width/height equals to 100 pixels
-        '100px' - maximum label width/height equals to 100 pixels
-        '100%' - child.bounds.width/height
-        */ 
+          In case of enabling adjustFontSize() without any bounds set to labels
+          '70%' below is not a random number: B≈A×0.7071 where A - diametr of the Circumscribing Circle and B - a side of Circumscribed square.
+         */
+        mergedSettings['width'] = mergedSettings['width'] ?
+            mergedSettings['width'] :
+            mergedSettings['adjustByWidth'] ?
+                '70%' :
+                mergedSettings['width'];
+
+        mergedSettings['height'] = mergedSettings['height'] ?
+            mergedSettings['height'] :
+            mergedSettings['adjustByHeight'] ?
+                '70%' :
+                mergedSettings['height'];
+
+        /*
+          Truncate lables behaviour 
+          null - default, unrestricted width/height of label
+          100 - maximum label width/height equals to 100 pixels
+          '100px' - maximum label width/height equals to 100 pixels
+          '100%' - child.bounds.width/height
+         */
         var widthOption = mergedSettings['width'];
         var heightOption = mergedSettings['height'];
         var normilizedWidth = anychart.utils.normalizeSize((widthOption), child.bounds.width);
@@ -730,7 +741,7 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
 
         // Position is defined 
         var position = anychart.enums.normalizeAnchor(label.getFinalSettings('position'));
-        var positionProvider = {'value': anychart.utils.getCoordinateByAnchor((child.bounds), position)};
+        var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(/** @type {goog.math.Rect} */(child.bounds), position)};
 
         label.positionProvider(positionProvider);
         label.draw();
@@ -742,44 +753,39 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
   labels.draw();
 };
 
+
 /**
  * Reqursive method to make an array of all the leaf children of a model item provided for drawLabels_ method.
- *
+ * 
  * @param {Array.<anychart.circlePackingModule.model.Item>|undefined} children
  * @returns {Array} childrenArray
  */
-anychart.circlePackingModule.Chart.prototype.concatChildren_ = function (
-  children
-) {
+anychart.circlePackingModule.Chart.prototype.concatChildren_ = function (children) {
   var childrenArray = [];
   for (var i = 0; i < children.length; i++) {
-    childrenArray = children[i].isLeaf
-      ? goog.array.concat(childrenArray, children[i])
-      : goog.array.concat(
-          childrenArray,
-          this.concatChildren_(children[i].children)
-        );
+    childrenArray = children[i].isLeaf ? goog.array.concat(childrenArray, children[i]) : goog.array.concat(childrenArray,this.concatChildren_(children[i].children));
   }
   return childrenArray;
 };
 
+
 /**
  * Gets the source color for item.
- *
+ * 
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item.
  * @return {acgraph.vector.Fill|acgraph.vector.Stroke} - .
  */
 anychart.circlePackingModule.Chart.prototype.getModelItemSourceColor_ = function(modelItem) {
-    if (modelItem.parent.isRoot) {
-      return this.palette().itemAt(modelItem.index);
-    }
+  if (modelItem.parent.isRoot) {
+    return this.palette().itemAt(modelItem.index);
+  }
   return anychart.color.lighten(this.getModelItemSourceColor_(modelItem.parent));
-  };
+};
 
 
 /**
  * Gets color resolution context.
- *
+ * 
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item to get info from.
  * @return {Object} - Context object.
  */
@@ -823,7 +829,7 @@ anychart.circlePackingModule.Chart.prototype.resolveColorProperty = function(mod
 
 /**
  * Initializes basic required DOM-structure.
- *
+ * 
  * @private
  */
 anychart.circlePackingModule.Chart.prototype.initDom_ = function() {
@@ -848,7 +854,7 @@ anychart.circlePackingModule.Chart.prototype.initDom_ = function() {
  * Gets currently drilled view.
  * Not used as it's needed in current implementation.
  * Will be used on drill-down mechanism impllementation.
- *
+ * 
  * @return {anychart.circlePackingModule.model.Item} - The current view.
  */
 anychart.circlePackingModule.Chart.prototype.getCurrentModel_ = function() {
@@ -858,7 +864,7 @@ anychart.circlePackingModule.Chart.prototype.getCurrentModel_ = function() {
     var curr = this.currentView_[i];
     model = model.children[curr];
   }
-
+  
   return model;
 };
 
