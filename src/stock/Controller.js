@@ -317,9 +317,11 @@ anychart.stockModule.Controller.prototype.refreshSelection = function(newPixelWi
     startKey = scrollerScale.inverseTransform(this.currentStartKeyRatio_);
     endKey = scrollerScale.inverseTransform(this.currentEndKeyRatio_);
   }
-  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(alignedFirst)))
+  /* The last condition in both below ifs is needed to prevent false positive
+   as the selection can be past the last index and not be sticking to the edge */
+  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(alignedFirst) && this.currentSelectionSticksRight()))
     startKey = alignedFirst;
-  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(alignedLast)))
+  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(alignedLast) && this.currentSelectionSticksLeft()))
     endKey = alignedLast;
 
   if (!isNaN(startKey)) {
