@@ -549,10 +549,14 @@ anychart.timelineModule.Axis.prototype.drawLabels = function() {
       autoFormat = minWidthFormat;
     }
 
-    var textString = this.labels().getText(/** @type {anychart.format.Context} */(this.formatProvider_.propagate({
+    // autoFormat should be present in the context as it generated dynamically
+    var contextExtension = {
+      'autoFormat': {value: autoFormat, type: anychart.enums.TokenType.STRING},
       'value': { value: anychart.format.dateTime(tick['start'], autoFormat), type: anychart.enums.TokenType.STRING},
       'tickValue': { value: tick['start'], type: anychart.enums.TokenType.NUMBER}
-    })));
+    };
+    var context = /** @type {anychart.format.Context} */(this.formatProvider_.propagate(contextExtension));
+    var textString = this.labels().getText(context);
 
     text.text(textString);
     text.style(labelsSettings.flatten());
