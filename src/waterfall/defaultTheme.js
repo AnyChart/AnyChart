@@ -5,6 +5,7 @@ goog.require('anychart.core.defaultTheme');
 goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
   'waterfall': {
     'dataMode': 'diff',
+    'drawTotalsAsAbsolute': false,
     'connectorStroke': anychart.core.defaultTheme.waterfallTotalStroke,
     'defaultSeriesType': 'waterfall',
     'defaultSeriesSettings': {
