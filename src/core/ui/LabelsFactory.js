@@ -2687,7 +2687,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 
     var canAdjustByWidth = !autoWidth;
     var canAdjustByHeight = !autoHeight;
-    var needAdjust = ((canAdjustByWidth && mergedSettings['adjustByHeight']) || (canAdjustByHeight && mergedSettings['adjustByHeight']));
+    var needAdjust = ((canAdjustByWidth && mergedSettings['adjustByWidth']) || (canAdjustByHeight && mergedSettings['adjustByHeight']));
 
     if (needAdjust) {
       var calculatedFontSize;
