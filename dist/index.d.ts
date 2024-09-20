@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.12.1
+// Type definitions for AnyChart JavaScript Charting Library, v8.13.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -1167,6 +1167,8 @@ declare namespace anychart.charts {
         data(data?: anychart.data.Tree | anychart.data.TreeView | Array<Object>, fillMethod?: string): anychart.charts.CirclePacking;
         hovered(): anychart.core.StateSettings;
         hovered(settings?: Object): anychart.charts.CirclePacking;
+        labelsMode(): string;
+        labelsMode(mode?: string): anychart.charts.CirclePacking;
         normal(): anychart.core.StateSettings;
         normal(settings?: Object): anychart.charts.CirclePacking;
         palette(): anychart.palettes.RangeColors | anychart.palettes.DistinctColors;
@@ -2429,6 +2431,8 @@ declare namespace anychart.charts {
         dataMode(mode?: string): anychart.charts.Waterfall;
         dispose(): void;
         draw(async?: boolean): anychart.charts.Waterfall;
+        drawTotalsAsAbsolute(): boolean;
+        drawTotalsAsAbsolute(value?: boolean): anychart.charts.Waterfall;
         enabled(): boolean;
         enabled(enabled?: boolean): anychart.charts.Waterfall;
         exports(): anychart.core.utils.Exports;
