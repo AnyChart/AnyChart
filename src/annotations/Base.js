@@ -87,6 +87,8 @@ anychart.annotationsModule.Base = function(chartController) {
   this.coords['secondValueAnchor'] = NaN;
   this.coords['thirdXAnchor'] = NaN;
   this.coords['thirdValueAnchor'] = NaN;
+  this.coords['fourthXAnchor'] = NaN;
+  this.coords['fourthValueAnchor'] = NaN;
 
   /**
    * Secured coords for dragging.
@@ -535,6 +537,9 @@ anychart.annotationsModule.Base.prototype.moveAnchor = function(anchorId, dx, dy
           this.moveAnchor_('secondXAnchor', 'secondValueAnchor', dx, dy);
           if (!!(this.SUPPORTED_ANCHORS & anychart.annotationsModule.AnchorSupport.THREE_POINTS)) {
             this.moveAnchor_('thirdXAnchor', 'thirdValueAnchor', dx, dy);
+            if (!!(this.SUPPORTED_ANCHORS & anychart.annotationsModule.AnchorSupport.FOUR_POINTS)) {
+                this.moveAnchor_('fourthXAnchor', 'fourthValueAnchor', dx, dy);
+              }
           }
         }
       }
@@ -550,6 +555,9 @@ anychart.annotationsModule.Base.prototype.moveAnchor = function(anchorId, dx, dy
       break;
     case 2:
       this.moveAnchor_('thirdXAnchor', 'thirdValueAnchor', dx, dy);
+      break;
+    case 3:
+      this.moveAnchor_('fourthXAnchor', 'fourthValueAnchor', dx, dy);
       break;
   }
   this.invalidate(anychart.ConsistencyState.ANNOTATIONS_SHAPES | anychart.ConsistencyState.ANNOTATIONS_MARKERS);
@@ -628,8 +636,8 @@ anychart.annotationsModule.Base.prototype.calculate = function() {
     yScale = this.yScale();
     if (!xScale || !yScale) return false;
 
-    var firstX, firstY, secondX, secondY, thirdX, thirdY;
-    firstX = firstY = secondX = secondY = thirdX = thirdY = NaN;
+    var firstX, firstY, secondX, secondY, thirdX, thirdY, fourthX, fourthY;
+    firstX = firstY = secondX = secondY = thirdX = thirdY = fourthX = fourthY = NaN;
     var availableCoords = 0;
     var missingCoords = 0;
     if (!!(this.SUPPORTED_ANCHORS & anychart.annotationsModule.AnchorSupport.X)) {
@@ -662,6 +670,14 @@ anychart.annotationsModule.Base.prototype.calculate = function() {
       else
         availableCoords |= anychart.annotationsModule.AnchorSupport.THIRD_POINT;
     }
+    if (!!(this.SUPPORTED_ANCHORS & anychart.annotationsModule.AnchorSupport.FOURTH_POINT)) {
+      fourthX = this.xRatioToPix(xScale.transform(this.getOwnOption('fourthXAnchor'), 0.5));
+      fourthY = this.yRatioToPix(yScale.transform(this.getOwnOption('fourthValueAnchor'), 0.5));
+      if (isNaN(fourthX) || isNaN(fourthY))
+        missingCoords |= anychart.annotationsModule.AnchorSupport.FOURTH_POINT;
+      else
+        availableCoords |= anychart.annotationsModule.AnchorSupport.FOURTH_POINT;
+    }
 
     // we allow dragging draw if we are missing more than two points
     var dragDrawingAvailable = false;
@@ -681,6 +697,10 @@ anychart.annotationsModule.Base.prototype.calculate = function() {
       lastPointXName = 'thirdXAnchor';
       lastPointYName = 'thirdValueAnchor';
       this.lastPointAnchor = anychart.annotationsModule.AnchorSupport.THIRD_POINT;
+    } else if (!!(missingCoords & anychart.annotationsModule.AnchorSupport.FOURTH_POINT)) {
+      lastPointXName = 'fourthXAnchor';
+      lastPointYName = 'fourthValueAnchor';
+      this.lastPointAnchor = anychart.annotationsModule.AnchorSupport.FOURTH_POINT;
     } else {
       this.lastPointAnchor = anychart.annotationsModule.AnchorSupport.NONE;
     }
@@ -691,6 +711,8 @@ anychart.annotationsModule.Base.prototype.calculate = function() {
     this.coords['secondValueAnchor'] = secondY;
     this.coords['thirdXAnchor'] = thirdX;
     this.coords['thirdValueAnchor'] = thirdY;
+    this.coords['fourthXAnchor'] = fourthX;
+    this.coords['fourthValueAnchor'] = fourthY;
 
     this.anchorsAvailable = availableCoords;
     this.lastPointXName = lastPointXName;
@@ -744,6 +766,7 @@ anychart.annotationsModule.Base.prototype.checkVisible = function() {
     coords.push(this.coords['xAnchor']);
     coords.push(this.coords['secondXAnchor']);
     coords.push(this.coords['thirdXAnchor']);
+    coords.push(this.coords['fourthXAnchor']);
     var allLeft = true;
     var allRight = true;
     for (var i = 0; i < coords.length; i++) {
@@ -815,8 +838,19 @@ anychart.annotationsModule.Base.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ANNOTATIONS_SHAPES)) {
     if (visible) {
-      if (this.SUPPORTED_ANCHORS == anychart.annotationsModule.AnchorSupport.THREE_POINTS &&
-          this.anchorsWithLastPoint == anychart.annotationsModule.AnchorSupport.THREE_POINTS) {
+      if (this.SUPPORTED_ANCHORS == anychart.annotationsModule.AnchorSupport.FOUR_POINTS &&
+          this.anchorsWithLastPoint == anychart.annotationsModule.AnchorSupport.FOUR_POINTS) {
+        this.drawFourPointsShape(
+            this.coords['xAnchor'],
+            this.coords['valueAnchor'],
+            this.coords['secondXAnchor'],
+            this.coords['secondValueAnchor'],
+            this.coords['thirdXAnchor'],
+            this.coords['thirdValueAnchor'],
+            this.coords['fourthXAnchor'],
+            this.coords['fourthValueAnchor']);
+      } else if (this.SUPPORTED_ANCHORS >= anychart.annotationsModule.AnchorSupport.THREE_POINTS &&
+          this.anchorsWithLastPoint >= anychart.annotationsModule.AnchorSupport.THREE_POINTS) {
         this.drawThreePointsShape(
             this.coords['xAnchor'],
             this.coords['valueAnchor'],
@@ -968,6 +1002,24 @@ anychart.annotationsModule.Base.prototype.drawTwoPointsShape = function(firstX, 
 anychart.annotationsModule.Base.prototype.drawThreePointsShape = function(firstX, firstY, secondX, secondY, thirdX, thirdY) {
   // this is a fallback for an unimplemented case.
   this.drawTwoPointsShape(firstX, firstY, secondX, secondY);
+};
+
+
+/**
+ * Draws current annotation with four point defined.
+ * @param {number} firstX
+ * @param {number} firstY
+ * @param {number} secondX
+ * @param {number} secondY
+ * @param {number} thirdX
+ * @param {number} thirdY
+ * @param {number} fourthX
+ * @param {number} fourthY
+ * @protected
+ */
+anychart.annotationsModule.Base.prototype.drawFourPointsShape = function(firstX, firstY, secondX, secondY, thirdX, thirdY, fourthX, fourthY) {
+  // this is a fallback for an unimplemented case.
+  this.drawThreePointsShape(firstX, firstY, secondX, secondY, thirdX, thirdY);
 };
 
 
@@ -1223,6 +1275,9 @@ anychart.annotationsModule.Base.prototype.createPositionProviders = function() {
       res.push({'x': this.coords['secondXAnchor'], 'y': this.coords['secondValueAnchor']});
       if (!!(this.SUPPORTED_ANCHORS & this.anchorsWithLastPoint & anychart.annotationsModule.AnchorSupport.THIRD_POINT)) {
         res.push({'x': this.coords['thirdXAnchor'], 'y': this.coords['thirdValueAnchor']});
+        if (!!(this.SUPPORTED_ANCHORS & this.anchorsWithLastPoint & anychart.annotationsModule.AnchorSupport.FOURTH_POINT)) {
+          res.push({'x': this.coords['fourthXAnchor'], 'y': this.coords['fourthValueAnchor']});
+        }
       }
     }
   }
