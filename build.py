@@ -173,9 +173,9 @@ def __get_gzip_file_size(f):
 # Decorators
 # ======================================================================================================================
 def memoize(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
         if not hasattr(func, 'cache'):
-            func.cache = func()
+            func.cache = func(*args, **kwargs)
         return func.cache
 
     return wrapper
@@ -257,7 +257,7 @@ def __get_current_branch_name():
 
 
 @memoize
-def __get_build_version():
+def __get_build_version(is_release=False):
     branch_name = __get_current_branch_name()
 
     travis_branch = os.environ.get('TRAVIS_BRANCH') if branch_name == 'HEAD' else None
@@ -284,8 +284,11 @@ def __get_build_version():
             ['git', 'rev-list', 'HEAD', '--count'],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            cwd=PROJECT_PATH).communicate()
+            cwd=PROJECT_PATH
+        ).communicate()
         commits_count = count_output.strip()
+        if (is_release):
+            commits_count = int(commits_count) + 1
 
     return '%s.%s' % (__get_version(), commits_count)
 
@@ -685,7 +688,7 @@ def __make_manifest(module_name, files, theme_name='none', gen_manifest=False, a
 
 @stopwatch()
 def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_edition=False, perf_mon=False,
-                 gen_manifest=False, debug_files=False, output=OUT_PATH, is_amd=False):
+                 gen_manifest=False, debug_files=False, output=OUT_PATH, is_amd=False, is_release=False):
     modules_parts_output = os.path.join(output, 'parts')
     __create_dir_if_not_exists(modules_parts_output)
     print '\nBuilding manifests for target "%s" (%s parts) to %s' % (build_name, len(modules), modules_parts_output)
@@ -745,7 +748,7 @@ def __make_build(build_name, modules, checks_only=False, theme_name='none', dev_
 
 @stopwatch()
 def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug_files=False, gzip=False, stat=False,
-                  output=OUT_PATH, is_amd=False):
+                  output=OUT_PATH, is_amd=False, is_release=False):
     print ''
     modules_parts_output = os.path.join(output, 'parts')
     postfix = '.amd' if is_amd else ''
@@ -763,7 +766,7 @@ def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug
                                                   str(dev_edition).lower(),
                                                   str(perf_mon).lower())
 
-    wrapper = __get_bundle_wrapper(bundle_name, modules, file_name, perf_mon, debug_files, stat, is_amd)
+    wrapper = __get_bundle_wrapper(bundle_name, modules, file_name, perf_mon, debug_files, stat, is_amd, is_release)
     with open(file_name, 'w') as output:
         output.write(wrapper[0])
         for module_name in modules:
@@ -777,7 +780,7 @@ def __make_bundle(bundle_name, modules, dev_edition=False, perf_mon=False, debug
 
 
 def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitoring=False, debug_files=False,
-                         stat=False, is_amd=False):
+                         stat=False, is_amd=False, is_release=False):
     if stat:
         return '', ''
     perf_start = ''
@@ -811,7 +814,7 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
     date_mask = '%Y-%m-%d' #if branch_name == 'master' else '%Y-%m-%d %H:%M'
     start = start % (
         ', '.join(modules),
-        __get_build_version(),
+        __get_build_version(is_release),
         time.strftime(date_mask),
         time.strftime('%Y'),
         perf_start,
@@ -957,13 +960,14 @@ def __compile_project(*args, **kwargs):
 
 
     builds = kwargs['build'] or ['bundle']
-    print '\n%s AnyChart\nVersion: %s\nModule: %s' % ('Checking' if checks else 'Building', __get_build_version(), module)
+    print '\n%s AnyChart\nVersion: %s\nModule: %s' % ('Checking' if checks else 'Building', __get_build_version(kwargs['is_release']), module)
+
     compile_errors = ''
     for build_name, build in __get_builds().iteritems():
         if build_name in builds:
             compile_errors += __make_build(build_name, build, checks, kwargs['theme'], kwargs['develop'],
                                            kwargs['performance_monitoring'], kwargs['manifest'], kwargs['debug_files'],
-                                           output=output, is_amd=kwargs['is_amd'])
+                                           output=output, is_amd=kwargs['is_amd'], is_release=kwargs['is_release'])
 
     if not checks:
         print '\nBuilding bundles\n'
@@ -973,14 +977,14 @@ def __compile_project(*args, **kwargs):
         for bundle_name, bundle in bundles.iteritems():
             if all(map(lambda module_name: __get_build_name(module_configs[module_name]) in builds, bundle['parts'])):
                 __make_bundle(bundle_name, bundle['parts'], kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'])
+                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'], is_release=kwargs['is_release'])
                 built_bundles[bundle_name] = bundle['parts']
             else:
                 print 'Skipping bundle "%s"' % bundle_name
         for build_name, build in __get_builds().iteritems():
             if build_name in builds:
                 __make_bundle('anychart-' + build_name, build, kwargs['develop'], kwargs['performance_monitoring'],
-                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'])
+                              kwargs['debug_files'], kwargs['gzip'], output=output, is_amd=kwargs['is_amd'], is_release=kwargs['is_release'])
                 built_bundles['anychart-' + build_name] = build
 
         modules_json = {'parts': {}, 'modules': {}}
@@ -1281,7 +1285,8 @@ def __exec_main_script():
                                 check_only=False,
                                 manifest=False,
                                 build=None,
-                                is_amd=False)
+                                is_amd=False,
+                                is_release=False)
     # compile_parser.add_argument('-s', '--sources',
     #                             action='store_true',
     #                             help='build project sources file (not minimized).')
@@ -1318,6 +1323,9 @@ def __exec_main_script():
     compile_parser.add_argument('-amd', '--is_amd',
                                 action='store_true',
                                 help='Whether to compile as AMD-module')
+    compile_parser.add_argument('-r', '--is_release',
+                                action='store_true',
+                                help='Whether compiling as a release')
 
     # compile_parser.add_argument('-m', '--module',
     #                             metavar='',

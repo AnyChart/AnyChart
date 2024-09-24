@@ -681,19 +681,40 @@ anychart.waterfallModule.ArrowsController.prototype.calculateArrowsPositions = f
   this.xScaleIndexToArrows_.length = 0;
   var positionedArrows = [];
 
+  /*
+    DVF-4691 updates algorithm of arrow positioning.
+
+    (1) First we group arrows.
+
+    (2) Then calculate x-coordinate (this.positionFromToPoints()) in case
+      arrows points to one category, and we need to move apart arrows by
+      x-coordinate.
+
+    (3) Finally calculate proper height.
+
+    Solves problem with incorrect height of arrow lines in case they
+      are point to the same category.
+   */
+
+  // (1)
   goog.array.forEach(this.arrows_, function(arrow) {
     if (arrow.enabled() && arrow.isCorrect()) {
       this.createArrowDrawSettings(arrow);
-
-      this.positionArrow(arrow, positionedArrows);
-
       this.groupArrowsByFromTo(arrow);
+    }
+  }, this);
 
+  // (2)
+  this.positionFromToPoints();
+
+  // (3)
+  goog.array.forEach(this.arrows_, function(arrow) {
+    if (arrow.enabled() && arrow.isCorrect()) {
+      this.positionArrow(arrow, positionedArrows);
       positionedArrows.push(arrow);
     }
   }, this);
 
-  this.positionFromToPoints();
 };
 
 

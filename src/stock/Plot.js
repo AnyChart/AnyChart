@@ -2856,7 +2856,7 @@ anychart.stockModule.Plot.prototype.initDragger_ = function(e) {
  * @return {IArrayLike<Object>|null} - 'Touches' field.
  */
 anychart.stockModule.Plot.prototype.extractTouches_ = function(e) {
-  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e.getOriginalEvent());
+  var acgraphBrowserEvent = /** @type {acgraph.events.BrowserEvent} */ (e['originalEvent']);
 
   // TODO I don't know why, but 'touches' field is in this path.
   var originalEvent = /** @type {goog.events.BrowserEvent} */ (acgraphBrowserEvent.getOriginalEvent());

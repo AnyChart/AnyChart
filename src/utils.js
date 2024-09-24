@@ -13,6 +13,7 @@ goog.require('goog.dom.xml');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.json.hybrid');
 goog.require('goog.object');
+goog.require('goog.string');
 
 
 /**
@@ -802,6 +803,107 @@ anychart.utils.alignDateLeft = function(date, interval, flagDateValue) {
 
 
 /**
+ * Add a prefix of two or three zeroes depending on the length on the passed number and the idea that the resulting
+ * string length should not be shorter than four.
+ *
+ * Cannot be used for negative numbers.
+ *
+ * Examples:
+ * 1. anychart.utils.addPrefixToYear(1) returns {string} '0001'
+ * 2. anychart.utils.addPrefixToYear(99) returns {string} '0099'
+ * 3. anychart.utils.addPrefixToYear(100) returns {string} '0100'
+ * 4. anychart.utils.addPrefixToYear(-1) returns {number} '00-1'
+ *
+ * @param {number} year to add prefix to
+ * @returns {string}
+ */
+anychart.utils.addPrefixToYear = function(year) {
+  return goog.string.padNumber(year, 4);
+};
+
+
+/**
+ * Writes a prefix of a zero to a passed month/day/hour/minute/second.
+ *
+ * Examples:
+ * 1. anychart.utils.addPrefixToDate(1) returns {string} '01'
+ * 2. anychart.utils.addPrefixToDate(99) returns {number} '99'
+ * 3. anychart.utils.addPrefixToYear(-1) returns {number} '-1'
+ *
+ * @param {number=} opt_period month/day/hour/minute/second
+ * @returns {string|undefined}
+ */
+anychart.utils.addPrefixToDate = function(opt_period) {
+  if (!goog.isDef(opt_period)) {
+    return /** @type {undefined} */ (opt_period);
+  }
+  return goog.string.padNumber(opt_period, 2);
+};
+
+/**
+ * Turns passed {number(s)} into a {string} then {string} into a {date} then {date} into a {number} representing date in
+ * UTC milliseconds.
+ * Was created as a part of the DVF-4690 to negate a Date.UTC() methods negligence of the 0 to 99 years AD
+ *
+ * Cannot be used for negative numbers.
+ *
+ * Examples:
+ * 1. anychart.utils.toUTCMilliseconds(0) returns -62167249672000
+ * 2. anychart.utils.toUTCMilliseconds(-1) returns NaN
+ * 3. anychart.utils.toUTCMilliseconds(100) returns -59011489672000
+ * 4. anychart.utils.toUTCMilliseconds(0,0,0,0,0,0,0) returns NaN
+ * 5. anychart.utils.toUTCMilliseconds(0,0,1,0,0,0,0) returns -62167249672000
+ *
+ * @param {number} year_num required year to set into the date that will be turned into milliseconds
+ * @param {number=} opt_month optional month index to include into the date expected to be 0-based  defaults to '01'
+ * @param {number=} opt_day optional day index to include into the date expected to be 1-based defaults to '01'
+ * @param {number=} opt_hour optional hour to include into the date expected to be 0-based defaults to '00'
+ * @param {number=} opt_minute optional minute to include into the date expected to be 0-based defaults to '00'
+ * @param {number=} opt_second optional second to include into the date expected to be 0-based defaults to '00'
+ * @param {number=} opt_millisecond optional millisecond to include into the date expected to be 0-based defaults to '0'
+ * @returns
+ */
+anychart.utils.toUTCMilliseconds = function(year_num, opt_month, opt_day, opt_hour, opt_minute, opt_second, opt_millisecond) {
+  // Translate 0-based indexes into 1-based indexes
+  var tmp_month = goog.isDef(opt_month) ? opt_month + 1 : opt_month;
+
+  var year = anychart.utils.addPrefixToYear(year_num) || '2000';
+  var month = anychart.utils.addPrefixToDate(tmp_month) || '01';
+  var day = anychart.utils.addPrefixToDate(opt_day) || '01';
+  var hour = anychart.utils.addPrefixToDate(opt_hour) || '00';
+  var minute = anychart.utils.addPrefixToDate(opt_minute) || '00';
+  var second = anychart.utils.addPrefixToDate(opt_second) || '00';
+  var millisecond = anychart.utils.addPrefixToDate(opt_millisecond) || '0';
+
+  var precisionLevel = arguments.length;
+  var dateStr;
+  switch (precisionLevel) {
+    case 2:
+      dateStr = year + '-' + month;
+      break;
+    case 3:
+      dateStr = year + '-' + month + '-' + day;
+      break;
+    case 4:
+    case 5:
+      dateStr = year + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+      break;
+    case 6:
+      dateStr = year + '-' + month + '-' + day + 'T' + hour + ':' + minute + ':' + second;
+      break;
+    case 7:
+      dateStr = year + '-' + month + '-' + day + 'T' + hour + ':' + minute + ':' + second + '.' + millisecond;
+      break;
+    case 1:
+    default:
+      dateStr = year;
+      break;
+  }
+  return new Date(dateStr).getTime();
+};
+
+
+/**
  * Aligns passed timestamp to the left according to the passed unit and count.
  * @param {number} date Date to align.
  * @param {anychart.enums.Interval} unit
@@ -820,21 +922,27 @@ anychart.utils.alignDateLeftByUnit = function(date, unit, count, flagDateValue) 
   var seconds = dateObj.getUTCSeconds();
   var milliseconds = dateObj.getUTCMilliseconds();
 
+  // During the DVF-4690 the below was added to counteract the special behavior Date.UTC() has with 0-99 AD years
+  var isYearsBelowHundred = (years < 100 && years > -1);
+  var utcConstructor = isYearsBelowHundred ? anychart.utils.toUTCMilliseconds : Date.UTC;
+
   switch (unit) {
     case anychart.enums.Interval.YEAR:
-      var flagDate = new Date(flagDateValue);
+      /* Changed to String(flagDateValue) during the DVF-4690 implementation. As flagDateValue === 2000 {number} resolved
+       into 2 seconds after the midnight of 1 jan 1970 which didn't make sense.*/
+      var flagDate = new Date(String(flagDateValue));
       var flagYear = flagDate.getUTCFullYear();
       years = anychart.utils.alignLeft(years, count, flagYear);
-      return Date.UTC(years, 0);
+      return utcConstructor(years, 0);
     case anychart.enums.Interval.SEMESTER:
       months = anychart.utils.alignLeft(months, count * 6);
-      return Date.UTC(years, months);
+      return utcConstructor(years, months);
     case anychart.enums.Interval.QUARTER:
       months = anychart.utils.alignLeft(months, count * 3);
-      return Date.UTC(years, months);
+      return utcConstructor(years, months);
     case anychart.enums.Interval.MONTH:
       months = anychart.utils.alignLeft(months, count);
-      return Date.UTC(years, months);
+      return utcConstructor(years, months);
     case anychart.enums.Interval.THIRD_OF_MONTH:
       return anychart.utils.alignLeft(dateObj.getTime(), count * 1000 * 60 * 60 * 24 * 10, Date.UTC(2000, 0, 2));
     case anychart.enums.Interval.WEEK:
@@ -845,16 +953,16 @@ anychart.utils.alignDateLeftByUnit = function(date, unit, count, flagDateValue) 
       return anychart.utils.alignLeft(dateObj.getTime(), count * 1000 * 60 * 60 * 24, Date.UTC(2000, 0, 2));
     case anychart.enums.Interval.HOUR:
       hours = anychart.utils.alignLeft(hours, count);
-      return Date.UTC(years, months, days, hours);
+      return utcConstructor(years, months, days, hours);
     case anychart.enums.Interval.MINUTE:
       minutes = anychart.utils.alignLeft(minutes, count);
-      return Date.UTC(years, months, days, hours, minutes);
+      return utcConstructor(years, months, days, hours, minutes);
     case anychart.enums.Interval.SECOND:
       seconds = anychart.utils.alignLeft(seconds, count);
-      return Date.UTC(years, months, days, hours, minutes, seconds);
+      return utcConstructor(years, months, days, hours, minutes, seconds);
     case anychart.enums.Interval.MILLISECOND:
       milliseconds = anychart.utils.alignLeft(milliseconds, count);
-      return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+      return utcConstructor(years, months, days, hours, minutes, seconds, milliseconds);
   }
   return date;
 };
@@ -1791,7 +1899,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.12.1/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.13.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);

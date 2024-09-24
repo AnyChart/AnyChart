@@ -73,6 +73,11 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
 
   this.data(opt_data, opt_fillMethod);
 
+  // Descriptor Meta set-up for labelsMode
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['labelsMode', anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW]
+  ]);
+
   var normalDescriptorsMeta = {};
   anychart.core.settings.createDescriptorsMeta(normalDescriptorsMeta, [
     ['fill', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND],
@@ -104,6 +109,18 @@ anychart.circlePackingModule.Chart = function(opt_data, opt_fillMethod) {
 goog.inherits(anychart.circlePackingModule.Chart, anychart.core.SeparateChart);
 anychart.core.settings.populateAliases(anychart.circlePackingModule.Chart, ['fill', 'stroke', 'labels'], 'normal');
 
+/**
+ * Descriptor set-up for labelsMode
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.circlePackingModule.Chart.DESCRIPTORS = (function(){
+  var map = {};
+  anychart.core.settings.createDescriptors(map,[
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'labelsMode', anychart.enums.normalizeCirclePackingLabelsMode]
+  ]);
+  return map;
+})();  
+anychart.core.settings.populate(anychart.circlePackingModule.Chart, anychart.circlePackingModule.Chart.DESCRIPTORS);
 
 /**
  * Supported signals.
@@ -677,24 +694,106 @@ anychart.circlePackingModule.Chart.prototype.createFormatProvider = function(mod
 
   if (labels.enabled()) {
     if (modelItem) {
-      var children = modelItem.children || [];      
-      children = modelItem.isRoot ? children : goog.array.concat(modelItem, children);
+      var labelsAdjustFontSize = labels.textSettings()['adjustFontSize'];
+      var adjustByWidth = labelsAdjustFontSize['width'];
+      var adjustByHeight = labelsAdjustFontSize['height'];
+      var widthOption = labels.getOption('width');
+      var heightOption = labels.getOption('height');
+      var anchorOption = labels.getOwnAndAutoOption('anchor');
+      var positionOption = labels.getOwnAndAutoOption('position');
+      var isLabelsModeLeaves = this.getOption('labelsMode') === anychart.enums.CirclePackingLabelsMode.LEAVES;
+      var labeledChildren = this.getLabeledChildren_();
 
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
+      for (var i = 0; i < labeledChildren.length; i++) {
+        var child = labeledChildren[i];
         var context = this.createFormatProvider(child);
         var label = labels.add(context, null);
 
+        /*
+          If labelsMode is 'leaves' then if the user has set up any of anchor or position options on the label or
+          label factory level keep them, otherwise use 'center'.
+        */
+        if (isLabelsModeLeaves) {
+          var labelAnchor = label.getOwnAndAutoOption('anchor') || anchorOption || 'center';
+          var labelPosition = label.getOwnAndAutoOption('position') || positionOption || 'center';
+          label['anchor'](labelAnchor);
+          label['position'](labelPosition);
+        }
+
+        /*
+          In case of enabling adjustFontSize() without any bounds set to labels
+          '70%' below is not a random number: B≈A×0.7071 where A - diameter of the Circumscribing Circle and 
+          B - a side of Circumscribed square.
+         */
+        widthOption = widthOption || (adjustByWidth ? '70%' : widthOption);
+        heightOption = heightOption || (adjustByHeight ? '70%' : heightOption);
+
+        /*
+          Truncate labels behavior 
+          null - default, unrestricted width/height of label
+          100 - maximum label width/height equals to 100 pixels
+          '100px' - maximum label width/height equals to 100 pixels
+          '100%' - child.bounds.width/height
+         */
+        var normalizedWidth = anychart.utils.normalizeSize(/** @type {number|string}*/(widthOption), child.bounds.width);
+        var normalizedHeight = anychart.utils.normalizeSize(/** @type {number|string}*/(heightOption), child.bounds.height);
+        label.width(normalizedWidth);
+        label.height(normalizedHeight); 
+
+        // Position is defined 
         var position = anychart.enums.normalizeAnchor(label.getFinalSettings('position'));
-        var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(/** @type {goog.math.Rect} */ (child.bounds), position)};
+        var positionProvider = {
+            'value': anychart.utils.getCoordinateByAnchor(/** @type {goog.math.Rect} */(child.bounds), position)
+        };
+
         label.positionProvider(positionProvider);
-        label.draw();
+        label.draw();        
       }
     }
   }
 
   labels.resumeSignalsDispatching(true);
   labels.draw();
+};
+
+
+/**
+ * Recursive method to make an array of all the leaf children of a model item provided for drawLabels_ method.
+ * 
+ * @param {Array.<anychart.circlePackingModule.model.Item>|undefined} children
+ * @returns {Array} childrenArray
+ */
+anychart.circlePackingModule.Chart.prototype.concatChildren_ = function(children) {
+  var childrenArray = [];
+  for (var i = 0; i < children.length; i++) {
+    var child = children[i];
+
+    if (child.isLeaf) {
+      childrenArray.push(child);
+    } else {
+      var childDirectDescendants = child.children;
+      var allChildDescendant = this.concatChildren_(childDirectDescendants);
+      childrenArray = childrenArray.concat(childrenArray, allChildDescendant);
+    }
+  }
+  return childrenArray;
+};
+
+
+/**
+ * A method to get children of a current model to draw labels  
+ * 
+ * @returns {Array|null|undefined} childrenArray
+ */
+anychart.circlePackingModule.Chart.prototype.getLabeledChildren_ = function() {
+  var model = this.getCurrentModel_();
+  var modelChildren = model.children;
+
+  // Labels behavior according to labelsMode.
+  if (this.getOption('labelsMode') === anychart.enums.CirclePackingLabelsMode.LEAVES) {
+    modelChildren = this.concatChildren_(modelChildren);
+  }
+  return modelChildren;
 };
 
 
@@ -734,7 +833,7 @@ anychart.circlePackingModule.Chart.prototype.getColorContext = function(modelIte
 
 /**
  * Resolves color.
- * 
+ *
  * @param {anychart.circlePackingModule.model.Item} modelItem - Model item to deal with.
  * @param {string} propName - 'fill' or 'stroke'.
  * @param {anychart.PointState} state - State to process.
@@ -782,7 +881,7 @@ anychart.circlePackingModule.Chart.prototype.initDom_ = function() {
 /**
  * Gets currently drilled view.
  * Not used as it's needed in current implementation.
- * Will be used on drill-down mechanism impllementation.
+ * Will be used on drill-down mechanism implementation.
  * 
  * @return {anychart.circlePackingModule.model.Item} - The current view.
  */

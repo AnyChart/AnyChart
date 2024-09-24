@@ -292,18 +292,40 @@ anychart.waterfallModule.Series.prototype.postProcessPoint = function(iterator, 
   if (isMissing && (isFirstPoint || !isTotal)) {
     point.meta['missing'] = anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
   } else {
-    var value;
+    var drawTotalsAsAbsolute = /** @type {anychart.waterfallModule.Chart} */ (this.chart).getOption('drawTotalsAsAbsolute');
+    var isTotalWithValueInMode = (isTotal && drawTotalsAsAbsolute && !isMissing);
+    var pointDataValue = +(point.data['value']);
+
+    var absoluteValue;
     if (processingMeta.modeAbsolute) {
-      value = isMissing ? processingMeta.prevValue : +(point.data['value']);
+      absoluteValue = isMissing ? processingMeta.prevValue : pointDataValue;
     } else {
-      value = processingMeta.prevValue + (isMissing ? 0 : +(point.data['value']));
+      absoluteValue = processingMeta.prevValue + (isMissing ? 0 : pointDataValue);
     }
-    point.meta['absolute'] = value;
-    point.meta['diff'] = value - processingMeta.prevValue;
+
+    if (isTotalWithValueInMode) {
+      absoluteValue = pointDataValue;
+    }
+
+    point.meta['absolute'] = absoluteValue;
+
+    /*
+      If we are in drawTotalsAsAbsolute mode, and it's not a first point then we shouldn't calculate diff to
+      properly process next points diff value.
+     */
+    point.meta['diff'] = isTotalWithValueInMode && !isFirstPoint ? 0 : absoluteValue - processingMeta.prevValue;
+
     point.meta['isTotal'] = isTotal;
     point.meta['missing'] = 0;
+    var drawConnector = iterator.get('drawConnector');
+    point.meta['drawConnector'] = goog.isDef(drawConnector) ? drawConnector : true;
     processingMeta.hadNonMissing = true;
-    processingMeta.prevValue = value;
+
+    /*
+      If we are in drawTotalsAsAbsolute mode, and it's not a first point then we should treat previous value
+      as value of last valuable point.
+     */
+    processingMeta.prevValue = isTotalWithValueInMode && !isFirstPoint ? processingMeta.prevValue : absoluteValue;
   }
 };
 

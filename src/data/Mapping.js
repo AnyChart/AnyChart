@@ -184,7 +184,7 @@ anychart.data.Mapping.prototype.checkFieldExist = function(name) {
  * @type {!Object.<Array.<number|string>>}
  */
 anychart.data.Mapping.DEFAULT_MAPPING = {
-  'x': [0, 'column', 'x'],
+  'x': [0, 'column', 'x', 'name'], // "name" added as a part of timeline range series
   'value': [1, 0, 'value', 'y', 'close', 'heat'],
   'size': [2, 1], // bubble series
   'open': [1],
