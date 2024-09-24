@@ -960,7 +960,8 @@ def __compile_project(*args, **kwargs):
 
 
     builds = kwargs['build'] or ['bundle']
-    print '\n%s AnyChart\nVersion: %s\nModule: %s' % ('Checking' if checks else 'Building', __get_build_version(), module)
+    print '\n%s AnyChart\nVersion: %s\nModule: %s' % ('Checking' if checks else 'Building', __get_build_version(kwargs['is_release']), module)
+
     compile_errors = ''
     for build_name, build in __get_builds().iteritems():
         if build_name in builds:
