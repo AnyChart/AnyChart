@@ -122,11 +122,11 @@ def __ensure_installed(module_name, version=None):
 def sync_libs(needs_lesscpy=False, needs_jsb=False):
     __create_dir_if_not_exists(LIBS_PATH)
     flag = False
-    if not os.path.exists(CLOSURE_LIBRARY_PATH) or \
-            not os.path.exists(GRAPHICS_PATH):
+    if not os.path.exists(os.path.join(CLOSURE_LIBRARY_PATH, ".git")) or \
+            not os.path.exists(os.path.join(GRAPHICS_PATH, ".git")):
         flag = True
         print 'Initializing submodules'
-        subprocess.call(['git', 'submodule', 'update', '--init'])
+        subprocess.call(['git', 'submodule', 'update', '--init', '--recursive'])
         subprocess.call(['rm', '-f', '.git/hooks/post-checkout'])
         subprocess.call(['ln', '-s', '../../update-submodules', '.git/hooks/post-checkout'])
         print 'Done'
