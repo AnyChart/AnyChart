@@ -592,7 +592,8 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, canModi
   }
 
   for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, opt_base, precision), precision);
-       j <= max;
+      // Changed from (j <= max) to (j < max) as it caused infinite loop on low values(like 1e-14)
+       j < max;
        j = anychart.math.specialRound(j + interval, precision)) {
     ticks.push(j);
   }
