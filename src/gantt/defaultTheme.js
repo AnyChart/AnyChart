@@ -464,6 +464,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       }
     },
+    'allowConnectorCaps': true,
 
     'connectors': {
       'previewStroke': {
