@@ -3337,6 +3337,10 @@ anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
+  // rowSelectedFill has been added here to allow for the functional coloring and context of the selected row.
+  var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+  this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
+
   var selection = this.interactivityHandler.selection();
   selection.selectPeriod(item, opt_periodIndex);
   if (selection.hasSelectedRow()) {

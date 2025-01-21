@@ -102,6 +102,14 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
    */
   this.rowStrokePath_ = null;
 
+  /**
+   * Pool containing each row stripe(stroke) for function row coloring.
+   * 
+   * The use of row stroke naming is avoided to reduce confusion with element stroke.
+   * @type {Array.<acgraph.vector.Path>}
+   * @private
+   */
+  this.rowStripePool_ = [];
 
   /**
    * Path that separates header of grid's body.
@@ -238,6 +246,13 @@ anychart.ganttModule.BaseGrid = function(opt_controller, opt_isResource) {
    * @private
    */
   this.gridHeightCache_ = [];
+
+  /**
+   * Pool containing each row path for function row coloring.
+   * @type {Array.<acgraph.vector.Path>}
+   * @private
+   */
+  this.rowPathPool_ = [];
 
   /**
    * Index of currently hovered row.
@@ -1741,6 +1756,25 @@ anychart.ganttModule.BaseGrid.prototype.getHoverPath = function() {
 
 
 /**
+ * Getter for this.rowPathPool_[row].
+ * 
+ * Creates and returns a row path or returns one from a pool.
+ * 
+ * This method has been added to create a support for by row coloring functionality.
+ * @param {number} index Index of a row (0 based).
+ * @return {acgraph.vector.Path}
+ */
+anychart.ganttModule.BaseGrid.prototype.getEachPathItem = function(index) {
+  if (!this.rowPathPool_[index]) {
+    this.rowPathPool_[index] = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.rowPathPool_[index], [index] + '-item-path');
+    this.rowPathPool_[index].stroke(null).zIndex(1);
+  }
+  return this.rowPathPool_[index];
+};
+
+
+/**
  * Getter for this.selectedPath_.
  * @return {acgraph.vector.Path}
  */
@@ -1765,6 +1799,25 @@ anychart.ganttModule.BaseGrid.prototype.getRowStrokePath = function() {
     this.rowStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'))).zIndex(4);
   }
   return this.rowStrokePath_;
+};
+
+
+/**
+ * Getter for this.rowStripePool_[row].
+ * 
+ * Creates and returns a path or returns one from a pool.
+ * 
+ * This method has been added to create a support for the each row stripe coloring functionality.
+ * @param {number} index Index of a row (0 based).
+ * @return {acgraph.vector.Path}
+ */
+anychart.ganttModule.BaseGrid.prototype.getEachRowStrokePath = function(index) {
+  if (!this.rowStripePool_[index]) {
+    this.rowStripePool_[index] = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    anychart.utils.nameElement(this.rowStripePool_[index], [index] + '-row-stroke-path');
+    this.rowStripePool_[index].stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'))).zIndex(4);
+  }
+  return this.rowStripePool_[index];
 };
 
 
@@ -1808,10 +1861,10 @@ anychart.ganttModule.BaseGrid.COLOR_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'backgroundFill', anychart.core.settings.fillNormalizer],
 
     // row coloring
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowFill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowStroke', anychart.core.settings.strokeNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowEvenFill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowOddFill', anychart.core.settings.fillNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowStroke', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowEvenFill', anychart.core.settings.fillOrFunctionNormalizer],
+    [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowOddFill', anychart.core.settings.fillOrFunctionNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowHoverFill', anychart.core.settings.fillOrFunctionNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'rowSelectedFill', anychart.core.settings.fillOrFunctionNormalizer]
   ]);
@@ -1991,6 +2044,9 @@ anychart.ganttModule.BaseGrid.prototype.getSourceColorFor = function(colorName, 
       break;
     case 'selectedConnectorStroke':
       sourceColor = anychart.color.setThickness(/** @type {acgraph.vector.Stroke} */(anychart.color.lighten(palette.itemAt(2))), 2);
+      break;
+    case 'rowFill':
+      sourceColor = anychart.getFlatTheme('ganttBase')['rowFill'];
       break;
     case 'rowHoverFill':
       sourceColor = anychart.getFlatTheme('ganttBase')['defaultRowHoverFill'];
@@ -2355,6 +2411,12 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   this.getSelectedPath().clear();
   this.getRowStrokePath().clear();
 
+  // The number of row stripes is equal to the number of rows so there is no point of having to loops here
+  for (var index = 0; index < this.rowPathPool_.length; index++) {
+    this.rowPathPool_[index].clear();
+    this.rowStripePool_[index].clear();    
+  }
+
   // COLORS CONFIG MAGIC PREPARATION!
   var colorsPrepared = false;
   var colors, checkers;
@@ -2392,24 +2454,40 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
     height = firstCell ? height - verticalOffset + 1 : height;
 
     /*
-      Note: Straight indexing starts with 0 (this.visibleItems_[0], this.visibleItems_[1], this.visibleItems_[2]...).
-      But for user numeration starts with 1 and looks like
-        1. Item0
-        2. Item1
-        3. Item2
-
-      That's why evenPath highlights odd value of i, and oddPath highlights even value of i.
-     */
-    var path = i % 2 ? this.evenPath_ : this.oddPath_;
-
-    var newTop = /** @type {number} */ (top + height);
-    if (!anychart.utils.isNone(path.fill())) {
+      If rowFill is set as function:
+      1. We need to get each individual path for every row.
+      2. We need to omit odd and even path behavior.
+    */
+    if (goog.isFunction(this.getOption('rowFill'))) {
+      var path = this.getEachPathItem(i);
+      var newTop = /** @type {number} */ (top + height);
       path
-          .moveTo(this.pixelBoundsCache.left, top)
-          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
-          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
-          .lineTo(this.pixelBoundsCache.left, newTop)
-          .close();
+        .moveTo(this.pixelBoundsCache.left, top)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
+        .lineTo(this.pixelBoundsCache.left, newTop)
+        .close();
+    } else {
+      /*
+        Note: Straight indexing starts with 0 (this.visibleItems_[0], this.visibleItems_[1], this.visibleItems_[2]...).
+        But for user numeration starts with 1 and looks like
+          1. Item0
+          2. Item1
+          3. Item2
+  
+        That's why evenPath highlights odd value of i, and oddPath highlights even value of i.
+       */
+      var path = i % 2 ? this.evenPath_ : this.oddPath_;
+
+      var newTop = /** @type {number} */ (top + height);
+      if (!anychart.utils.isNone(path.fill())) {
+        path
+            .moveTo(this.pixelBoundsCache.left, top)
+            .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
+            .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
+            .lineTo(this.pixelBoundsCache.left, newTop)
+            .close();
+      }
     }
 
     if (item.meta('selected')) {
@@ -2448,10 +2526,24 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
 
     totalTop = (newTop + this.rowStrokeThickness);
 
-    var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness / 2) + pixelShift;
-    this.rowStrokePath_
-        .moveTo(this.pixelBoundsCache.left, strokePathTop)
-        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, strokePathTop);
+    /*
+      If rowStroke is set as function:
+      1. We need to get each individual path for every rowStroke.
+      2. We need to ignore the usual behavior.
+    */
+    if (goog.isFunction(this.getOption('rowStroke'))) {
+      var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness / 2) + pixelShift;
+      var strokePath = this.getEachRowStrokePath(i);
+      strokePath
+          .moveTo(this.pixelBoundsCache.left, strokePathTop)
+          // 0.001 below has been added to draw gradients as they are omitted in case of a path having zero width.
+          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, strokePathTop + 0.0001);
+    } else {
+      var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness / 2) + pixelShift;
+      this.rowStrokePath_
+          .moveTo(this.pixelBoundsCache.left, strokePathTop)
+          .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, strokePathTop);
+    }
 
     var h = totalTop - header;
     this.gridHeightCache_.push(h);
@@ -2723,7 +2815,8 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
     this.getHeaderSeparationPath()
         .clear()
         .moveTo(this.pixelBoundsCache.left, headSepTop)
-        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop);
+        // 0.001 below has been added to draw gradients as they are omitted in case of a path having zero width
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop + 0.0001);
 
     var barSize;
     if (this.isStandalone) {
@@ -2769,28 +2862,69 @@ anychart.ganttModule.BaseGrid.prototype.drawInternal = function(positionRecalcul
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.bgRect_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('backgroundFill')));
     var rowFill = this.getOption('rowFill');
-    var rowOddFill = this.getOption('rowOddFill');
-    rowOddFill = anychart.utils.isNone(rowOddFill) ? rowFill : rowOddFill;
-    var rowEvenFill = this.getOption('rowEvenFill');
-    rowEvenFill = anychart.utils.isNone(rowEvenFill) ? rowFill : rowEvenFill;
-    this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
-    this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
+    
+    // Get the visible items to give context in the fills and strokes below.
+    var visibleItems = this.controller.getVisibleItems();
 
-    var selectedItem = this.interactivityHandler.selection().getSelectedItem();
-    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
-    this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
+    /*
+      If rowFill is set as function we need to:
+      1. Get or create each individual path for every row.
+      2. Get and call color resolver getting a context for the rowFill function in the process.
+      3. Fill the path and store it in the rowPathPool_ array.
+    */
+    if (goog.isFunction(rowFill)){
+      for (var index = 0; index < visibleItems.length; index++) {
+        var item = visibleItems[index];
+        rowFill = anychart.ganttModule.BaseGrid.getColorResolver('rowFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+        this.getEachPathItem(index).fill(/** @type {acgraph.vector.Fill} */(rowFill));
+      }
+    } else {
+      var rowOddFill = anychart.ganttModule.BaseGrid.getColorResolver('rowOddFill', anychart.enums.ColorType.FILL, false)(this, 0);
+      rowOddFill = anychart.utils.isNone(rowOddFill) ? rowFill : rowOddFill;
+      var rowEvenFill = anychart.ganttModule.BaseGrid.getColorResolver('rowEvenFill', anychart.enums.ColorType.FILL, false)(this, 0);
+      rowEvenFill = anychart.utils.isNone(rowEvenFill) ? rowFill : rowEvenFill;
+      this.getOddPath().fill(/** @type {acgraph.vector.Fill} */(rowOddFill));
+      this.getEvenPath().fill(/** @type {acgraph.vector.Fill} */(rowEvenFill));
+    }
 
+    /*
+      If the rowSelectedFill is not set as a function the behavior stays as usual.
+      If it is the coloring of the selected path is done in the selectRow method here and selectTimelineRow in timeline.
+    */
+    if (!goog.isFunction(this.getOption('rowSelectedFill'))) {
+      // As of 11.12.2024 test the selectedItem doesn't work and always returns null. I'll leave it be as to not break anything.
+      var selectedItem = this.interactivityHandler.selection().getSelectedItem();
+      var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, selectedItem);
+      this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
+    }
+
+    var rowStroke = this.getOption('rowStroke');
     var rowStrokeColor;
-    var rowStroke = /** @type {acgraph.vector.Stroke} */ (this.getOption('rowStroke'));
-    if (goog.isString(rowStroke)) {
-      rowStrokeColor = rowStroke;
-    } else if (goog.isObject(rowStroke) && rowStroke['color']) {
-      rowStrokeColor = rowStroke['color'];
+
+    /*
+      If rowFill is set as function we need to:
+      1. Get or create each individual path for every row.
+      2. Get and call color resolver getting a context for the rowFill function in the process.
+      3. Fill the path and store it in the rowPathPool_ array.
+    */
+    if (goog.isFunction(rowStroke)){
+      for (var index = 0; index < visibleItems.length; index++) {
+        var item = visibleItems[index];
+        rowStroke = anychart.ganttModule.BaseGrid.getColorResolver('rowStroke', anychart.enums.ColorType.STROKE, false)(this, 0, item);
+        this.getEachRowStrokePath(index).stroke(/** @type {acgraph.vector.Stroke} */(rowStroke));
+      }
+      // For now header separation path will be equal to the first row stroke.
+      rowStrokeColor = anychart.ganttModule.BaseGrid.getColorResolver('rowStroke', anychart.enums.ColorType.STROKE, false)(this, 0, visibleItems[0]);
+    } else {
+      if (goog.isString(rowStroke)) {
+        rowStrokeColor = rowStroke;
+      } else if (goog.isObject(rowStroke) && rowStroke['color']) {
+        rowStrokeColor = rowStroke['color'];
+      }
+      this.getRowStrokePath().stroke(/** @type {acgraph.vector.Stroke} */(rowStroke));
     }
 
     if (rowStrokeColor) this.getHeaderSeparationPath().stroke(rowStrokeColor);
-
-    this.getRowStrokePath().stroke(rowStroke);
 
     this.appearanceInvalidated();
     this.reapplyStructureEditAppearance();
@@ -3083,6 +3217,9 @@ anychart.ganttModule.BaseGrid.prototype.scroll = goog.abstractMethod;
  */
 anychart.ganttModule.BaseGrid.prototype.selectRow = function(item) {
   if (item) {
+    // rowSelectedFill has been added here to allow for the functional coloring and context of the selected row.
+    var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+    this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
     this.interactivityHandler.selection().selectRow(item);
     this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     return true;
