@@ -464,6 +464,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       }
     },
+    'allowConnectorCaps': true,
 
     'connectors': {
       'previewStroke': {
@@ -541,6 +542,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'splitterPosition': '30%',
     'headerHeight': 70,
     'rowStroke': '#cecece',
+    'rowFill':'none',
     'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
     'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
     'edit': {

@@ -420,7 +420,8 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
       var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('weekendsFill'));
       this.getWeekendsPath_().fill(fill);
     }],
-    ['connectBy', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW]
+    ['connectBy', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['allowConnectorCaps', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
   ]);
 
   this.controller.timeline(this);
@@ -648,7 +649,8 @@ anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'weekendsFill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectBy', anychart.core.settings.stringNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectBy', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowConnectorCaps', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -3337,6 +3339,10 @@ anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
+  // rowSelectedFill has been added here to allow for the functional coloring and context of the selected row.
+  var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+  this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
+
   var selection = this.interactivityHandler.selection();
   selection.selectPeriod(item, opt_periodIndex);
   if (selection.hasSelectedRow()) {
@@ -4874,67 +4880,70 @@ anychart.ganttModule.TimeLine.prototype.drawSegment_ = function(fromLeft, fromTo
  * @return {acgraph.vector.Path} - Arrow path or null if path is not drawn.
  */
 anychart.ganttModule.TimeLine.prototype.drawArrow_ = function(left, top, orientation, opt_path) {
-  var drawPreview = goog.isDefAndNotNull(opt_path);
+  if(this.getOption('allowConnectorCaps')){
+    var drawPreview = goog.isDefAndNotNull(opt_path);
 
-  var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
+    var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
 
-  if (left >= this.pixelBoundsCache.left &&
+    if (left >= this.pixelBoundsCache.left &&
       left <= this.pixelBoundsCache.left + this.pixelBoundsCache.width &&
       top >= this.pixelBoundsCache.top &&
       top <= this.pixelBoundsCache.top + this.pixelBoundsCache.height) { //Is in visible area.
 
-    var arrSize = anychart.ganttModule.TimeLine.ARROW_SIZE;
-    var left1 = 0;
-    var top1 = 0;
-    var left2 = 0;
-    var top2 = 0;
+      var arrSize = anychart.ganttModule.TimeLine.ARROW_SIZE;
+      var left1 = 0;
+      var top1 = 0;
+      var left2 = 0;
+      var top2 = 0;
 
-    switch (orientation) {
-      case anychart.enums.Orientation.LEFT:
-        left = left + 1;
-        left1 = left + arrSize;
-        top1 = top - arrSize;
-        left2 = left1;
-        top2 = top + arrSize;
-        break;
-      case anychart.enums.Orientation.TOP:
-        top = top + 1;
-        left1 = left - arrSize;
-        top1 = top + arrSize;
-        left2 = left + arrSize;
-        top2 = top1;
-        break;
-      case anychart.enums.Orientation.RIGHT:
-        left = left - 1;
-        left1 = left - arrSize;
-        top1 = top - arrSize;
-        left2 = left1;
-        top2 = top + arrSize;
-        break;
-      case anychart.enums.Orientation.BOTTOM:
-        top = top - 1;
-        left1 = left - arrSize;
-        top1 = top - arrSize;
-        left2 = left + arrSize;
-        top2 = top1;
-        break;
+      switch (orientation) {
+        case anychart.enums.Orientation.LEFT:
+          left = left + 1;
+          left1 = left + arrSize;
+          top1 = top - arrSize;
+          left2 = left1;
+          top2 = top + arrSize;
+          break;
+        case anychart.enums.Orientation.TOP:
+          top = top + 1;
+          left1 = left - arrSize;
+          top1 = top + arrSize;
+          left2 = left + arrSize;
+          top2 = top1;
+          break;
+        case anychart.enums.Orientation.RIGHT:
+          left = left - 1;
+          left1 = left - arrSize;
+          top1 = top - arrSize;
+          left2 = left1;
+          top2 = top + arrSize;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          top = top - 1;
+          left1 = left - arrSize;
+          top1 = top - arrSize;
+          left2 = left + arrSize;
+          top2 = top1;
+          break;
+      }
+
+      if (!drawPreview) {
+        //path = /** @type {acgraph.vector.Path} */ (this.getDrawLayer().genNextChild());
+        path = this.genElement_();
+        path.type = anychart.enums.TLElementTypes.CONNECTORS;
+      }
+      path
+          .zIndex(anychart.ganttModule.TimeLine.ARROW_Z_INDEX)
+          .moveTo(left, top)
+          .lineTo(left1, top1)
+          .lineTo(left2, top2)
+          .lineTo(left, top);
+
     }
 
-    if (!drawPreview) {
-      //path = /** @type {acgraph.vector.Path} */ (this.getDrawLayer().genNextChild());
-      path = this.genElement_();
-      path.type = anychart.enums.TLElementTypes.CONNECTORS;
-    }
-    path
-        .zIndex(anychart.ganttModule.TimeLine.ARROW_Z_INDEX)
-        .moveTo(left, top)
-        .lineTo(left1, top1)
-        .lineTo(left2, top2)
-        .lineTo(left, top);
-
+    return path;
   }
-
-  return path;
+  return null;
 };
 
 

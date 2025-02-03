@@ -2359,7 +2359,7 @@ anychart.core.series.Base.prototype.extractSettings = function(settingsArray, op
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
  * @param {boolean} callDraw
- * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label|null}
+ * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label|null|Array.<anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label>}
  * @protected
  */
 anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state, callDraw) {
@@ -2516,6 +2516,21 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
             ], 'position'),
             'auto');
       }
+      /*
+        To switch to the two marker per point behavior the marker's position must be set to 'rangeMode'.
+        This boils down to the positions of a point marker: 'high', 'low' and 'rangeMode'.
+        The 'rangeMode' is an amalgamation of 'high' and 'low' which are yValueNames in the drawer.
+      */
+       if (position == 'rangeMode' && !isLabel) {
+        var highPositionProvider = this.createPositionProvider(/** @type {string} */('high'), true);
+        var lowPositionProvider = this.createPositionProvider(/** @type {string} */('low'), true);
+        /*
+          The easiest way to go about two markers on one point is to create an additional marker with an index exceeding
+          the total point amount. It is calculated as current point index + total amount of points. 
+        */
+        var lowMarkerIndex = index + this.rawData.length;
+        return this.drawTwoMarkers(factories, index, lowMarkerIndex, highPositionProvider, lowPositionProvider, callDraw);
+      }
       positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(factories, settings, index, positionProvider, formatProvider, callDraw, /** @type {string} */(position));
     }
@@ -2526,6 +2541,21 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
       }
     } else {
       mainFactory.clear(index);
+      // If the marker's position's set to rangeMode, the lower marker must be cleared in addition to the higher one.
+      if (!isLabel) {
+      position = anychart.utils.getFirstDefinedValueRecursive(
+        anychart.utils.extractSettings([
+          pointState, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+          seriesState, anychart.utils.ExtractSettingModes.CALL_METHOD,
+          pointNormal, anychart.utils.ExtractSettingModes.PLAIN_OBJECT,
+          seriesNormal, anychart.utils.ExtractSettingModes.CALL_METHOD
+        ], 'position'),
+        'auto');
+        if (position == 'rangeMode') {
+          var lowMarkerIndex = index + this.rawData.length;
+          mainFactory.clear(lowMarkerIndex);
+        }
+      }
     }
   }
   return null;
@@ -2831,6 +2861,31 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factorie
   if (callDraw)
     element.draw();
   return element;
+};
+
+
+/**
+ * Draws two markers using the given position providers.
+ * 
+ * Has been added as a part of the DVF-4703 to allow the users to have two markers on the range series points. 
+ *
+ * @param {Array.<anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|*>} factories [seriesNormal, seriesState, pointNormal, pointState]
+ * @param {number|undefined} index - Index of for the 1st(with a 'high' position) marker for the point.
+ * @param {number|undefined} lowMarkerIndex - Index of for the 2nd(with a 'low' position) marker for the point.
+ * @param {Object} highPositionProvider - Position provider for the 1st(with a 'high' position) marker for the point.
+ * @param {Object} lowPositionProvider - Position provider for the 2nd(with a 'low' position) marker for the point.
+ * @param {boolean} callDraw - Call draw method of created item or not.
+ *
+ * @return {Array.<anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label>} - Item instance.
+ */
+anychart.core.series.Base.prototype.drawTwoMarkers = function(factories, index, lowMarkerIndex, highPositionProvider, lowPositionProvider, callDraw) {
+  var element1 = this.getSingleMarkersFactoryElement(factories, index, highPositionProvider);
+  var element2 = this.getSingleMarkersFactoryElement(factories, lowMarkerIndex, lowPositionProvider);
+  if (callDraw){
+    element1.draw();
+    element2.draw();
+  }
+  return [element1, element2];
 };
 
 
