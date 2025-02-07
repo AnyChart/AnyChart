@@ -421,6 +421,33 @@ anychart.ganttModule.Controller.prototype.periodsToMeta_ = function(item) {
         periodEnd = periodEndVal;
       }
 
+      /*
+        The resource baselines are much more simple compared to project baselines due to the resource itself being
+        much more simple.
+        There are no milestones and progresses in both periods and newly added baselines.
+      */
+      var periodBaselineStart = period[anychart.enums.GanttDataFields.BASELINE_START];
+      var periodBaselineStartVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.BASELINE_START]);
+
+      if (goog.isNull(periodBaselineStartVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.BASELINE_START, null);
+      } else {
+        periodBaselineStartVal = +periodBaselineStartVal;
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.BASELINE_START, periodBaselineStartVal);
+        periodBaselineStart = periodBaselineStartVal;
+      }
+
+      var periodBaselineEnd = period[anychart.enums.GanttDataFields.BASELINE_END];
+      var periodBaselineEndVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.BASELINE_END]);
+
+      if (goog.isNull(periodBaselineEndVal)) {
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.BASELINE_END, null);
+      } else {
+        periodBaselineEndVal = +periodBaselineEndVal;
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.BASELINE_END, periodBaselineEndVal);
+        periodBaselineEnd = periodBaselineEndVal;
+      }
+
       minPeriodDate = this.actualizeResourceDates_(Math.min, minPeriodDate, maxPeriodDate, periodStart, periodEnd);
       maxPeriodDate = this.actualizeResourceDates_(Math.max, minPeriodDate, maxPeriodDate, periodStart, periodEnd);
 

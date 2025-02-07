@@ -452,6 +452,12 @@ anychart.ganttModule.BaseGrid.ProjectItemData;
  *   start: number,
  *   end: number,
  *   milestoneTimestamp: number,
+ *   baselineStart: number,
+ *   baselineEnd: number,
+ *   isValidBaselineStart: boolean,
+ *   isValidBaselineEnd: boolean,
+ *   hasBaselineFields: boolean,
+ *   isValidBaseline: boolean,
  *   isValidStart: boolean,
  *   isValidEnd: boolean,
  *   isValidPeriod: boolean,
@@ -658,7 +664,7 @@ anychart.ganttModule.BaseGrid.isBaseline = function(item, opt_info) {
  * Checks whether tree data item is actually a grouping task.
  *
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Tree data item.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData=} opt_info - Already calculated info. Used to avoid recalculation.
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData|anychart.ganttModule.BaseGrid.PeriodData=} opt_info - Already calculated info. Used to avoid recalculation.
  * @return {boolean} - Whether tree data item is grouping task.
  */
 anychart.ganttModule.BaseGrid.isGroupingTask = function(item, opt_info) {
@@ -843,10 +849,19 @@ anychart.ganttModule.BaseGrid.getPeriodInfo = function(item, periodIndex) {
 
   var milestoneTimestamp = isValidStart ? start : (isValidEnd ? end : null);
 
+  var baselineStart = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.BASELINE_START] : void 0;
+  var baselineEnd = metaPeriod ? metaPeriod[anychart.enums.GanttDataFields.BASELINE_END] : void 0;
+
   return /** @type {anychart.ganttModule.BaseGrid.PeriodData} */ ({
     start: start,
     end: end,
     milestoneTimestamp: milestoneTimestamp,
+    baselineStart: baselineStart,
+    baselineEnd: baselineEnd,
+    isValidBaselineStart: !isNaN(baselineStart),
+    isValidBaselineEnd: !isNaN(baselineEnd),
+    isValidBaseline: goog.isNumber(baselineStart) && !isNaN(baselineStart) && goog.isNumber(baselineEnd) &&
+        !isNaN(baselineEnd) && (baselineStart !== baselineEnd),
     isValidStart: isValidStart,
     isValidEnd: isValidEnd,
     isValidPeriod: isValidStart && isValidEnd,
