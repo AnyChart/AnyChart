@@ -614,7 +614,18 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'tooltip': {
           'format': '{%start}'
         }
-      }
+      },
+      'baselines': {
+        'labels': {
+          'position': 'right-center',
+          'anchor': 'left-center',
+          'format': 'Baseline Label',
+          'enabled': false
+        },
+        'tooltip': {
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}'
+        }
+      },
     }
   },
   'ganttProject': {
