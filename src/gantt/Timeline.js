@@ -2019,7 +2019,7 @@ anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(posi
         anchor = above ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
       break;
     case anychart.enums.TLElementTypes.PERIODS:
-      if (position == anychart.enums.Position.LEFT_CENTER)
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER)
         anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
   }
 
@@ -3806,9 +3806,9 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
     isParent ? this.groupingTasks() :
     isPeriod ? this.periods() : this.tasks());
   var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
-  var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
-
   var periodIndex = isPeriod ? opt_periodIndex : void 0;
+  var isSelected = isPeriod ? this.interactivityHandler.selection().isPeriodSelected(dataItem, periodIndex) :
+    this.interactivityHandler.selection().isRowSelected(dataItem);
 
   var actualStart = info.start;
   var actualEnd = info.end;
