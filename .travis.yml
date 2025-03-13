@@ -1,39 +1,36 @@
 language: java
 jdk:
-  - oraclejdk12
-
+- oraclejdk12
 git:
   submodules: false
   depth: 1
-
 addons:
   ssh_known_hosts:
   - 104.236.0.245
   - static.anychart.com
-
 before_install:
-  - openssl aes-256-cbc -K $encrypted_500e779cfa6c_key -iv $encrypted_500e779cfa6c_iv -in bin/anychart-bot-key.enc -out ~/.ssh/id_rsa -d
-  - chmod 600 ~/.ssh/id_rsa
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - pyenv install 2.7.16
-
+- openssl aes-256-cbc -K $encrypted_500e779cfa6c_key -iv $encrypted_500e779cfa6c_iv -in bin/anychart-bot-key.enc -out ~/.ssh/id_rsa -d
+- chmod 600 ~/.ssh/id_rsa
+- sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+- pyenv install 2.7.16
 install:
-  - pyenv local 2.7.16
-  - git submodule update --init
-  - pip install requests --user --upgrade
-  - pip install maxcdn --user --upgrade
-  - ./build.py libs
-  - git clone git@github.com:AnyChart/travis-scripts.git out/travis --depth 1
-  - mv out/travis/anychart bin/travis
-
+- pyenv local 2.7.16
+- git submodule update --init
+- pip install requests --user --upgrade
+- pip install maxcdn --user --upgrade
+- "./build.py libs"
+- git clone git@github.com:AnyChart/travis-scripts.git out/travis --depth 1
+- mv out/travis/anychart bin/travis
 cache: pip
-
 script:
-  - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
-  - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - git rev-parse HEAD >> ./dist/commit-hash.txt
-  - export MOCK_CDN_PATH=''
-  - . ./bin/travis/build.sh
-
+- echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
+- echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- git rev-parse HEAD >> ./dist/commit-hash.txt
+- export MOCK_CDN_PATH=''
+- ". ./bin/travis/build.sh"
 after_success:
-  - curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+- curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+notifications:
+  webhooks:
+    urls:
+    - secure: VYGUZ2nNjwiAjIqULPMhCNe5N8NOvcuVgN2vLPVYKr4Sa5aOfZBL6J/J8AbMRf5txWQcjawHm6FmXQKL/OpQ9XizvZTlbwiQvB2JT/BWX2NO73rDcaTeqdyccYAw5wGWpF1lxc1OphcFNBMGEgKtKVOo9mGEOCiUEgeQM2QXJHmZT3SQCIMj86Yj2iKV1BAo2ATZ1nBHBugPndWBEF+oKF0LUnJN867vNUdx7R9Ju6usmJjmLwwZASp4nEb7uN6ZWZhLzhhdmD0I4klhJWPp9q0RgTQgxAWAOARPk23DBYztbsYoByxrRsFm1GbRGXW6Q6hc9RndHOz1RUkoeLUANqOoaCDp/wPGqulBz/127WhxvcY8ROEaiIw9sQGfXxSWhrnBAramYGeTPsgRXqLc7Hguzj+pRxrZ/UVeaW4/TSqbezhXck9IqiZk3+Pq9fiMc217Jxg8dvZ0HDPw+ZtBp5XKOAVmCJs+RgFyyYuKDxcS9OIKMbVVKQgASVYusbhrP0fJlhZZg9IKjvfzlCiACTjktiQWfTIlqO1/e6Bl3KMUxLZnlZntq3sNCvMg84MQvy6Om/5SFxuKtWJQwmHhH2mBzD1MbsA8GU0qKSk4jImPapd32CzYdSN0b8w5tCK7m6KpnPLah3saWPXXt17D205zhNASKqNOr3Nb5cb96vw=
