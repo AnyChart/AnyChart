@@ -12,7 +12,7 @@ addons:
   - static.anychart.com
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_70c31ee585ad_key -iv $encrypted_70c31ee585ad_iv -in bin/anychart-deploy-key.enc -out ~/.ssh/id_rsa -d
+  - openssl aes-256-cbc -K $encrypted_500e779cfa6c_key -iv $encrypted_500e779cfa6c_iv -in bin/anychart-bot-key.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - pyenv install 2.7.16
@@ -29,16 +29,11 @@ install:
 cache: pip
 
 script:
-  - . bin/travis/utils/skype.sh
   - echo -e "//registry.npmjs.org/:_authToken=$NPM_TOKEN\n" >> ~/.npmrc
   - echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git rev-parse HEAD >> ./dist/commit-hash.txt
   - export MOCK_CDN_PATH=''
   - . ./bin/travis/build.sh
 
-after_failure:
-- skype_send failed
-
 after_success:
-- skype_send success
-- curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+  - curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
