@@ -663,6 +663,64 @@ anychart.core.ui.Legend.prototype.getPixelBounds = function() {
 
 
 /**
+ * Gets or sets the actual pixel bounds of the legend.
+ * When called without arguments, returns the current bounds including any transformations (like drag).
+ * When called with arguments, sets the new position of the legend.
+ * 
+ * @param {(number|string|goog.math.Rect|{left: number, top: number}|{x: number, y: number}|{left: string, top: string}|{x: string, y: string})=} opt_boundsOrLeft Left coordinate or object with bounds settings.
+ * @param {(number|string)=} opt_top Top coordinate.
+ * @return {(anychart.math.Rect|anychart.core.ui.Legend)} Current bounds when getting, or self for method chaining if set.
+ */
+anychart.core.ui.Legend.prototype.currentPixelBounds = function(opt_boundsOrLeft, opt_top) {
+  var pixelBounds = this.getPixelBounds();
+
+  if (goog.isDef(opt_boundsOrLeft)) {
+    var parentBounds = this.parentBounds();
+
+    // Handle different input types and set drag offsets
+    if (opt_boundsOrLeft instanceof goog.math.Rect) {
+      this.dragOffsetX = opt_boundsOrLeft.left;
+      this.dragOffsetY = opt_boundsOrLeft.top;
+    } else if (goog.isObject(opt_boundsOrLeft)) {
+      this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft.left || opt_boundsOrLeft.x, parentBounds.width);
+      this.dragOffsetY = anychart.utils.normalizeSize(opt_boundsOrLeft.top || opt_boundsOrLeft.y, parentBounds.height);
+    } else {
+      this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft, parentBounds.width);
+      this.dragOffsetY = anychart.utils.normalizeSize(opt_top, parentBounds.height);
+    }
+    this.dragged = true;
+    this.percentOffsetLeft = (this.dragOffsetX - parentBounds.left) / (parentBounds.width);
+    this.percentOffsetTop = (this.dragOffsetY - parentBounds.top) / (parentBounds.height);
+    this.percentOffsetRight = (parentBounds.width - (this.dragOffsetX - parentBounds.left + pixelBounds.width)) / parentBounds.width;
+    this.percentOffsetBottom = (parentBounds.height - (this.dragOffsetY - parentBounds.top + pixelBounds.height)) / parentBounds.height;
+
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_DRAG, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  } else {
+    var transformation = this.rootElement.getSelfTransformation();
+    return anychart.math.rect(
+      transformation.getTranslateX(),
+      transformation.getTranslateY(),
+      pixelBounds.width,
+      pixelBounds.height
+    );
+  }
+};
+
+
+/**
+ * Resets pixel bounds and related drag state to initial values.
+ * @return {anychart.core.ui.Legend} Self for method chaining.
+ */
+anychart.core.ui.Legend.prototype.resetPixelBounds = function() {
+  this.dragged = false;
+  this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_DRAG,
+    anychart.Signal.NEEDS_REDRAW);
+  return this;
+};
+
+
+/**
  * Calculation content bounds.
  * @param {number} widthLimit .
  * @param {number} heightLimit .
@@ -2437,6 +2495,7 @@ anychart.standalones.legend = function() {
   proto['tooltip'] = proto.tooltip;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['getPixelBounds'] = proto.getPixelBounds;
+  proto['currentPixelBounds'] = proto.currentPixelBounds;
 
   // auto generated
   // proto['inverted'] = proto.inverted;
