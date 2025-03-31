@@ -1200,7 +1200,11 @@ anychart.ganttModule.BaseGrid.prototype.handleMouseClick_ = function(event) {
       if (click && !this.interactivityHandler.altKey) {
         var mouseUp = goog.object.clone(click);
         mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
-        var upDispatched = this.interactivityHandler.dispatchEvent(mouseUp);
+
+        // DVF-4706 Flag to track if mouse up event was already handled, by the handleMouseUp_ method.
+        var upDispatched = this.isMouseUpDispatched_ || this.interactivityHandler.dispatchEvent(mouseUp);
+        this.isMouseUpDispatched_ = false;
+
         var clickDispatched = this.interactivityHandler.dispatchEvent(click);
         if (upDispatched && clickDispatched) {
           this.interactivityHandler.rowClick(click);
@@ -1325,6 +1329,9 @@ anychart.ganttModule.BaseGrid.prototype.handleMouseUp_ = function(event) {
   if (this.interactive) {
     if (evt && this.interactivityHandler.dispatchEvent(evt)) {
       this.interactivityHandler.rowMouseUp(evt);
+
+      // DVF-4706 Flag to track if mouse up event was already handled, checked at the handleMouseUp_ method.
+      this.isMouseUpDispatched_ = true;
     }
   }
   this.tooltip().hide();
