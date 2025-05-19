@@ -209,6 +209,41 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.boundsProvider_ = null;
+
+  /**
+   * Controls whether week intervals should cycle monthly instead of yearly.
+   * When enabled, week intervals will restart at the beginning of each month,
+   * rather than continuing across month boundaries.
+   *
+   * For example, with weeksCycleMonthly enabled:
+   * - Week 1: Jan 1-7
+   * - Week 2: Jan 8-14
+   * - Week 3: Jan 15-21
+   * - Week 4: Jan 22-31
+   * - Week 1: Feb 1-7 (resets at month boundary)
+   *
+   * @type {boolean}
+   * @private
+   */
+  this.weeksCycleMonthly_ = false;
+
+  /**
+   * Controls whether week intervals should end with the year boundary.
+   * When enabled, the last week interval of the year will be truncated
+   * to end exactly at the year boundary (December 31st), rather than
+   * continuing into the next year. This ensures week intervals align
+   * cleanly with calendar year boundaries.
+   *
+   * For example, with weeksEndWithYear enabled:
+   * - Week 51: Dec 17-23
+   * - Week 52: Dec 24-30
+   * - Week 53: Dec 31 (truncated to end at year boundary)
+   * - Week 1: Jan 1-7 (new year starts)
+   *
+   * @type {boolean}
+   * @private
+   */
+  this.weeksEndWithYear_ = false;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -1390,6 +1425,54 @@ anychart.scales.GanttDateTime.prototype.softMaximum = function(opt_value) {
 
 
 /**
+ * Gets or sets whether week intervals should align with year boundaries.
+ * When enabled, the last week interval of each year will be adjusted to end exactly 
+ * at the year boundary, which may result in a shorter interval. This ensures week
+ * ticks align perfectly with year transitions.
+ * 
+ * @param {boolean=} opt_value - Whether to enable week alignment with year boundaries.
+ *    If true, week intervals will be adjusted to align with year boundaries.
+ *    If false (default), week intervals will maintain consistent length.
+ * @return {boolean|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.weeksEndWithYear = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.weeksEndWithYear_ !== opt_value) {
+      this.weeksEndWithYear_ = !!opt_value;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.weeksEndWithYear_;
+};
+
+
+/**
+ * Gets or sets whether week intervals should align with month boundaries.
+ * When enabled, the last week interval of each month will be adjusted to end exactly 
+ * at the month boundary, which may result in a shorter interval. This ensures week
+ * ticks align perfectly with month transitions.
+ * 
+ * @param {boolean=} opt_value - Whether to enable week alignment with month boundaries.
+ *    If true, week intervals will be adjusted to align with month boundaries.
+ *    If false (default), week intervals will maintain consistent length.
+ * @return {boolean|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.weeksCycleMonthly = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.weeksCycleMonthly_ !== opt_value) {
+      this.weeksCycleMonthly_ = !!opt_value;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.weeksCycleMonthly_;
+};
+
+
+/**
  * Start month of the fiscal year setter/getter.
  *
  * @param {number=} opt_value - Number of month (1 - 12).
@@ -1731,7 +1814,12 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, un
   unit = normalizedValues.unit;
   count = normalizedValues.count;
 
-  var start = anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
+  // There are 2 places where this check is needed so, to keep it DRY, placing it here. 
+  var isEndWeeksWithCycle = unit === anychart.enums.Interval.WEEK &&
+      (this.weeksEndWithYear_ || this.weeksCycleMonthly_);
+  var start = isEndWeeksWithCycle ?
+      anychart.utils.alignDateLeftToWeekCycleBoundary(range['min'], count, this.fiscalYearStartMonth_, /** @type {boolean}*/(this.weeksCycleMonthly_)) :
+      anychart.utils.alignDateLeftByUnit(range['min'], unit, count, 2000);
   var interval = anychart.utils.getIntervalFromInfo(unit, count);
 
   var end = range['max'];
@@ -1789,7 +1877,27 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, un
   }
 
   currentMs = current.getTime();
+  var oldInterval = interval;
   while (currentMs < end) {
+    interval = oldInterval;
+
+    /*
+      For week intervals that need to end with a cycle boundary (month or year):
+      1. Calculate how many seconds remain until the next cycle boundary
+      2. Compare with the normal week interval length in seconds
+      3. If the remaining time is less than a full week, create a shorter
+         custom interval that ends exactly at the cycle boundary
+      4. Otherwise, use the standard week interval
+      This ensures week ticks align perfectly with month/year boundaries
+     */
+    if (isEndWeeksWithCycle) {
+      var lastIntervalSeconds = this.getLastIntervalSeconds(currentMs);
+      var intervalSeconds = interval.getTotalSeconds();
+      interval = lastIntervalSeconds < intervalSeconds ?
+          new goog.date.Interval(0, 0, 0, 0, 0, lastIntervalSeconds) :
+          interval;
+    }
+
     var prev = currentMs;
     current.add(interval);
     currentMs = current.getTime();
@@ -1799,6 +1907,69 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(pixStart, pixEnd, un
     });
   }
   return res;
+};
+
+
+/**
+ * Takes a tick value for the week as a number of milliseconds and converts it into the
+ * number of seconds until the start of the next cycle. A cycle can be a month, year or fiscal year.
+ * 
+ * Added as part of the DVF-4705 ticket. This method should only be used with the "week" unit.
+ * 
+ * Returns seconds instead of milliseconds since goog.date.Interval does not support milliseconds,
+ * which would require additional calculations later.
+ * 
+ * @param {number} weekTickValue - Number of milliseconds since January 1, 1970 to the start of the week
+ * @return {number} - Number of seconds until the start of the next cycle
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.getLastIntervalSeconds = function(weekTickValue) {
+  var date = new Date(weekTickValue);
+  var isDecember = date.getMonth() === 11;
+  var isCycleMonthly = this.weeksCycleMonthly_;
+  // The subtraction of a 1 from the fiscalYearStartMonth is needed to convert 1-based indexes into 0-based indexes.
+  var fiscalYearStartMonth = this.fiscalYearStartMonth_ - 1;
+  var thisYear = date.getFullYear();
+  var thisMonth = date.getMonth();
+  
+  /*
+    Handles fiscal year and cycle end calculations:
+
+    For monthly cycles:
+    - If not December, use next month in current year
+    - If December, use January of next year
+
+    For yearly cycles:
+    - If fiscal year starts in January (fiscalYearStartMonth=0), use January of next year
+    - Otherwise:
+      - If current month is before fiscal year start, use fiscal start month in current year
+      - If current month is after fiscal year start, use fiscal start month in next year
+   */
+  var month, year;
+  if (isCycleMonthly) {
+    if (isDecember) {
+      month = 0;
+      year = thisYear + 1;
+    } else {
+      month = thisMonth + 1;
+      year = thisYear;
+    }
+  } else {
+    if (fiscalYearStartMonth === 0) {      
+      month = 0;
+      year = thisYear + 1;
+    } else {
+      month = fiscalYearStartMonth;
+      if (thisMonth >= 0 && thisMonth < fiscalYearStartMonth) {
+          year = thisYear;
+      } else {
+          year = thisYear + 1; // Next year
+      }
+    }
+  }
+  var startOfNextCycleMs = Date.UTC(year, month, 1);
+
+  return (startOfNextCycleMs - date) / 1000;
 };
 
 
@@ -2119,6 +2290,8 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
   proto['zoomLevels'] = proto.zoomLevels;
   proto['maxTicksCount'] = proto.maxTicksCount;
   proto['calendar'] = proto.calendar;
+  proto['weeksEndWithYear'] = proto.weeksEndWithYear;
+  proto['weeksCycleMonthly'] = proto.weeksCycleMonthly;
 })();
 
 
