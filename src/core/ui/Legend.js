@@ -667,43 +667,69 @@ anychart.core.ui.Legend.prototype.getPixelBounds = function() {
  * When called without arguments, returns the current bounds including any transformations (like drag).
  * When called with arguments, sets the new position of the legend.
  * 
+ * Expected to be called only after the chart is drawn. Yet has a safety mechanism to prevent errors.
+ * 
  * @param {(number|string|goog.math.Rect|{left: number, top: number}|{x: number, y: number}|{left: string, top: string}|{x: string, y: string})=} opt_boundsOrLeft Left coordinate or object with bounds settings.
  * @param {(number|string)=} opt_top Top coordinate.
  * @return {(anychart.math.Rect|anychart.core.ui.Legend)} Current bounds when getting, or self for method chaining if set.
  */
 anychart.core.ui.Legend.prototype.currentPixelBounds = function(opt_boundsOrLeft, opt_top) {
-  var pixelBounds = this.getPixelBounds();
-
-  if (goog.isDef(opt_boundsOrLeft)) {
-    var parentBounds = this.parentBounds();
-
-    // Handle different input types and set drag offsets
-    if (opt_boundsOrLeft instanceof goog.math.Rect) {
-      this.dragOffsetX = opt_boundsOrLeft.left;
-      this.dragOffsetY = opt_boundsOrLeft.top;
-    } else if (goog.isObject(opt_boundsOrLeft)) {
-      this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft.left || opt_boundsOrLeft.x, parentBounds.width);
-      this.dragOffsetY = anychart.utils.normalizeSize(opt_boundsOrLeft.top || opt_boundsOrLeft.y, parentBounds.height);
+  /* 
+    Preventing this method erroring out as a result of being called before the chart is drawn.
+    If this method was called as a getter, return null to indicate that the method was used incorrectly.
+    If this method was called as a setter, return this for method chaining.
+   */
+  if (this.rootElement === undefined){
+    if (goog.isDef(opt_boundsOrLeft)) {
+      this.needsCurrentPixelBoundsSet_ = true;
+      this.needsCurrentPixelBoundsSetArgs_ = [opt_boundsOrLeft, opt_top];
+      return this;
     } else {
-      this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft, parentBounds.width);
-      this.dragOffsetY = anychart.utils.normalizeSize(opt_top, parentBounds.height);
+      return null;
     }
-    this.dragged = true;
-    this.percentOffsetLeft = (this.dragOffsetX - parentBounds.left) / (parentBounds.width);
-    this.percentOffsetTop = (this.dragOffsetY - parentBounds.top) / (parentBounds.height);
-    this.percentOffsetRight = (parentBounds.width - (this.dragOffsetX - parentBounds.left + pixelBounds.width)) / parentBounds.width;
-    this.percentOffsetBottom = (parentBounds.height - (this.dragOffsetY - parentBounds.top + pixelBounds.height)) / parentBounds.height;
-
-    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_DRAG, anychart.Signal.NEEDS_REDRAW);
-    return this;
   } else {
-    var transformation = this.rootElement.getSelfTransformation();
-    return anychart.math.rect(
-      transformation.getTranslateX(),
-      transformation.getTranslateY(),
-      pixelBounds.width,
-      pixelBounds.height
-    );
+    this.needsCurrentPixelBoundsSet_ = false;
+    this.needsCurrentPixelBoundsSetArgs_ = null;
+
+    var pixelBounds = this.getPixelBounds();
+
+    if (goog.isDef(opt_boundsOrLeft)) {
+      var parentBounds = this.parentBounds();
+
+      // Handle different input types and set drag offsets.
+      if (opt_boundsOrLeft instanceof goog.math.Rect) {
+        this.dragOffsetX = opt_boundsOrLeft.left;
+        this.dragOffsetY = opt_boundsOrLeft.top;
+      } else if (goog.isObject(opt_boundsOrLeft)) {
+        // Preventing errors when called with empty object.
+        if (goog.isDefAndNotNull(opt_boundsOrLeft.left || opt_boundsOrLeft.x) && goog.isDefAndNotNull(opt_boundsOrLeft.top || opt_boundsOrLeft.y)) {
+          this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft.left || opt_boundsOrLeft.x || 0, parentBounds.width);
+          this.dragOffsetY = anychart.utils.normalizeSize(opt_boundsOrLeft.top || opt_boundsOrLeft.y || 0, parentBounds.height);
+        } else {
+          return this;
+        }
+      } else {
+        this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft || 0, parentBounds.width);
+        this.dragOffsetY = anychart.utils.normalizeSize(opt_top || 0, parentBounds.height);
+      }
+
+      this.dragged = true;
+      this.percentOffsetLeft = (this.dragOffsetX - parentBounds.left) / (parentBounds.width);
+      this.percentOffsetTop = (this.dragOffsetY - parentBounds.top) / (parentBounds.height);
+      this.percentOffsetRight = (parentBounds.width - (this.dragOffsetX - parentBounds.left + pixelBounds.width)) / parentBounds.width;
+      this.percentOffsetBottom = (parentBounds.height - (this.dragOffsetY - parentBounds.top + pixelBounds.height)) / parentBounds.height;
+
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.enums.EventType.DRAG_END, anychart.Signal.NEEDS_REDRAW);
+      return this;
+    } else {
+      var transformation = this.rootElement.getSelfTransformation();
+      return anychart.math.rect(
+        transformation.getTranslateX(),
+        transformation.getTranslateY(),
+        pixelBounds.width,
+        pixelBounds.height
+      );
+    }
   }
 };
 
@@ -1672,6 +1698,14 @@ anychart.core.ui.Legend.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  /*
+    Preventing currentPixelBounds erroring out as a result of being called before the chart is drawn.
+    See the comments in the currentPixelBounds method for more details.
+   */
+  if (this.needsCurrentPixelBoundsSet_) {
+    this.currentPixelBounds.apply(this, this.needsCurrentPixelBoundsSetArgs_);
+  }
+
   this.clearLastDrawnPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     // Reset items width (needs when container was resized) for DVF-2119
@@ -2496,6 +2530,7 @@ anychart.standalones.legend = function() {
   proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['getPixelBounds'] = proto.getPixelBounds;
   proto['currentPixelBounds'] = proto.currentPixelBounds;
+  proto['resetPixelBounds'] = proto.resetPixelBounds;
 
   // auto generated
   // proto['inverted'] = proto.inverted;
