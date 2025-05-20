@@ -2433,10 +2433,13 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
   this.getSelectedPath().clear();
   this.getRowStrokePath().clear();
 
-  // The number of row stripes is equal to the number of rows so there is no point of having to loops here
+  // The number of row stripes is equal to the number of rows so there is no point of having to loops here.
   for (var index = 0; index < this.rowPathPool_.length; index++) {
     this.rowPathPool_[index].clear();
-    this.rowStripePool_[index].clear();    
+    // Avoiding errors in case stripes were not set-up.
+    if (goog.isDef(this.rowStripePool_[index])) {
+      this.rowStripePool_[index].clear();
+    }
   }
 
   // COLORS CONFIG MAGIC PREPARATION!
