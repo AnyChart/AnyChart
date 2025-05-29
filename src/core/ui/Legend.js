@@ -76,7 +76,14 @@ anychart.core.ui.Legend = function() {
   };
 
   var positionBeforeInvalidationHook = function() {
-    this.dragged = false;
+    var position = this.getOption('position');
+    if (goog.isObject(position)){
+      this.setPositionByObject_(position);
+    } else {
+      this.needsSetPositionByObjectSet_ = false;
+      this.needsSetPositionByObjectSetArgs_ = null;
+      this.dragged = false;
+    }
     this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   };
 
@@ -169,6 +176,15 @@ anychart.core.ui.Legend.PROPERTY_DESCRIPTORS = (function() {
     };
   };
 
+  var positionNormalizer = function(position) {
+    if (goog.isObject(position)) {
+      position.x = anychart.utils.normalizeSize(position.x) || 0;
+      position.y = anychart.utils.normalizeSize(position.y) || 0;
+      return position;
+    }
+    return anychart.enums.normalizeOrientation(position);
+  };
+
   anychart.core.settings.createDescriptors(map, [
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'inverted', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsLayout', anychart.enums.normalizeLegendLayout],
@@ -177,7 +193,7 @@ anychart.core.ui.Legend.PROPERTY_DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'height', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxWidth', anychart.core.settings.asIsNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'maxHeight', anychart.core.settings.asIsNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', anychart.enums.normalizeOrientation],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'position', positionNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'positionMode', anychart.enums.normalizeLegendPositionMode],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'drag', anychart.core.settings.booleanNormalizer],
     [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'itemsFormat', anychart.core.settings.asIsNormalizer],
@@ -628,8 +644,14 @@ anychart.core.ui.Legend.prototype.getRemainingBounds = function() {
 
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calculateBounds_();
+  
+  // if legend positionMode 'outside' and the position is set with an object we need legend to behave like it is 'inside'
+  var position = this.getOption('position');
+  if (goog.isObject(position)) {
+    return parentBounds;
+  }
 
-  switch (this.getOption('position')) {
+  switch (position) {
     case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
@@ -663,86 +685,57 @@ anychart.core.ui.Legend.prototype.getPixelBounds = function() {
 
 
 /**
- * Gets or sets the actual pixel bounds of the legend.
- * When called without arguments, returns the current bounds including any transformations (like drag).
- * When called with arguments, sets the new position of the legend.
- * 
- * Expected to be called only after the chart is drawn. Yet has a safety mechanism to prevent errors.
- * 
- * @param {(number|string|goog.math.Rect|{left: number, top: number}|{x: number, y: number}|{left: string, top: string}|{x: string, y: string})=} opt_boundsOrLeft Left coordinate or object with bounds settings.
- * @param {(number|string)=} opt_top Top coordinate.
- * @return {(anychart.math.Rect|anychart.core.ui.Legend)} Current bounds when getting, or self for method chaining if set.
+ * Internal method that sets the legend position using an object with coordinates.
+ * If called before the chart is drawn, stores the position to be applied later.
+ * Otherwise immediately applies the new position and triggers redraw.
+ *
+ * @param {{left: (number|string), top: (number|string)}|{x: (number|string), y: (number|string)}} positionObject Object containing left/x and top/y coordinates.
+ * @private
  */
-anychart.core.ui.Legend.prototype.currentPixelBounds = function(opt_boundsOrLeft, opt_top) {
-  /* 
-    Preventing this method erroring out as a result of being called before the chart is drawn.
-    If this method was called as a getter, return null to indicate that the method was used incorrectly.
-    If this method was called as a setter, return this for method chaining.
-   */
+anychart.core.ui.Legend.prototype.setPositionByObject_ = function(positionObject) {
+  // Preventing this method erroring out as a result of being called before the chart is drawn.
   if (this.rootElement === undefined){
-    if (goog.isDef(opt_boundsOrLeft)) {
-      this.needsCurrentPixelBoundsSet_ = true;
-      this.needsCurrentPixelBoundsSetArgs_ = [opt_boundsOrLeft, opt_top];
-      return this;
-    } else {
-      return null;
-    }
+    this.needsSetPositionByObjectSet_ = true;
+    this.needsSetPositionByObjectSetArgs_ = [positionObject];
   } else {
-    this.needsCurrentPixelBoundsSet_ = false;
-    this.needsCurrentPixelBoundsSetArgs_ = null;
+    this.needsSetPositionByObjectSet_ = false;
+    this.needsSetPositionByObjectSetArgs_ = null;
 
     var pixelBounds = this.getPixelBounds();
+    var parentBounds = this.parentBounds();
 
-    if (goog.isDef(opt_boundsOrLeft)) {
-      var parentBounds = this.parentBounds();
+    this.dragOffsetX = positionObject.x;
+    this.dragOffsetY = positionObject.y;
 
-      // Handle different input types and set drag offsets.
-      if (opt_boundsOrLeft instanceof goog.math.Rect) {
-        this.dragOffsetX = opt_boundsOrLeft.left;
-        this.dragOffsetY = opt_boundsOrLeft.top;
-      } else if (goog.isObject(opt_boundsOrLeft)) {
-        // Preventing errors when called with empty object.
-        if (goog.isDefAndNotNull(opt_boundsOrLeft.left || opt_boundsOrLeft.x) && goog.isDefAndNotNull(opt_boundsOrLeft.top || opt_boundsOrLeft.y)) {
-          this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft.left || opt_boundsOrLeft.x || 0, parentBounds.width);
-          this.dragOffsetY = anychart.utils.normalizeSize(opt_boundsOrLeft.top || opt_boundsOrLeft.y || 0, parentBounds.height);
-        } else {
-          return this;
-        }
-      } else {
-        this.dragOffsetX = anychart.utils.normalizeSize(opt_boundsOrLeft || 0, parentBounds.width);
-        this.dragOffsetY = anychart.utils.normalizeSize(opt_top || 0, parentBounds.height);
-      }
+    this.dragged = true;
+    this.percentOffsetLeft = (this.dragOffsetX - parentBounds.left) / (parentBounds.width);
+    this.percentOffsetTop = (this.dragOffsetY - parentBounds.top) / (parentBounds.height);
+    this.percentOffsetRight = (parentBounds.width - (this.dragOffsetX - parentBounds.left + pixelBounds.width)) / parentBounds.width;
+    this.percentOffsetBottom = (parentBounds.height - (this.dragOffsetY - parentBounds.top + pixelBounds.height)) / parentBounds.height;
 
-      this.dragged = true;
-      this.percentOffsetLeft = (this.dragOffsetX - parentBounds.left) / (parentBounds.width);
-      this.percentOffsetTop = (this.dragOffsetY - parentBounds.top) / (parentBounds.height);
-      this.percentOffsetRight = (parentBounds.width - (this.dragOffsetX - parentBounds.left + pixelBounds.width)) / parentBounds.width;
-      this.percentOffsetBottom = (parentBounds.height - (this.dragOffsetY - parentBounds.top + pixelBounds.height)) / parentBounds.height;
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.enums.EventType.DRAG_END, anychart.Signal.NEEDS_REDRAW);
-      return this;
-    } else {
-      var transformation = this.rootElement.getSelfTransformation();
-      return anychart.math.rect(
-        transformation.getTranslateX(),
-        transformation.getTranslateY(),
-        pixelBounds.width,
-        pixelBounds.height
-      );
-    }
+    this.invalidate(anychart.ConsistencyState.BOUNDS , anychart.Signal.NEEDS_REDRAW);
   }
 };
 
 
 /**
- * Resets pixel bounds and related drag state to initial values.
- * @return {anychart.core.ui.Legend} Self for method chaining.
+ * Gets the current pixel position of the legend.
+ * Returns the left and top coordinates of the legend.
+ * 
+ * This method should only be called after the chart is drawn.
+ * 
+ * @return {?{x: number, y: number}} An object containing:
+ *    - left: The x-coordinate of the legend's left edge in pixels
+ *    - top: The y-coordinate of the legend's top edge in pixels
+ *    Returns null if the legend has not been drawn yet.
  */
-anychart.core.ui.Legend.prototype.resetPixelBounds = function() {
-  this.dragged = false;
-  this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_DRAG,
-    anychart.Signal.NEEDS_REDRAW);
-  return this;
+anychart.core.ui.Legend.prototype.getCurrentPosition = function() {
+  // Preventing this method erroring out as a result of being called before the chart is drawn.
+  if (this.rootElement === undefined){
+    return null;
+  }
+  var transformation = this.rootElement.getSelfTransformation();
+  return {x: transformation.getTranslateX(), y: transformation.getTranslateY()};
 };
 
 
@@ -1699,11 +1692,11 @@ anychart.core.ui.Legend.prototype.draw = function() {
   }
 
   /*
-    Preventing currentPixelBounds erroring out as a result of being called before the chart is drawn.
-    See the comments in the currentPixelBounds method for more details.
+    Preventing setPositionByObject erroring out as a result of being called before the chart is drawn.
+    See the comments in the setPositionByObject method for more details.
    */
-  if (this.needsCurrentPixelBoundsSet_) {
-    this.currentPixelBounds.apply(this, this.needsCurrentPixelBoundsSetArgs_);
+  if (this.needsSetPositionByObjectSet_) {
+    this.setPositionByObject_.apply(this, this.needsSetPositionByObjectSetArgs_);
   }
 
   this.clearLastDrawnPage_();
@@ -2529,8 +2522,7 @@ anychart.standalones.legend = function() {
   proto['tooltip'] = proto.tooltip;
   proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['getPixelBounds'] = proto.getPixelBounds;
-  proto['currentPixelBounds'] = proto.currentPixelBounds;
-  proto['resetPixelBounds'] = proto.resetPixelBounds;
+  proto['getCurrentPosition'] = proto.getCurrentPosition;
 
   // auto generated
   // proto['inverted'] = proto.inverted;

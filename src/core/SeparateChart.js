@@ -220,13 +220,16 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 
   var legend = this.getCreated('legend');
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
-    //if legend positionMode 'inside', redraw legend in specialDraw method
-    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE) {
+    // if legend positionMode 'inside' or if the position is set with an object, redraw legend in specialDraw method
+    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE
+           && goog.isString((legend).getOption('position'))) {
       this.drawLegend(bounds);
       this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
     }
   }
-  bounds = legend && legend.enabled() && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE ?
+
+  bounds = legend && legend.enabled() && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.OUTSIDE
+             && goog.isString((legend).getOption('position')) ?
       legend.getRemainingBounds() :
       bounds;
   return bounds.clone();
@@ -240,7 +243,8 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 anychart.core.SeparateChart.prototype.specialDraw = function(bounds) {
   var legend = this.getCreated('legend');
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS))
-    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE)
+    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE
+      || goog.isObject((legend).getOption('position')))
       this.drawLegend(bounds);
     else
       this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
