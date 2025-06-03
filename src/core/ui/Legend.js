@@ -689,7 +689,7 @@ anychart.core.ui.Legend.prototype.getPixelBounds = function() {
  * If called before the chart is drawn, stores the position to be applied later.
  * Otherwise immediately applies the new position and triggers redraw.
  *
- * @param {{x: (number|string), y: (number|string)}} positionObject Object containing left/x and top/y coordinates.
+ * @param {{x: number, y: number}} positionObject Object containing left/x and top/y coordinates.
  * @private
  */
 anychart.core.ui.Legend.prototype.setPositionByObject_ = function(positionObject) {

@@ -243,8 +243,8 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 anychart.core.SeparateChart.prototype.specialDraw = function(bounds) {
   var legend = this.getCreated('legend');
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS))
-    if (legend && /** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE
-      || goog.isObject((legend).getOption('position')))
+    if (legend && (/** @type {anychart.core.ui.Legend} */(legend).getOption('positionMode') == anychart.enums.LegendPositionMode.INSIDE
+      || goog.isObject((legend).getOption('position'))))
       this.drawLegend(bounds);
     else
       this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
