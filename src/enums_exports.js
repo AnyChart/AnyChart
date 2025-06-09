@@ -784,6 +784,7 @@ goog.exportSymbol('anychart.enums.AnnotationTypes.RECTANGLE', anychart.enums.Ann
 goog.exportSymbol('anychart.enums.AnnotationTypes.ELLIPSE', anychart.enums.AnnotationTypes.ELLIPSE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.TRIANGLE', anychart.enums.AnnotationTypes.TRIANGLE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.TREND_CHANNEL', anychart.enums.AnnotationTypes.TREND_CHANNEL);
+goog.exportSymbol('anychart.enums.AnnotationTypes.WAVE', anychart.enums.AnnotationTypes.WAVE);
 goog.exportSymbol('anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK', anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK);
 goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_FAN', anychart.enums.AnnotationTypes.FIBONACCI_FAN);
 goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_ARC', anychart.enums.AnnotationTypes.FIBONACCI_ARC);
