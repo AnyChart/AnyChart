@@ -4957,6 +4957,7 @@ anychart.enums.AnnotationTypes = {
   HORIZONTAL_LINE: 'horizontal-line',
   RECTANGLE: 'rectangle',
   ELLIPSE: 'ellipse',
+  POSITION: 'position',
   TRIANGLE: 'triangle',
   TREND_CHANNEL: 'trend-channel',
   FINITE_TREND_CHANNEL: 'finite-trend-channel',
