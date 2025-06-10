@@ -3343,6 +3343,7 @@ anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
  * @param {anychart.treeDataModule.Tree.DataItem} item - New selected data item.
  * @param {number=} opt_periodIndex - Index of period in item to be selected.
  * @return {boolean} - Whether has been selected.
+ * @public
  */
 anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
   // rowSelectedFill has been added here to allow for the functional coloring and context of the selected row.
@@ -6349,6 +6350,7 @@ anychart.standalones.resourceTimeline = function() {
   proto['baselines'] = proto.baselines;
   proto['periods'] = proto.periods;
 
+  proto['selectTimelineRow'] = proto.selectTimelineRow;
 
   proto = anychart.standalones.ProjectTimeline.prototype;
   goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
