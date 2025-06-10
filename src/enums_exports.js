@@ -240,6 +240,7 @@ goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_CREATE', anychart.enums.Ev
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_MOVE', anychart.enums.EventType.TREE_ITEM_MOVE);
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_REMOVE', anychart.enums.EventType.TREE_ITEM_REMOVE);
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_UPDATE', anychart.enums.EventType.TREE_ITEM_UPDATE);
+goog.exportSymbol('anychart.enums.EventType.BEFORE_UPDATE_PERIOD', anychart.enums.EventType.BEFORE_UPDATE_PERIOD);
 
 goog.exportSymbol('anychart.enums.ScaleStackMode.NONE', anychart.enums.ScaleStackMode.NONE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.VALUE', anychart.enums.ScaleStackMode.VALUE);

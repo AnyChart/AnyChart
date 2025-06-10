@@ -1541,6 +1541,7 @@ anychart.enums.EventType = {
   BEFORE_REMOVE_CONNECTOR: 'beforeRemoveConnector',
   ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
   GANTT_LOAD_DATA: 'ganttloaddata', // ENV-1410.
+  BEFORE_UPDATE_PERIOD: 'beforeupdateperiod',
 
   //Connectors events.
   CONNECTOR_SELECT: 'connectorselect',

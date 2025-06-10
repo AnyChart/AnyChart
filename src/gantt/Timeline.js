@@ -1760,8 +1760,8 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
             var newPeriodEnd = periodEnd + delta;
 
             // Create event object for period update to be cancelable
-            var beforePeriodUpdateEvent = {
-              'type': "beforePeriodUpdate",
+            var beforeUpdatePeriodEvent = {
+              'type': anychart.enums.EventType.BEFORE_UPDATE_PERIOD,
               'destinationItem': destinationItem,
               'sourceItem': dataItem,
               'originalPeriodIndex': periodIndex,
@@ -1770,7 +1770,7 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
 
             if (dataItem === destinationItem && !isNaN(newPeriodEnd)) {
               // Handle period dropped on same row
-              if (this.interactivityHandler.dispatchEvent(beforePeriodUpdateEvent)) {
+              if (this.interactivityHandler.dispatchEvent(beforeUpdatePeriodEvent)) {
                 // Update period start/end times
                 dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
                 dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
@@ -1780,9 +1780,9 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
             } else {
               // Handle period dropped on different row
               var nextPeriodsIndex = destinationItem.getMeta(anychart.enums.GanttDataFields.PERIODS).length;
-              beforePeriodUpdateEvent.newPeriodIndex = nextPeriodsIndex;
+              beforeUpdatePeriodEvent.newPeriodIndex = nextPeriodsIndex;
 
-              if (this.interactivityHandler.dispatchEvent(beforePeriodUpdateEvent)) {
+              if (this.interactivityHandler.dispatchEvent(beforeUpdatePeriodEvent)) {
                 // Create new period in destination row
                 destinationItem.set(anychart.enums.GanttDataFields.PERIODS, nextPeriodsIndex, anychart.enums.GanttDataFields.START, newActualStart);
                 destinationItem.setMeta(anychart.enums.GanttDataFields.PERIODS, nextPeriodsIndex, anychart.enums.GanttDataFields.START, newActualStart);
