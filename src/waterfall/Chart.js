@@ -403,6 +403,7 @@ anychart.waterfallModule.Chart.prototype.drawConnector = function() {
     if (this.isStackVisible(index)) {
       if (goog.isDef(prevIndex)) {
         var drawConnector = this.drawingPlans[0].data[prevIndex].meta['drawConnector'];
+        drawConnector = goog.isDef(drawConnector) ? drawConnector : true;
         if (drawConnector) {
           var segmentCoordinates = this.getConnectorCoordinates(prevIndex, index);
 
@@ -1962,8 +1963,8 @@ anychart.waterfallModule.Chart.prototype.getAllTotals = function() {
 
 /**
  * Getter/Setter for total splits.
- * Split independent total that created via this.createTotal({x, name}).
- * Total will be splitted if it reserve last chart category and sum of all split values is equal or less total value.
+ * Split independent total that created via this.addTotal({x, name}).
+ * Total will be split if it reserves last chart category and sum of all split values is equal or less total value.
  *
  * @param {Array.<anychart.waterfallModule.totals.Total.SplitConfig>=} opt_splits - Array of splits. Each split item must contain at least two fields 'name' and 'value'
  *

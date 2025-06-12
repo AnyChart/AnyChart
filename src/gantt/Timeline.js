@@ -420,7 +420,8 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
       var fill = /** @type {acgraph.vector.Fill} */ (this.getOption('weekendsFill'));
       this.getWeekendsPath_().fill(fill);
     }],
-    ['connectBy', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW]
+    ['connectBy', anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW],
+    ['allowConnectorCaps', 0, anychart.Signal.NEEDS_REDRAW_APPEARANCE],
   ]);
 
   this.controller.timeline(this);
@@ -648,7 +649,8 @@ anychart.ganttModule.TimeLine.DESCRIPTORS = (function() {
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'notWorkingFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'holidaysFill', anychart.core.settings.fillNormalizer],
     [anychart.enums.PropertyHandlerType.MULTI_ARG, 'weekendsFill', anychart.core.settings.fillNormalizer],
-    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectBy', anychart.core.settings.stringNormalizer]
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'connectBy', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'allowConnectorCaps', anychart.core.settings.booleanNormalizer]
   ]);
   return map;
 })();
@@ -668,7 +670,8 @@ anychart.ganttModule.TimeLine.prototype.initializeElements_ = function() {
     this.specificElements_ = this.controller.isResources() ?
         [
           this.periods(),
-          this.milestones()
+          this.milestones(),
+          this.baselines(),
         ] :
         [
           this.tasks(),
@@ -2014,6 +2017,10 @@ anychart.ganttModule.TimeLine.prototype.resolveAutoAnchorByType_ = function(posi
     case anychart.enums.TLElementTypes.BASELINES:
       if (position == anychart.enums.Position.LEFT_CENTER)
         anchor = above ? anychart.enums.Anchor.LEFT_BOTTOM : anychart.enums.Anchor.LEFT_TOP;
+      break;
+    case anychart.enums.TLElementTypes.PERIODS:
+      if (opt_considerBaseline && position == anychart.enums.Position.LEFT_CENTER)
+        anchor = above ? anychart.enums.Anchor.LEFT_TOP : anychart.enums.Anchor.LEFT_BOTTOM;
   }
 
   return /** @type {anychart.enums.Anchor} */ (anchor);
@@ -2944,7 +2951,8 @@ anychart.ganttModule.TimeLine.prototype.getTooltipOfElementByItem = function(ite
 
   if (goog.isDef(opt_periodIndex)) {
     var info = anychart.ganttModule.BaseGrid.getPeriodInfo(item, /** @type {number} */ (opt_periodIndex));
-    el = info.isValidMilestone ? this.milestones() : this.periods();
+    var isPeriodBaseline = info.isValidBaseline;
+    el = isPeriodBaseline ? this.baselines() : info.isValidMilestone ? this.milestones() : this.periods();
   } else if (anychart.ganttModule.BaseGrid.isProjectMilestone(item)) {
     el = this.milestones();
   } else if (anychart.ganttModule.BaseGrid.isProjectBaselineMilestone(item)) {
@@ -3337,6 +3345,10 @@ anychart.ganttModule.TimeLine.prototype.getTagByMouseEvent = function(event) {
  * @return {boolean} - Whether has been selected.
  */
 anychart.ganttModule.TimeLine.prototype.selectTimelineRow = function(item, opt_periodIndex) {
+  // rowSelectedFill has been added here to allow for the functional coloring and context of the selected row.
+  var rowSelectedFill = anychart.ganttModule.BaseGrid.getColorResolver('rowSelectedFill', anychart.enums.ColorType.FILL, false)(this, 0, item);
+  this.getSelectedPath().fill(/** @type {acgraph.vector.Fill} */(rowSelectedFill));
+
   var selection = this.interactivityHandler.selection();
   selection.selectPeriod(item, opt_periodIndex);
   if (selection.hasSelectedRow()) {
@@ -3465,7 +3477,18 @@ anychart.ganttModule.TimeLine.prototype.drawResourceTimeline_ = function() {
       var itemHeight = this.controller.getItemHeight(item);
       var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-      this.drawAsPeriods_(item, totalTop, itemHeight);
+      var periods = /** @type {Array.<Object>} */(item.get(anychart.enums.GanttDataFields.PERIODS));
+      if (periods) {
+        for (var j = 0; j < periods.length; j++) {
+          var info = anychart.ganttModule.BaseGrid.getPeriodInfo(item, j);
+
+          if (info.isValidBaseline) {
+            this.drawAsBaseline_(item, totalTop, itemHeight, info, j);
+          } else {
+            this.drawAsPeriods_(item, totalTop, itemHeight, j);
+          }
+        }
+      }
       this.drawMarkers_(item, totalTop, itemHeight);
 
       totalTop = (newTop + this.rowStrokeThickness);
@@ -3686,13 +3709,11 @@ anychart.ganttModule.TimeLine.prototype.drawStartEndMarkers_ = function(item, el
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
+ * @param {number} periodIndex - Index of a period to draw.
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, totalTop, itemHeight) {
-  var periods = /** @type {Array.<Object>} */(dataItem.get(anychart.enums.GanttDataFields.PERIODS));
-  if (periods) {
-    for (var j = 0; j < periods.length; j++) {
-      var info = anychart.ganttModule.BaseGrid.getPeriodInfo(dataItem, j);
+anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, totalTop, itemHeight, periodIndex) {
+      var info = anychart.ganttModule.BaseGrid.getPeriodInfo(dataItem, periodIndex);
       var start = info.start;
       var end = info.end;
 
@@ -3706,7 +3727,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           var width = right - left;
           var el = /** @type {anychart.ganttModule.elements.PeriodsElement} */ (this.periods());
 
-          var optionHeight = el.getHeight(dataItem, j);
+          var optionHeight = el.getHeight(dataItem, periodIndex);
           var height = anychart.utils.normalizeSize(optionHeight, itemHeight);
 
           var itemBounds = new anychart.math.Rect(left, totalTop, width, itemHeight);
@@ -3716,19 +3737,18 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
             anchor = this.resolveAutoAnchorByType_(position, anychart.enums.TLElementTypes.PERIODS);
           }
 
-          var offset = el.getOffset(dataItem, j);
+          var offset = el.getOffset(dataItem, periodIndex);
           var offsetNorm = anychart.utils.normalizeSize(offset, itemHeight);
 
           var coord = anychart.utils.getCoordinateByAnchor(itemBounds, position);
           var top = this.fixBarTop_(coord.y, height, anchor) + offsetNorm;
-          var isSelected = this.interactivityHandler.selection().isPeriodSelected(dataItem, j);
+          var isSelected = this.interactivityHandler.selection().isPeriodSelected(dataItem, periodIndex);
 
-          var bounds = this.fixBounds_(el, new anychart.math.Rect(coord.x, top, width, height), dataItem, j, isSelected);
-
-          var tag = this.createTag(dataItem, el, bounds, j);
-          this.setRelatedBounds_(dataItem, bounds, j);
-          el.rendering().callDrawer(dataItem, bounds, tag, j, isSelected);
-          this.drawStartEndMarkers_(dataItem, el, bounds, j);
+          var bounds = this.fixBounds_(el, new anychart.math.Rect(coord.x, top, width, height), dataItem, periodIndex, isSelected);
+          var tag = this.createTag(dataItem, el, bounds, periodIndex);
+          this.setRelatedBounds_(dataItem, bounds, periodIndex);
+          el.rendering().callDrawer(dataItem, bounds, tag, periodIndex, isSelected);
+          this.drawStartEndMarkers_(dataItem, el, bounds, periodIndex);
         }
       } else if (info.isValidMilestone) {
         this.drawAsMilestone_(
@@ -3737,10 +3757,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsPeriods_ = function(dataItem, tota
           totalTop,
           itemHeight,
           info,
-          j
+          periodIndex
         );
-      }
-    }
   }
 };
 
@@ -3777,14 +3795,20 @@ anychart.ganttModule.TimeLine.prototype.shouldDrawPreviewMilestone_ = function(p
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
- * @param {anychart.ganttModule.BaseGrid.ProjectItemData} info - .
+ * @param {anychart.ganttModule.BaseGrid.ProjectItemData|anychart.ganttModule.BaseGrid.PeriodData} info - .
+ * @param {number=} opt_periodIndex - is needed to let resource chart have baselines and keep legacy behavior of project baselines
  * @private
  */
-anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight, info) {
+anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight, info, opt_periodIndex) {
   var isParent = info.isLoadable || anychart.ganttModule.BaseGrid.isGroupingTask(dataItem, info);
-  var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement} */ (isParent ? this.groupingTasks() : this.tasks());
+  var isPeriod = goog.isDef(opt_periodIndex);
+  var element = /** @type {anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.PeriodsElement} */ (
+    isParent ? this.groupingTasks() :
+    isPeriod ? this.periods() : this.tasks());
   var baselines = /** @type {anychart.ganttModule.elements.BaselinesElement} */ (this.baselines());
-  var isSelected = this.interactivityHandler.selection().isRowSelected(dataItem);
+  var periodIndex = isPeriod ? opt_periodIndex : void 0;
+  var isSelected = isPeriod ? this.interactivityHandler.selection().isPeriodSelected(dataItem, periodIndex) :
+    this.interactivityHandler.selection().isRowSelected(dataItem);
 
   var actualStart = info.start;
   var actualEnd = info.end;
@@ -3838,8 +3862,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
 
     if (baselineBounds) {
       baselineBounds = this.fixBounds_(baselines, baselineBounds, dataItem, void 0, isSelected);
-      var baselineTag = this.createTag(dataItem, baselines, baselineBounds);
-      baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, void 0, isSelected);
+      var baselineTag = this.createTag(dataItem, baselines, baselineBounds, periodIndex);
+      baselines.rendering().callDrawer(dataItem, baselineBounds, baselineTag, periodIndex, isSelected);
       this.drawStartEndMarkers_(dataItem, baselines, baselineBounds);
     }
 
@@ -3851,8 +3875,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
         actualBounds.width = actualWidth;
         info.isValidTask = true;
       }
-      actualBounds = this.fixBounds_(element, actualBounds, dataItem, void 0, isSelected);
-      var tag = this.createTag(dataItem, element, actualBounds);
+      actualBounds = this.fixBounds_(element, actualBounds, dataItem, periodIndex, isSelected);
+      var tag = this.createTag(dataItem, element, actualBounds, periodIndex);
 
       if (isParent) {
         var milestonesPreview = /** @type {anychart.ganttModule.elements.MilestonesElement.Preview} */ (this.milestones().preview());
@@ -3896,6 +3920,8 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaseline_ = function(dataItem, tot
             this.drawStartEndMarkers_(dataItem, progressEl, progressBounds);
           }
         }
+      } else if (info.isValidPeriod) {
+        element.rendering().callDrawer(dataItem, actualBounds, tag, periodIndex, isSelected);
       }
     }
 
@@ -4032,7 +4058,7 @@ anychart.ganttModule.TimeLine.prototype.drawAsBaselineLike_ = function(dataItem,
  * Allows to avoid bar and baseline intersection for auto anchor case.
  * @param {anychart.math.Rect} barBounds - .
  * @param {anychart.math.Rect} baselineBounds - .
- * @param {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement} element - .
+ * @param {anychart.ganttModule.elements.TasksElement|anychart.ganttModule.elements.GroupingTasksElement|anychart.ganttModule.elements.PeriodsElement} element - .
  * @param {(anychart.treeDataModule.Tree.DataItem|anychart.treeDataModule.View.DataItem)} item - Current tree data item.
  * @private
  */
@@ -4874,67 +4900,70 @@ anychart.ganttModule.TimeLine.prototype.drawSegment_ = function(fromLeft, fromTo
  * @return {acgraph.vector.Path} - Arrow path or null if path is not drawn.
  */
 anychart.ganttModule.TimeLine.prototype.drawArrow_ = function(left, top, orientation, opt_path) {
-  var drawPreview = goog.isDefAndNotNull(opt_path);
+  if(this.getOption('allowConnectorCaps')){
+    var drawPreview = goog.isDefAndNotNull(opt_path);
 
-  var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
+    var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
 
-  if (left >= this.pixelBoundsCache.left &&
+    if (left >= this.pixelBoundsCache.left &&
       left <= this.pixelBoundsCache.left + this.pixelBoundsCache.width &&
       top >= this.pixelBoundsCache.top &&
       top <= this.pixelBoundsCache.top + this.pixelBoundsCache.height) { //Is in visible area.
 
-    var arrSize = anychart.ganttModule.TimeLine.ARROW_SIZE;
-    var left1 = 0;
-    var top1 = 0;
-    var left2 = 0;
-    var top2 = 0;
+      var arrSize = anychart.ganttModule.TimeLine.ARROW_SIZE;
+      var left1 = 0;
+      var top1 = 0;
+      var left2 = 0;
+      var top2 = 0;
 
-    switch (orientation) {
-      case anychart.enums.Orientation.LEFT:
-        left = left + 1;
-        left1 = left + arrSize;
-        top1 = top - arrSize;
-        left2 = left1;
-        top2 = top + arrSize;
-        break;
-      case anychart.enums.Orientation.TOP:
-        top = top + 1;
-        left1 = left - arrSize;
-        top1 = top + arrSize;
-        left2 = left + arrSize;
-        top2 = top1;
-        break;
-      case anychart.enums.Orientation.RIGHT:
-        left = left - 1;
-        left1 = left - arrSize;
-        top1 = top - arrSize;
-        left2 = left1;
-        top2 = top + arrSize;
-        break;
-      case anychart.enums.Orientation.BOTTOM:
-        top = top - 1;
-        left1 = left - arrSize;
-        top1 = top - arrSize;
-        left2 = left + arrSize;
-        top2 = top1;
-        break;
+      switch (orientation) {
+        case anychart.enums.Orientation.LEFT:
+          left = left + 1;
+          left1 = left + arrSize;
+          top1 = top - arrSize;
+          left2 = left1;
+          top2 = top + arrSize;
+          break;
+        case anychart.enums.Orientation.TOP:
+          top = top + 1;
+          left1 = left - arrSize;
+          top1 = top + arrSize;
+          left2 = left + arrSize;
+          top2 = top1;
+          break;
+        case anychart.enums.Orientation.RIGHT:
+          left = left - 1;
+          left1 = left - arrSize;
+          top1 = top - arrSize;
+          left2 = left1;
+          top2 = top + arrSize;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          top = top - 1;
+          left1 = left - arrSize;
+          top1 = top - arrSize;
+          left2 = left + arrSize;
+          top2 = top1;
+          break;
+      }
+
+      if (!drawPreview) {
+        //path = /** @type {acgraph.vector.Path} */ (this.getDrawLayer().genNextChild());
+        path = this.genElement_();
+        path.type = anychart.enums.TLElementTypes.CONNECTORS;
+      }
+      path
+          .zIndex(anychart.ganttModule.TimeLine.ARROW_Z_INDEX)
+          .moveTo(left, top)
+          .lineTo(left1, top1)
+          .lineTo(left2, top2)
+          .lineTo(left, top);
+
     }
 
-    if (!drawPreview) {
-      //path = /** @type {acgraph.vector.Path} */ (this.getDrawLayer().genNextChild());
-      path = this.genElement_();
-      path.type = anychart.enums.TLElementTypes.CONNECTORS;
-    }
-    path
-        .zIndex(anychart.ganttModule.TimeLine.ARROW_Z_INDEX)
-        .moveTo(left, top)
-        .lineTo(left1, top1)
-        .lineTo(left2, top2)
-        .lineTo(left, top);
-
+    return path;
   }
-
-  return path;
+  return null;
 };
 
 

@@ -142,6 +142,36 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
   /**
    * @this {anychart.ganttModule.Chart}
    */
+  function rowFillBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.tl_['rowFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowFill')));
+    this.dg_['rowFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowFill')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+
+  /**
+   * @this {anychart.ganttModule.Chart}
+   */
+  function rowEvenFillBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.tl_['rowEvenFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowEvenFill')));
+    this.dg_['rowEvenFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowEvenFill')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+
+  /**
+   * @this {anychart.ganttModule.Chart}
+   */
+  function rowOddFillBeforeInvalidation() {
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.tl_['rowOddFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowOddFill')));
+    this.dg_['rowOddFill'](/** @type {acgraph.vector.Fill} */ (this.getOption('rowOddFill')));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+  }
+
+  /**
+   * @this {anychart.ganttModule.Chart}
+   */
   function columnStrokeBeforeInvalidation() {
     anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
     this.dg_['columnStroke'](/** @type {acgraph.vector.Stroke} */ (this.getOption('columnStroke')));
@@ -166,6 +196,9 @@ anychart.ganttModule.Chart = function(opt_isResourcesChart) {
     ['splitterPosition', anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW],
     ['rowHoverFill', 0, 0, 0, rowHoverFillBeforeInvalidation],
     ['rowSelectedFill', 0, 0, 0, rowSelectedFillBeforeInvalidation],
+    ['rowFill', 0, 0, 0, rowFillBeforeInvalidation],
+    ['rowEvenFill', 0, 0, 0, rowEvenFillBeforeInvalidation],
+    ['rowOddFill', 0, 0, 0, rowOddFillBeforeInvalidation],
     ['columnStroke', 0, 0, 0, columnStrokeBeforeInvalidation],
     ['rowStroke', 0, 0, 0, rowStrokeBeforeInvalidation]
   ]);
@@ -404,6 +437,24 @@ anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS = (function() {
   anychart.core.settings.createDescriptor(
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'rowFill',
+      anychart.core.settings.fillOrFunctionNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'rowEvenFill',
+      anychart.core.settings.fillOrFunctionNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      'rowOddFill',
+      anychart.core.settings.fillOrFunctionNormalizer);
+
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
       'columnStroke',
       anychart.core.settings.strokeNormalizer);
 
@@ -411,7 +462,7 @@ anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS = (function() {
       map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rowStroke',
-      anychart.core.settings.strokeNormalizer);
+      anychart.core.settings.strokeOrFunctionNormalizer);
   return map;
 })();
 anychart.core.settings.populate(anychart.ganttModule.Chart, anychart.ganttModule.Chart.PROPERTY_DESCRIPTORS);

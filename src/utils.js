@@ -969,6 +969,75 @@ anychart.utils.alignDateLeftByUnit = function(date, unit, count, flagDateValue) 
 
 
 /**
+ * Aligns a given date to the earliest date of a week cycle within a larger time period.
+ * 
+ * This function handles alignment of dates to week boundaries within months, years, or fiscal years.
+ * It specifically addresses the case where weeks need to align with year boundaries when the 
+ * "endWeeksWithYear" setting is enabled. Note that this function does not take into account
+ * custom first day of week settings.
+ *
+ * For example, when aligning within a year cycle:
+ * - Input date: 2023-03-15
+ * - Count: 52 weeks
+ * - Result: Will align to the start of the week containing January 1st, 2023
+ *
+ * For monthly cycles:
+ * - Input date: 2023-03-15  
+ * - Count: 4 weeks
+ * - Result: Will align to the first week of March 2023
+ *
+ * Added as part of DVF-4705 ticket implementation.
+ * 
+ * @param {number} date - Unix timestamp to align to a week boundary
+ * @param {number} count - Number of weeks in the cycle (e.g. 52 for yearly, 4-5 for monthly)
+ * @param {number} fiscalYearStartMonth - Month number (1-12) when fiscal year starts. Used to adjust alignment when fiscal years don't match calendar years.
+ * @param {boolean} isCycleMonthly - True if aligning within monthly cycles, false for yearly/fiscal yearly cycles
+ * @return {number} - Unix timestamp aligned to the start of the appropriate week
+ */
+anychart.utils.alignDateLeftToWeekCycleBoundary = function(date, count, fiscalYearStartMonth, isCycleMonthly) {
+  var dateObj = new Date(date);
+  /*
+    If fiscalYearStartMonth is 1 (January), it either:
+    - Was not set by the user (using the default value)
+    - Was explicitly set to 1 by the user to match the calendar year
+    In both cases we can ignore it.
+   */
+  var isFiscalYearStartMonthSet = fiscalYearStartMonth !== 1;
+  var thisMonth = dateObj.getMonth();
+  var thisYear = dateObj.getFullYear();
+
+  /*
+    Determine the month and year for week alignment based on cycle type:
+
+      For monthly cycles:
+      - Use the current month in the current year.
+      For fiscal year cycles:
+      - If fiscal year starts in a month other than January:
+        - Use the fiscal year start month.
+        - If current month is between the calendar year start and fiscal year start, use previous year.
+        - If current month is after fiscal year start, use current year.
+
+      For calendar year cycles:
+      - Always use January (month 0) of the current year.
+   */
+  var month;
+  var year = thisYear;
+  if (isCycleMonthly) {
+    month = thisMonth;
+  } else if (isFiscalYearStartMonthSet) {
+    // The subtraction of a 1 from the fiscalYearStartMonth is needed to convert 1-based indexes into 0-based indexes.
+    month = fiscalYearStartMonth - 1;
+    if (thisMonth >= 0 && thisMonth < month) {
+      year = thisYear - 1;
+    }
+  } else {
+    month = 0;
+  }
+  return anychart.utils.alignLeft(date, count * 1000 * 60 * 60 * 24 * 7, Date.UTC(year, month, 1));
+};
+
+
+/**
  * Turns passed calendar UTC-date to fiscal date.
  * @see https://en.wikipedia.org/wiki/Fiscal_year
  * @param {number} date - Calendar UTC timestamp.
@@ -1899,7 +1968,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.13.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/8.13.1/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);

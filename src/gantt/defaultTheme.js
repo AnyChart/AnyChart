@@ -464,6 +464,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         }
       }
     },
+    'allowConnectorCaps': true,
 
     'connectors': {
       'previewStroke': {
@@ -541,6 +542,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
     'splitterPosition': '30%',
     'headerHeight': 70,
     'rowStroke': '#cecece',
+    'rowFill':'none',
     'rowHoverFill': anychart.core.defaultTheme.returnSourceColor,
     'rowSelectedFill': anychart.core.defaultTheme.returnSourceColor,
     'edit': {
@@ -612,7 +614,18 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme'], {
         'tooltip': {
           'format': '{%start}'
         }
-      }
+      },
+      'baselines': {
+        'labels': {
+          'position': 'right-center',
+          'anchor': 'left-center',
+          'format': 'Baseline Label',
+          'enabled': false
+        },
+        'tooltip': {
+          'format': 'Start Date: {%start}\nEnd Date: {%end}\nBaseline Start: {%baselineStart}\nBaseline End: {%baselineEnd}'
+        }
+      },
     }
   },
   'ganttProject': {
