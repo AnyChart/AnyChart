@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.13.0
+// Type definitions for AnyChart JavaScript Charting Library, v8.13.1
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -24518,6 +24518,8 @@ declare namespace anychart.core.timeline.series {
 
 declare namespace anychart.core.ui {
     interface Timeline extends anychart.core.VisualBaseWithBounds {
+        allowConnectorCaps(): boolean;
+        allowConnectorCaps(value?: boolean): anychart.core.ui.Timeline;
         backgroundFill(): anychart.graphics.vector.Fill | string;
         backgroundFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.Timeline;
         backgroundFill(color: string, opacity?: number): anychart.core.ui.Timeline;
@@ -24597,8 +24599,7 @@ declare namespace anychart.core.ui {
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.Timeline;
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.Timeline;
         rowFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.Timeline;
-        rowFill(): anychart.graphics.vector.Fill | string;
-        rowFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.Timeline;
+        rowFill(fillFunction: (() => void)): anychart.core.ui.Timeline;
         rowHoverFill(): anychart.graphics.vector.Fill | string;
         rowHoverFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.Timeline;
         rowHoverFill(color: string, opacity?: number): anychart.core.ui.Timeline;
@@ -24616,6 +24617,12 @@ declare namespace anychart.core.ui {
         rowSelectedFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object): anychart.core.ui.Timeline;
         rowSelectedFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.Timeline;
         rowSelectedFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.Timeline;
+        rowStroke(): anychart.graphics.vector.Stroke | string;
+        rowStroke(value: anychart.graphics.vector.Stroke | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.Timeline;
+        rowStroke(color: string, opacity?: number): anychart.core.ui.Timeline;
+        rowStroke(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.Timeline;
+        rowStroke(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.Timeline;
+        rowStroke(strokeFunction: (() => void)): anychart.core.ui.Timeline;
         scale(): anychart.scales.GanttDateTime;
         scale(value?: Object): anychart.core.ui.Timeline;
         tasks(): anychart.core.gantt.elements.TasksElement;
@@ -24724,6 +24731,7 @@ declare namespace anychart.core.ui {
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.DataGrid;
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.DataGrid;
         rowFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.DataGrid;
+        rowFill(fillFunction: (() => void)): anychart.core.ui.DataGrid;
         rowHoverFill(): anychart.graphics.vector.Fill | string;
         rowHoverFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.DataGrid;
         rowHoverFill(color: string, opacity?: number): anychart.core.ui.DataGrid;
@@ -24742,6 +24750,12 @@ declare namespace anychart.core.ui {
         rowSelectedFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object): anychart.core.ui.DataGrid;
         rowSelectedFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.DataGrid;
         rowSelectedFill(imageSettings: anychart.graphics.vector.Fill): anychart.core.ui.DataGrid;
+        rowStroke(): anychart.graphics.vector.Stroke | string;
+        rowStroke(value: anychart.graphics.vector.Stroke | Array<anychart.graphics.vector.GradientKey|string>): anychart.core.ui.DataGrid;
+        rowStroke(color: string, opacity?: number): anychart.core.ui.DataGrid;
+        rowStroke(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.core.ui.DataGrid;
+        rowStroke(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.core.ui.DataGrid;
+        rowStroke(strokeFunction: (() => void)): anychart.core.ui.DataGrid;
         startIndex(): number;
         startIndex(index?: number): anychart.core.ui.DataGrid;
         tooltip(): anychart.core.ui.Tooltip;
@@ -25506,6 +25520,7 @@ declare namespace anychart.core.ui {
         fontVariant(value?: anychart.graphics.vector.Text.FontVariant | string): anychart.core.ui.Legend;
         fontWeight(): string | number;
         fontWeight(weight?: string | number): anychart.core.ui.Legend;
+        getCurrentPosition(): Object;
         getPixelBounds(): anychart.math.Rect;
         getRemainingBounds(): anychart.math.Rect;
         hAlign(): anychart.graphics.vector.Text.HAlign | string;
@@ -25552,6 +25567,7 @@ declare namespace anychart.core.ui {
         paginator(settings?: Object | boolean): anychart.core.ui.Legend;
         position(): string;
         position(position?: string): anychart.core.ui.Legend;
+        position(position?: Object): anychart.core.ui.Legend;
         positionMode(): string;
         positionMode(mode?: string): anychart.core.ui.Legend;
         selectable(): boolean;
@@ -30797,6 +30813,10 @@ declare namespace anychart.scales {
         softMinimum(): number;
         softMinimum(minimum?: number): anychart.scales.GanttDateTime;
         transform(value: any): number;
+        weeksCycleMonthly(): boolean;
+        weeksCycleMonthly(value?: boolean): anychart.scales.GanttDateTime;
+        weeksEndWithYear(): boolean;
+        weeksEndWithYear(value?: boolean): anychart.scales.GanttDateTime;
         zoomLevels(): anychart.scales.GanttDateTime.ZoomLevelsSettings;
         zoomLevels(settings?: anychart.scales.GanttDateTime.ZoomLevelsSettings): anychart.scales.GanttDateTime;
         listen(type: string, listener: ((e:Object)=>void), useCapture?: boolean, listenerScope?: Object): Object;
@@ -30986,8 +31006,7 @@ declare namespace anychart.standalones {
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.standalones.ProjectTimeline;
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.standalones.ProjectTimeline;
         rowFill(imageSettings: anychart.graphics.vector.Fill): anychart.standalones.ProjectTimeline;
-        rowFill(): anychart.graphics.vector.Fill | string;
-        rowFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.ProjectTimeline;
+        rowFill(fillFunction: (() => void)): anychart.standalones.ProjectTimeline;
         rowHoverFill(): anychart.graphics.vector.Fill | string;
         rowHoverFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.ProjectTimeline;
         rowHoverFill(color: string, opacity?: number): anychart.standalones.ProjectTimeline;
@@ -31027,6 +31046,8 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.ProjectTimeline;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ProjectTimeline;
+        allowConnectorCaps(): boolean;
+        allowConnectorCaps(value?: boolean): anychart.standalones.ProjectTimeline;
         baselineMilestones(): anychart.core.gantt.elements.BaselineMilestonesElement;
         baselineMilestones(settings?: Object): anychart.standalones.ProjectTimeline;
         cropLabels(): boolean;
@@ -31126,8 +31147,7 @@ declare namespace anychart.standalones {
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.standalones.ResourceTimeline;
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.standalones.ResourceTimeline;
         rowFill(imageSettings: anychart.graphics.vector.Fill): anychart.standalones.ResourceTimeline;
-        rowFill(): anychart.graphics.vector.Fill | string;
-        rowFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.ResourceTimeline;
+        rowFill(fillFunction: (() => void)): anychart.standalones.ResourceTimeline;
         rowHoverFill(): anychart.graphics.vector.Fill | string;
         rowHoverFill(value: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.ResourceTimeline;
         rowHoverFill(color: string, opacity?: number): anychart.standalones.ResourceTimeline;
@@ -31165,6 +31185,8 @@ declare namespace anychart.standalones {
         width(width?: number | string): anychart.standalones.ResourceTimeline;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.ResourceTimeline;
+        allowConnectorCaps(): boolean;
+        allowConnectorCaps(value?: boolean): anychart.standalones.ResourceTimeline;
         baselineMilestones(): anychart.core.gantt.elements.BaselineMilestonesElement;
         baselineMilestones(settings?: Object): anychart.standalones.ResourceTimeline;
         baselines(): anychart.core.gantt.elements.BaselinesElement;
@@ -31271,6 +31293,7 @@ declare namespace anychart.standalones {
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, angle?: number, mode?: boolean | anychart.graphics.vector.Rect | Object, opacity?: number): anychart.standalones.DataGrid;
         rowFill(keys: Array<anychart.graphics.vector.GradientKey|string>, cx: number, cy: number, mode?: anychart.graphics.math.Rect, opacity?: number, fx?: number, fy?: number): anychart.standalones.DataGrid;
         rowFill(imageSettings: anychart.graphics.vector.Fill): anychart.standalones.DataGrid;
+        rowFill(fillFunction: (() => void)): anychart.standalones.DataGrid;
         rowHoverFill(): anychart.graphics.vector.Fill | string;
         rowHoverFill(color: anychart.graphics.vector.Fill | Array<anychart.graphics.vector.GradientKey|string>): anychart.standalones.DataGrid;
         rowHoverFill(color: string, opacity?: number): anychart.standalones.DataGrid;
@@ -31774,6 +31797,7 @@ declare namespace anychart.standalones {
         parentBounds(left?: number, top?: number, width?: number, height?: number): anychart.standalones.Legend;
         position(): string;
         position(position?: string): anychart.standalones.Legend;
+        position(position?: Object): anychart.standalones.Legend;
         positionMode(): string;
         positionMode(mode?: string): anychart.standalones.Legend;
         selectable(): boolean;
@@ -31808,6 +31832,7 @@ declare namespace anychart.standalones {
         wordWrap(mode?: string): anychart.standalones.Legend;
         zIndex(): number;
         zIndex(zIndex?: number): anychart.standalones.Legend;
+        getCurrentPosition(): Object;
         itemsHAlign(): string;
         itemsHAlign(hAlign?: string): anychart.standalones.Legend;
         textShadow(): string;
