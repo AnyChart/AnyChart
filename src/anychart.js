@@ -72,6 +72,12 @@ anychart.global = function(opt_value) {
  */
 anychart.isAsync_ = false;
 
+/**
+ * Object that tracks which modules are currently being used in the application.
+ * Used for license validation to ensure all active modules are properly licensed.
+ * @type {!Object<string, boolean>}
+ */
+anychart.usedModules_ = {};
 
 /**
  * Experimental setter of async mode.
@@ -535,7 +541,40 @@ anychart.isValidKey = function() {
   var lio = anychart.licenseKey_.lastIndexOf('-');
   var value = anychart.licenseKey_.substr(0, lio);
   var hashToCheck = anychart.licenseKey_.substr(lio + 1);
-  return (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt()));
+
+  if (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt())) {
+    var isValidModuleUsed = anychart.validateModules();
+    if (isValidModuleUsed) return true;
+  }
+  return false;
+};
+
+
+/**
+ * Validates that all currently used modules are covered by the active license.
+ * Checks the modules being used against those included in the license key.
+ * @return {boolean} True if all used modules are licensed, false otherwise
+ * @private 
+ */
+anychart.validateModules = function() {
+    var keyModules = anychart.licenseKey_.split('-').slice(1, -2);
+    var usedModulesKeys = Object.keys(anychart.usedModules_);
+    var modulesWithoutLicense = usedModulesKeys.reduce(function(unlicensed, key) {
+      if (anychart.usedModules_[key] && keyModules.indexOf(key) === -1) {
+        unlicensed.push(key);
+      }
+      return unlicensed;
+    }, []);
+
+    if (modulesWithoutLicense.length > 0) {
+      for (var i = 0; i < modulesWithoutLicense.length; i++) {
+        var currentString = modulesWithoutLicense[i];
+        // Change the console.log to any logic that is needed.
+        console.warn('No license for ' + currentString.toUpperCase() + ' module.');
+      }
+      return false;
+    }
+    return true;
 };
 
 

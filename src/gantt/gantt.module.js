@@ -30,7 +30,7 @@ anychart.ganttResource = function() {
 
 anychart.ganttTypesMap[anychart.enums.ChartTypes.GANTT_RESOURCE] = anychart.ganttResource;
 anychart.ganttTypesMap[anychart.enums.ChartTypes.GANTT_PROJECT] = anychart.ganttProject;
-
+anychart.usedModules_['gantt'] = true;
 
 //exports
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
