@@ -85,7 +85,7 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
   var css = goog.dom.createDom(goog.dom.TagName.STYLE);
   css.type = 'text/css';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
+  styles += '#' + anychart.core.ui.StageCredits.CssId_.CREDITS + '{' +
       'position:absolute;' +
       'overflow:hidden;' +
       'right:9px;' +
@@ -93,11 +93,11 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
       'height:10px;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
+  styles += '#' + anychart.core.ui.StageCredits.CssId_.CREDITS + ' a {' +
       'text-decoration:none;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.LOGO + '{' +
+  styles += '#' + anychart.core.ui.StageCredits.CssId_.LOGO + '{' +
       'border:none;' +
       'margin-right:2px;' +
       'height:10px;' +
@@ -106,7 +106,7 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
       'vertical-align:top;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
+  styles += '#' + anychart.core.ui.StageCredits.CssId_.TEXT + '{' +
       'font-size:10px;' +
       'line-height:9px;' +
       'display:inline-block;' +
@@ -330,11 +330,7 @@ anychart.core.ui.StageCredits.prototype.domElement = function() {
  * @enum {string}
  * @private
  */
-anychart.core.ui.StageCredits.CssClass_ = {
-  CREDITS: goog.getCssName('anychart-credits'),
-  LOGO: goog.getCssName('anychart-credits-logo'),
-  TEXT: goog.getCssName('anychart-credits-text')
-};
+anychart.core.ui.StageCredits.CssId_ = {};
 
 
 //endregion
@@ -362,27 +358,40 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     return this;
   }
 
+  var cssIdPrefix = ['chart', 'layer', 'path'];
+
+  if (!this.domElement_) {
+    this.domElement_ = goog.dom.createDom(goog.dom.TagName.DIV);
+    var domElementId = acgraph.utils.IdGenerator.getInstance().generateId(this.domElement_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.domElement_.id = domElementId;
+    anychart.core.ui.StageCredits.CssId_.CREDITS = domElementId;
+  }
+
+  if (!this.a_) {
+    this.a_ = goog.dom.createDom(goog.dom.TagName.A);
+    this.span_ = goog.dom.createDom(goog.dom.TagName.SPAN);
+    var spanId = acgraph.utils.IdGenerator.getInstance().generateId(this.span_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.span_.id = spanId;
+    anychart.core.ui.StageCredits.CssId_.TEXT = spanId;
+
+    this.image_ = goog.dom.createDom(goog.dom.TagName.IMG);
+    var imageId = acgraph.utils.IdGenerator.getInstance().generateId(this.image_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.image_.id = imageId;
+    anychart.core.ui.StageCredits.CssId_.LOGO = imageId;
+
+    goog.dom.append(this.a_, this.span_);
+    goog.dom.appendChild(this.domElement_, this.a_);
+  }
+
   if (!anychart.core.ui.StageCredits.stylesInstalled_) {
     anychart.core.ui.StageCredits.installStyles_();
     anychart.core.ui.StageCredits.stylesInstalled_ = true;
   }
 
-  if (!this.domElement_) {
-    this.domElement_ = goog.dom.createDom(goog.dom.TagName.DIV, anychart.core.ui.StageCredits.CssClass_.CREDITS);
-  }
-
-  if (!this.a_) {
-    this.a_ = goog.dom.createDom(goog.dom.TagName.A);
-    this.span_ = goog.dom.createDom(goog.dom.TagName.SPAN, anychart.core.ui.StageCredits.CssClass_.TEXT);
-    this.image_ = goog.dom.createDom(goog.dom.TagName.IMG, anychart.core.ui.StageCredits.CssClass_.LOGO);
-    goog.dom.append(this.a_, this.span_);
-    goog.dom.appendChild(this.domElement_, this.a_);
-  }
-
   var containerElement = this.stage_.getDomWrapper();
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.ENABLED)) {
     if (containerElement)
-      goog.dom.appendChild(containerElement, this.domElement_);
+      goog.dom.insertChildAt(containerElement, this.domElement_, Math.floor(Math.random() * 3));
     this.markConsistent(anychart.core.ui.StageCredits.States.ENABLED);
   }
 
@@ -404,7 +413,13 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   }
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.TEXT)) {
-    var text = valid ? this.text() : 'AnyChart Trial Version';
+    var lineVariants = ['AnyChart Trial Version',
+       'AnyChart - Trial Use Only',
+       'UNLICENSED: AnyChart Trial',
+       'AnyChart | Evaluation Copy',
+       'Trial Version of AnyChart'
+      ];
+    var text = valid ? this.text() : lineVariants[Math.floor(Math.random() * lineVariants.length)];
     goog.dom.setTextContent(this.span_, /** @type {string} */ (text));
     this.markConsistent(anychart.core.ui.StageCredits.States.TEXT);
   }
