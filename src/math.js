@@ -1813,6 +1813,9 @@ anychart.math.intersectBezier2Bezier2 = function(a0x, a0y, a1x, a1y, a2x, a2y, b
 
 
 /**
+ * returns the intersection point between two segments defined by two points each
+ * if segments do not intersect or if they are parallel/coincident, return null
+ *
  * @param {number} a1x .
  * @param {number} a1y .
  * @param {number} a2x .
@@ -1854,6 +1857,44 @@ anychart.math.intersectLineLine = function(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2
 };
 
 
+/**
+ * returns the intersection point between two infinite lines defined by two points each
+ * if lines are parallel/coincident, returns null
+ *
+ * @param {number} a1x .
+ * @param {number} a1y .
+ * @param {number} a2x .
+ * @param {number} a2y .
+ * @param {number} b1x .
+ * @param {number} b1y .
+ * @param {number} b2x .
+ * @param {number} b2y .
+ * @return {anychart.math.Point2D}
+ */
+anychart.math.intersectInfiniteLineLine = function(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2y) {
+    var result;
+
+    var ua_t = (b2x - b1x) * (a1y - b1y) - (b2y - b1y) * (a1x - b1x);
+    var ub_t = (a2x - a1x) * (a1y - b1y) - (a2y - a1y) * (a1x - b1x);
+    var u_b = (b2y - b1y) * (a2x - a1x) - (b2x - b1x) * (a2y - a1y);
+
+    if (u_b != 0) {
+      var ua = ua_t / u_b;
+      var ub = ub_t / u_b;
+
+      result = new anychart.math.Point2D(a1x + ua * (a2x - a1x), a1y + ua * (a2y - a1y));
+    } else {
+      if (ua_t == 0 || ub_t == 0) {
+        //coincident
+        result = null;
+      } else {
+        //parallel
+        result = null;
+      }
+    }
+
+    return result;
+  };
 
 //exports
 goog.exportSymbol('anychart.math.rect', anychart.math.rect);

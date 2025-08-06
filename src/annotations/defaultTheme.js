@@ -63,6 +63,7 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
     'ellipse': {},
     'triangle': {},
     'trendChannel': {},
+    'wave': {},
     'finiteTrendChannel': {
       'channelWidth': 0
     },
