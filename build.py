@@ -236,16 +236,17 @@ def __get_themes_list():
 
 
 def __get_version():
+    return '8.13.1'
     # get global, major, minor versions from version.ini
-    version_file = VERSION_INI_PATH
-    with open(version_file, 'r') as f:
-        lines = f.readlines()
+    # version_file = VERSION_INI_PATH
+    # with open(version_file, 'r') as f:
+    #     lines = f.readlines()
 
-    major = lines[0].split('=')[1].strip()
-    minor = lines[1].split('=')[1].strip()
-    patch = lines[2].split('=')[1].strip()
+    # major = lines[0].split('=')[1].strip()
+    # minor = lines[1].split('=')[1].strip()
+    # patch = lines[2].split('=')[1].strip()
 
-    return '%s.%s.%s' % (major, minor, patch)
+    # return '%s.%s.%s' % (major, minor, patch)
 
 def __get_current_branch_name():
     (name_output, name_err) = subprocess.Popen(
@@ -258,39 +259,40 @@ def __get_current_branch_name():
 
 @memoize
 def __get_build_version(is_release=False):
-    branch_name = __get_current_branch_name()
+    return '8.13.1.1939'
+    # branch_name = __get_current_branch_name()
 
-    travis_branch = os.environ.get('TRAVIS_BRANCH') if branch_name == 'HEAD' else None
-    github_token = os.environ.get('GITHUB_TOKEN') if 'GITHUB_TOKEN' in os.environ else None
+    # travis_branch = os.environ.get('TRAVIS_BRANCH') if branch_name == 'HEAD' else None
+    # github_token = os.environ.get('GITHUB_TOKEN') if 'GITHUB_TOKEN' in os.environ else None
 
-    if travis_branch is not None:
-        # see https://anychart.atlassian.net/browse/DVF-3193
-        get_request = lambda url: urllib2.Request(url, None, {'Authorization' : 'token %s' % github_token if github_token else ''})
+    # if travis_branch is not None:
+    #     # see https://anychart.atlassian.net/browse/DVF-3193
+    #     get_request = lambda url: urllib2.Request(url, None, {'Authorization' : 'token %s' % github_token if github_token else ''})
 
-        contributors_response = urllib2.urlopen(get_request(GIT_CONTRIBUTORS_URL))
-        contributors_data = json.loads(contributors_response.read())
-        contributions = 0
-        for contributor in contributors_data:
-            contributions += contributor['contributions']
+    #     contributors_response = urllib2.urlopen(get_request(GIT_CONTRIBUTORS_URL))
+    #     contributors_data = json.loads(contributors_response.read())
+    #     contributions = 0
+    #     for contributor in contributors_data:
+    #         contributions += contributor['contributions']
 
-        compare_response = urllib2.urlopen(get_request(GIT_COMPARE_URL_TEMPLATE % travis_branch))
-        compare_data = json.loads(compare_response.read())
+    #     compare_response = urllib2.urlopen(get_request(GIT_COMPARE_URL_TEMPLATE % travis_branch))
+    #     compare_data = json.loads(compare_response.read())
 
-        behind_by = compare_data.get('behind_by', 0)
-        ahead_by = compare_data.get('ahead_by', 0)
-        commits_count = contributions - behind_by + ahead_by
-    else:
-        (count_output, name_err) = subprocess.Popen(
-            ['git', 'rev-list', 'HEAD', '--count'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=PROJECT_PATH
-        ).communicate()
-        commits_count = count_output.strip()
-        if (is_release):
-            commits_count = int(commits_count) + 1
+    #     behind_by = compare_data.get('behind_by', 0)
+    #     ahead_by = compare_data.get('ahead_by', 0)
+    #     commits_count = contributions - behind_by + ahead_by
+    # else:
+    #     (count_output, name_err) = subprocess.Popen(
+    #         ['git', 'rev-list', 'HEAD', '--count'],
+    #         stdout=subprocess.PIPE,
+    #         stderr=subprocess.STDOUT,
+    #         cwd=PROJECT_PATH
+    #     ).communicate()
+    #     commits_count = count_output.strip()
+    #     if (is_release):
+    #         commits_count = int(commits_count) + 1
 
-    return '%s.%s' % (__get_version(), commits_count)
+    # return '%s.%s' % (__get_version(), commits_count)
 
 
 def __version_by_pattern(pattern, path, value=None, rc=None):
@@ -815,8 +817,8 @@ def __get_bundle_wrapper(bundle_name, modules, file_name='', performance_monitor
     start = start % (
         ', '.join(modules),
         __get_build_version(is_release),
-        time.strftime(date_mask),
-        time.strftime('%Y'),
+        '2025-06-12',
+        '2025',
         perf_start,
         core_check
     )

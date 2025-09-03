@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.StageCredits');
 goog.require('goog.Disposable');
 goog.require('goog.dom');
+goog.require('goog.net.ImageLoader');
 
 
 
@@ -11,7 +12,7 @@ goog.require('goog.dom');
  * @constructor
  * @extends {goog.Disposable}
  */
-anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
+anychart.core.ui.StageCredits = function (stage, disabledByDefault) {
   anychart.core.ui.StageCredits.base(this, 'constructor');
 
   /**
@@ -48,9 +49,15 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
    * @private
    */
   this.state_ = anychart.core.ui.StageCredits.States.ENABLED |
-      anychart.core.ui.StageCredits.States.URL_ALT |
-      anychart.core.ui.StageCredits.States.TEXT |
-      anychart.core.ui.StageCredits.States.IMAGE;
+    anychart.core.ui.StageCredits.States.URL_ALT |
+    anychart.core.ui.StageCredits.States.TEXT |
+    anychart.core.ui.StageCredits.States.IMAGE;
+
+  /**
+   * Preflight loader.
+   */
+  this.preflightLoader_ = null;
+
 };
 goog.inherits(anychart.core.ui.StageCredits, goog.Disposable);
 
@@ -80,42 +87,42 @@ anychart.core.ui.StageCredits.stylesInstalled_ = false;
  * Installing default css.
  * @private
  */
-anychart.core.ui.StageCredits.installStyles_ = function() {
+anychart.core.ui.StageCredits.installStyles_ = function () {
   var styles = '';
   var css = goog.dom.createDom(goog.dom.TagName.STYLE);
   css.type = 'text/css';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
-      'position:absolute;' +
-      'overflow:hidden;' +
-      'right:9px;' +
-      'bottom:6px;' +
-      'height:10px;' +
-      '}';
+    'position:absolute;' +
+    'overflow:hidden;' +
+    'right:9px;' +
+    'bottom:6px;' +
+    'height:10px;' +
+    '}';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
-      'text-decoration:none;' +
-      '}';
+    'text-decoration:none;' +
+    '}';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.LOGO + '{' +
-      'border:none;' +
-      'margin-right:2px;' +
-      'height:10px;' +
-      'width:10px;' +
-      'display:inline-block;' +
-      'vertical-align:top;' +
-      '}';
+    'border:none;' +
+    'margin-right:2px;' +
+    'height:10px;' +
+    'width:10px;' +
+    'display:inline-block;' +
+    'vertical-align:top;' +
+    '}';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
-      'font-size:10px;' +
-      'line-height:9px;' +
-      'display:inline-block;' +
-      'vertical-align:top;' +
-      'text-decoration:none;' +
-      'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
-      'color:#929292;' +
-      'height:10px;' +
-      '}';
+    'font-size:10px;' +
+    'line-height:9px;' +
+    'display:inline-block;' +
+    'vertical-align:top;' +
+    'text-decoration:none;' +
+    'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
+    'color:#929292;' +
+    'height:10px;' +
+    '}';
 
   if (css.styleSheet)
     css['styleSheet']['cssText'] = styles;
@@ -123,8 +130,8 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
     goog.dom.appendChild(css, goog.dom.createTextNode(styles));
 
   goog.dom.insertChildAt(
-      goog.dom.getElementsByTagNameAndClass('head')[0],
-      css, 0
+    goog.dom.getElementsByTagNameAndClass('head')[0],
+    css, 0
   );
 };
 
@@ -148,7 +155,7 @@ anychart.core.ui.StageCredits.States = {
  * Whether credits is consistent.
  * @return {boolean}
  */
-anychart.core.ui.StageCredits.prototype.isConsistent = function() {
+anychart.core.ui.StageCredits.prototype.isConsistent = function () {
   return !this.state_;
 };
 
@@ -158,7 +165,7 @@ anychart.core.ui.StageCredits.prototype.isConsistent = function() {
  * @param {number} state State to check.
  * @return {boolean} Has state or not.
  */
-anychart.core.ui.StageCredits.prototype.hasInvalidationState = function(state) {
+anychart.core.ui.StageCredits.prototype.hasInvalidationState = function (state) {
   return !!(this.state_ & state);
 };
 
@@ -167,7 +174,7 @@ anychart.core.ui.StageCredits.prototype.hasInvalidationState = function(state) {
  * Clears consistency state.
  * @param {anychart.core.ui.StageCredits.States|number} state State(s) to be cleared.
  */
-anychart.core.ui.StageCredits.prototype.markConsistent = function(state) {
+anychart.core.ui.StageCredits.prototype.markConsistent = function (state) {
   this.state_ &= ~state;
 };
 
@@ -177,7 +184,7 @@ anychart.core.ui.StageCredits.prototype.markConsistent = function(state) {
  * @param {anychart.core.ui.StageCredits.States|number} state State to invalidate.
  * @param {boolean=} opt_dispatch Whether to rerender.
  */
-anychart.core.ui.StageCredits.prototype.invalidate = function(state, opt_dispatch) {
+anychart.core.ui.StageCredits.prototype.invalidate = function (state, opt_dispatch) {
   var effective = state & ~this.state_;
   this.state_ |= effective;
   if (!this.isDisposed() && !this.stage_.isSuspended() && !!effective && !!opt_dispatch)
@@ -193,7 +200,7 @@ anychart.core.ui.StageCredits.prototype.invalidate = function(state, opt_dispatc
  * @return {string} Url with protocol.
  * @private
  */
-anychart.core.ui.StageCredits.prototype.addProtocol_ = function(url) {
+anychart.core.ui.StageCredits.prototype.addProtocol_ = function (url) {
   return ('https:' == anychart.window.location.protocol ? 'https://' : 'http://') + url;
 };
 
@@ -203,7 +210,7 @@ anychart.core.ui.StageCredits.prototype.addProtocol_ = function(url) {
  * @param {boolean=} opt_value enabled.
  * @return {boolean|anychart.core.ui.StageCredits} enabled or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.enabled = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.enabled = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.enabled_ != opt_value) {
       this.enabled_ = opt_value;
@@ -221,7 +228,7 @@ anychart.core.ui.StageCredits.prototype.enabled = function(opt_value) {
  * @param {string=} opt_value text.
  * @return {string|anychart.core.ui.StageCredits} text or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.text = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.text = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.text_ != opt_value) {
       this.text_ = opt_value;
@@ -239,7 +246,7 @@ anychart.core.ui.StageCredits.prototype.text = function(opt_value) {
  * @param {string=} opt_value url.
  * @return {string|anychart.core.ui.StageCredits} url or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.url = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.url = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.url_ != opt_value) {
       this.url_ = opt_value;
@@ -257,7 +264,7 @@ anychart.core.ui.StageCredits.prototype.url = function(opt_value) {
  * @param {string=} opt_value alt.
  * @return {string|anychart.core.ui.StageCredits} alt or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.alt = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.alt = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.alt_ != opt_value) {
       this.alt_ = opt_value;
@@ -275,7 +282,7 @@ anychart.core.ui.StageCredits.prototype.alt = function(opt_value) {
  * @param {string=} opt_value alt.
  * @return {string|anychart.core.ui.StageCredits} alt or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.imgAlt = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.imgAlt = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.imgAlt_ != opt_value) {
       this.imgAlt_ = opt_value;
@@ -293,7 +300,7 @@ anychart.core.ui.StageCredits.prototype.imgAlt = function(opt_value) {
  * @param {string=} opt_value logoSrc.
  * @return {string|anychart.core.ui.StageCredits} logoSrc or self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.logoSrc = function(opt_value) {
+anychart.core.ui.StageCredits.prototype.logoSrc = function (opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.logoSrc_ != opt_value) {
       this.logoSrc_ = opt_value;
@@ -310,7 +317,7 @@ anychart.core.ui.StageCredits.prototype.logoSrc = function(opt_value) {
  * Stage.
  * @return {acgraph.vector.Stage} Stage.
  */
-anychart.core.ui.StageCredits.prototype.getStage = function() {
+anychart.core.ui.StageCredits.prototype.getStage = function () {
   return this.stage_;
 };
 
@@ -319,7 +326,7 @@ anychart.core.ui.StageCredits.prototype.getStage = function() {
  * Returns dom element.
  * @return {Element} Dom element.
  */
-anychart.core.ui.StageCredits.prototype.domElement = function() {
+anychart.core.ui.StageCredits.prototype.domElement = function () {
   return this.domElement_;
 };
 
@@ -341,9 +348,10 @@ anychart.core.ui.StageCredits.CssClass_ = {
 //region --- DRAWING ---
 /**
  * Renders credits.
+ * @private
  * @return {anychart.core.ui.StageCredits} Self for chaining.
  */
-anychart.core.ui.StageCredits.prototype.render = function() {
+anychart.core.ui.StageCredits.prototype.render_ = function () {
   var valid = this.isValid();
 
   if (valid && (goog.isDef(this.prevValidState) && !this.prevValidState)) {
@@ -388,8 +396,8 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.URL_ALT)) {
     var version = anychart.VERSION ?
-        goog.string.subs.apply(null, [', v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
-        '';
+      goog.string.subs.apply(null, [', v%s.%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+      '';
     var defaultTitle = 'AnyChart - JavaScript Charts designed to be embedded and integrated{{anychart-version}}';
     var title = valid ? this.alt() : defaultTitle;
     goog.dom.setProperties(this.a_, {
@@ -405,7 +413,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.TEXT)) {
     var text = valid ? this.text() : 'AnyChart Trial Version';
-    goog.dom.setTextContent(this.span_, /** @type {string} */ (text));
+    goog.dom.setTextContent(this.span_, /** @type {string} */(text));
     this.markConsistent(anychart.core.ui.StageCredits.States.TEXT);
   }
 
@@ -439,10 +447,74 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
 
 /**
+ * Renders credits.
+ * @return {anychart.core.ui.StageCredits} Self for chaining.
+ */
+anychart.core.ui.StageCredits.prototype.render = function () {
+  this.render_();
+  // console.log('render');
+  this.preflight_();
+  return this;
+};
+
+/**
+ * Performs preflight logo request.
+ * @private 
+ */
+anychart.core.ui.StageCredits.prototype.preflight_ = function () {
+  if (!this.isLoading_ && !this.preflightLoader_) {
+    var defaultSrc = this.addProtocol_('static.anychart.com/logo.png');
+    var k = anychart.licenseKey();
+    defaultSrc += '?k=' + k;
+    defaultSrc += '&t=' + (new Date()).getTime();
+    defaultSrc += '&h=' + Number(this.checkEls_());
+
+    this.preflightLoader_ = new goog.net.ImageLoader();
+    this.preflightLoader_.addImage(defaultSrc, defaultSrc);
+    this.preflightLoader_.start();
+  }
+};
+
+/**
+ * Checks if element is hidden.
+ * @param {Element} el - .
+ * @return {boolean} - true if hidden, false if visible.
+ * @private
+ */
+anychart.core.ui.StageCredits.prototype.check_ = function (el) {
+  if (!el) return true;
+
+  var display = goog.style.getComputedStyle(el, 'display');
+  var visibility = goog.style.getComputedStyle(el, 'visibility');
+  var opacity = parseFloat(goog.style.getComputedStyle(el, 'opacity'));
+  var rect = el.getBoundingClientRect();
+
+  return display === 'none' ||
+    visibility === 'hidden' ||
+    opacity < 0.1 ||
+    (display !== 'none' &&
+      (rect.width < 5 || rect.height < 5 ||
+        rect.bottom < 0 || rect.right < 0 ||
+        rect.top > window.innerHeight || rect.left > window.innerWidth));
+};
+
+/**
+ * Visibility reporting.
+ * @return {boolean} - true if any credits part is hidden.
+ * @private
+ */
+anychart.core.ui.StageCredits.prototype.checkEls_ = function () {
+  return this.check_(this.domElement_) ||
+    this.check_(this.a_) ||
+    this.check_(this.image_) ||
+    this.check_(this.span_);
+};
+
+/**
  *
  * @return {boolean}
  */
-anychart.core.ui.StageCredits.prototype.isValid = function() {
+anychart.core.ui.StageCredits.prototype.isValid = function () {
   return anychart.isValidKey() || this.onAnyChartDomain_;
 };
 
@@ -451,7 +523,7 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
  * Returns final src value.
  * @return {string}
  */
-anychart.core.ui.StageCredits.prototype.getFinalSrc = function() {
+anychart.core.ui.StageCredits.prototype.getFinalSrc = function () {
   return /** @type {string} */ (this.isValid() ? this.logoSrc() : this.addProtocol_('static.anychart.com/logo.png'));
 };
 
@@ -461,14 +533,17 @@ anychart.core.ui.StageCredits.prototype.getFinalSrc = function() {
  * @param {goog.events.Event} e Event.
  * @private
  */
-anychart.core.ui.StageCredits.prototype.onImageLoadHandler_ = function(e) {
+anychart.core.ui.StageCredits.prototype.onImageLoadHandler_ = function (e) {
   var src = this.tagetSrc;
   if (e.target.id != src) return;
   if (!this.isDisposed() && this.getFinalSrc() == src)
     if (!this.image_.parentNode)
       goog.dom.insertChildAt(this.a_, this.image_, 0);
-    goog.dom.setProperties(this.image_, {'src': src});
+  goog.dom.setProperties(this.image_, { 'src': src });
   this.isLoading_ = false;
+
+  // console.log('onImageLoadHandler_');
+  this.preflight_();
 };
 
 
@@ -477,9 +552,11 @@ anychart.core.ui.StageCredits.prototype.onImageLoadHandler_ = function(e) {
  * @param {goog.events.Event} e Event.
  * @private
  */
-anychart.core.ui.StageCredits.prototype.onImageCompleteHandler_ = function(e) {
+anychart.core.ui.StageCredits.prototype.onImageCompleteHandler_ = function (e) {
   if (e.target.id != this.tagetSrc) return;
   this.isLoading_ = false;
+  // console.log('onImageCompleteHandler_');
+  this.preflight_();
 };
 
 
@@ -488,7 +565,7 @@ anychart.core.ui.StageCredits.prototype.onImageCompleteHandler_ = function(e) {
  * @param {goog.events.Event} e Event.
  * @private
  */
-anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function(e) {
+anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function (e) {
   if (e.target.id != this.tagetSrc) return;
   goog.dom.removeNode(this.image_);
 };
@@ -500,7 +577,7 @@ anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function(e) {
  * Setup.
  * @param {*} config Config.
  */
-anychart.core.ui.StageCredits.prototype.setup = function(config) {
+anychart.core.ui.StageCredits.prototype.setup = function (config) {
   this.stage_.suspend();
   if (goog.isString(config)) {
     this.text(/** @type {string} */(config));
@@ -523,7 +600,7 @@ anychart.core.ui.StageCredits.prototype.setup = function(config) {
  * Serializes credits.
  * @return {Object} Json object.
  */
-anychart.core.ui.StageCredits.prototype.serialize = function() {
+anychart.core.ui.StageCredits.prototype.serialize = function () {
   var json = {};
   json['url'] = this.url();
   json['alt'] = this.alt();
@@ -536,7 +613,7 @@ anychart.core.ui.StageCredits.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
+anychart.core.ui.StageCredits.prototype.disposeInternal = function () {
   if (acgraph.getRenderer().isImageLoader()) {
     var imageLoader = acgraph.getRenderer().getImageLoader();
 
@@ -554,13 +631,15 @@ anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
   this.a_ = null;
   this.domElement_ = null;
   this.stage_ = null;
+
+  goog.dispose(this.preflightLoader_);
   anychart.core.ui.StageCredits.base(this, 'disposeInternal');
 };
 
 
 //endregion
 //exports
-(function() {
+(function () {
   var proto = anychart.core.ui.StageCredits.prototype;
   proto['text'] = proto.text;
   proto['url'] = proto.url;
