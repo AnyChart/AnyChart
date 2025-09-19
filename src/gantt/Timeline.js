@@ -3519,32 +3519,53 @@ anychart.ganttModule.TimeLine.prototype.drawProjectTimeline_ = function() {
     var isProjectMilestone = anychart.ganttModule.BaseGrid.isProjectMilestone(item, info);
     var isProjectBaselineMilestone = anychart.ganttModule.BaseGrid.isProjectBaselineMilestone(item, info);
     var isBaselineLike = !isProjectBaselineMilestone && anychart.ganttModule.BaseGrid.isBaselineLike(item, info);
+    var above = isProjectMilestone || isProjectBaselineMilestone ? this.baselines().getOption('above') : false;
 
     if (isFullValidBaseline) {
       this.drawAsBaseline_(item, totalTop, itemHeight, info);
     } else if (isGroupOrLoadable) {
       this.drawAsParent_(item, totalTop, itemHeight, info);
-    } else if (isProjectMilestone || isProjectBaselineMilestone) {
+    } else  if (isBaselineLike) { 
+      this.drawAsBaselineLike_(item, totalTop, itemHeight, info);
+    } else {
+      /*
+       There are times when the baseline will be represented with a milestone, so the actual bar will be drawn here and
+       not in the isFullValidBaseline. 
+       So some adjustments to the top of the bar and a height of the bar are needed.
+
+       Additionally this will be called when the item is a milestone, but as the drawAsProgress_ has internal check for 
+       validity of a task, so nothing will be drawn or affected if there is no bar to draw.
+       */
+      var actualHeight = isProjectBaselineMilestone ? itemHeight / 2 : itemHeight;
+      var actualTop = isProjectBaselineMilestone && above ? totalTop + actualHeight : totalTop;
+      this.drawAsProgress_(item, actualTop, actualHeight, info);
+    }
+
+    /*
+     There are times when the item to draw can contain an actual bar and a baseline milestone.
+     There are also cases when the item to draw can contain baseline bar and an actual milestone.
+     So the logic of drawing a milestone should be separated from the main if..else if..else structure, as the actual
+     and baseline bar will be drown in the main if..else if..else structure.
+     */
+    if (isProjectMilestone || isProjectBaselineMilestone) {
       var milestones = /** @type {anychart.ganttModule.elements.MilestonesElement}*/ (this.milestones());
       var baselineMilestones = /** @type {anychart.ganttModule.elements.BaselineMilestonesElement}*/ (this.baselineMilestones());
-      var above = this.baselines().getOption('above');
-      
+
       if (isProjectMilestone) {
-        var milestoneHeight = info.hasBaselineFields ? itemHeight / 2 : itemHeight;
-        var milestoneTop = above && info.hasBaselineFields ? totalTop + milestoneHeight : totalTop;
+        var hasBaselineFields = info.hasBaselineFields;
+        var milestoneHeight = hasBaselineFields ? itemHeight / 2 : itemHeight;
+        var milestoneTop = above && hasBaselineFields ? totalTop + milestoneHeight : totalTop;
         this.drawAsMilestone_(milestones, item, milestoneTop, milestoneHeight, info);
       }
       if (isProjectBaselineMilestone) {
-        var baselineMilestoneHeight = isProjectMilestone ? itemHeight / 2 : itemHeight;
-        var baselineMilestoneTop = isProjectMilestone ?
+        // isValidTask is needed for the case when the item is a baseline milestone and an actual bar.
+        var isValidTask = info.isValidTask;
+        var baselineMilestoneHeight = isProjectMilestone || isValidTask ? itemHeight / 2 : itemHeight;
+        var baselineMilestoneTop = isProjectMilestone || isValidTask ?
           (above ? totalTop : totalTop + baselineMilestoneHeight) :
           totalTop;
         this.drawAsMilestone_(baselineMilestones, item, baselineMilestoneTop, baselineMilestoneHeight, info);
       }
-    } else if (isBaselineLike) { 
-      this.drawAsBaselineLike_(item, totalTop, itemHeight, info);
-    } else {
-      this.drawAsProgress_(item, totalTop, itemHeight, info);
     }
 
     this.drawMarkers_(item, totalTop, itemHeight);
