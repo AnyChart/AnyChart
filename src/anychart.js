@@ -74,6 +74,90 @@ anychart.isAsync_ = false;
 
 
 /**
+ * Object that tracks which products are currently licensed for the application.
+ * Used for license validation.
+ * @type {!Object<string, boolean>}
+ */
+anychart.licensedProducts_ = {};
+
+
+/**
+ * Object that maps chart types to their corresponding product categories.
+ * Used for license validation to determine which product license is needed for each chart type.
+ * Keys are strings as they get obfuscated otherwise.
+ * @type {!Object<string, Array<string>>}
+ */
+anychart.CHART_PRODUCTS = {
+  'chart' : [
+    'area',
+    'vertical-area',
+    'area-3d',
+    'bar',
+    'bar-3d',
+    'box',
+    'bubble',
+    'bullet',
+    'calendar',
+    'candlestick',
+    'cartesian',
+    'cartesian-3d',
+    'circle-packing',
+    'column',
+    'column-3d',
+    'financial',
+    'funnel',
+    'line',
+    'line-3d',
+    'vertical-line',
+    'marker',
+    'pie',
+    'pie-3d',
+    'polar',
+    'ohlc',
+    'pyramid',
+    'radar',
+    'scatter',
+    'step-line',
+    'sparkline',
+    'heat-map',
+    'tree-map',
+    'pert',
+    'resource',
+    'jump-line',
+    'stick',
+    'pareto',
+    'quadrant',
+    'mekko',
+    'mosaic',
+    'barmekko',
+    'tag-cloud',
+    'timeline',
+    'venn',
+    'hilo',
+    'waterfall',
+    'sunburst',
+    'sankey',
+    'surface',
+    'wordtree',
+    'graph'
+  ],
+  'stock' : ['stock'],
+  'map' : [
+    'map',
+    'choropleth',
+    'bubble',
+    'marker',
+    'connector',
+    'seat-map'
+  ],
+  'gantt' : [
+    'gantt-resource',
+    'gantt-project'
+  ]
+ };
+
+
+/**
  * Experimental setter of async mode.
  * @param {boolean=} opt_value - Value to set.
  * @return {boolean}
@@ -527,15 +611,94 @@ anychart.licenseKey = function(opt_value) {
 
 
 /**
- * Method to get hash from string.
- * @return {boolean} Is key valid.
+ * Validates the current license key by checking its hash value.
+ * @return {boolean} Returns true if the license key is valid, false otherwise.
  */
 anychart.isValidKey = function() {
+
+  /*
+    If you're reading this, you've found the spot.
+    But before you go further, let's talk.
+    This wasn't a shortcut; it was a trade-off. A decision made between a tight deadline and a limited budget.
+    Your talent is clearly top-tier, and I respect it.
+    So, I'm going to appeal to that respect.
+    Instead of hacking this, consider this an invitation. Write to our support team, and mention this token: eb6cb4e8.
+    By supporting us, you help a small team thrive and enable us to build even better products.
+    Let's both be the good guys.
+  */
+
   if (!goog.isDefAndNotNull(anychart.licenseKey_) || !goog.isString(anychart.licenseKey_)) return false;
+  // If the end of the license key is the same as the hashed beginning of it, then it is a valid, but deprecated key.
   var lio = anychart.licenseKey_.lastIndexOf('-');
   var value = anychart.licenseKey_.substr(0, lio);
   var hashToCheck = anychart.licenseKey_.substr(lio + 1);
-  return (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt()));
+  if (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt())) return true;
+
+  // If the key is not old and valid, check if it is new and valid.
+  var keyArray = anychart.licenseKey_.split('-');
+  var load = keyArray.slice(0,-2).join('-');
+  var keyHash = keyArray[keyArray.length - 2];
+  if (keyHash == anychart.utils.crc32(load + anychart.utils.getSalt())) {
+    // If it is new and valid: generate a complete array of possible product combinations.
+    var maskVariants = [];
+    for (var i = 1; i < 16; i++) {
+      maskVariants.push(('0000' + i.toString(2)).slice(-4));
+    }
+    /*
+     Generate hashes for all possible product combinations.
+     The maskVariants array contains all possible combinations of 4 bits.
+     Each bit represents a product: chart, stock, map, gantt.
+     */
+    var hashedMaskVariants = maskVariants.map(function(variant) {
+      return anychart.utils.crc32(variant);
+    });
+    // Take product hash from the new key and find a correct unhashed variant by comparing with generated hashes.
+    var hashedProducts = keyArray.slice(-1);
+    // CSMG = chart, stock, map, gantt.
+    var csmgIndex = hashedMaskVariants.indexOf(hashedProducts[0]);
+    // If there is no such hash in the generated array, then the new license key is invalid.
+    if (csmgIndex === -1) return false;
+
+    // If there is a valid hash, we need to check for licensed products in the key. 
+    anychart.checkForLicensedProducts(maskVariants[csmgIndex]);
+    return true;
+  } 
+  // If it is an invalid license key, or there are unlicensed products do not validate.
+  return false;
+};
+
+
+/**
+ * Gets an object that contains information about licensed products extracted from the key. And add this information to
+ * anychart.licensedProducts_ object.
+ * 
+ * @param {string} csmgString Binary string where each character is '1' (licensed) or '0' (unlicensed)
+ * @private
+ */
+anychart.checkForLicensedProducts = function(csmgString) {
+  var licensedProducts = {};
+  var chartsProduct = Object.keys(anychart.CHART_PRODUCTS);
+  for (var i = 0; i < csmgString.length; i++) {
+    if (csmgString[i] === '1') {
+      licensedProducts[chartsProduct[i]] = true;
+    }
+  }
+  // We're putting it in the anychart object so the StageCredits could get to the validation information. 
+  anychart.licensedProducts(licensedProducts);
+};
+
+
+/**
+ * Gets or sets the object tracking which products are currently licensed.
+ * Used for license validation to check if all active products have valid licenses.
+ * @param {!Object<string, boolean>=} opt_value Object indicating which products are licensed.
+ * @return {!Object<string, boolean>} Current licensed products object.
+ */
+anychart.licensedProducts = function(opt_value) {
+  if (goog.isDefAndNotNull(opt_value)) {
+    anychart.licensedProducts_ = opt_value;
+  }
+  return anychart.licensedProducts_;
 };
 
 
