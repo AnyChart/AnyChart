@@ -6388,6 +6388,7 @@ anychart.standalones.resourceTimeline = function() {
   proto['baselines'] = proto.baselines;
   proto['periods'] = proto.periods;
 
+  proto['selectTimelineRow'] = proto.selectTimelineRow;
 
   proto = anychart.standalones.ProjectTimeline.prototype;
   goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
