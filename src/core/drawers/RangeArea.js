@@ -187,6 +187,32 @@ anychart.core.drawers.RangeArea.prototype.drawSubsequentPoint = function(point, 
       anychart.core.drawers.move(hatchFill, this.isVertical, crossPoint.x, crossPoint.y);
 
       this.lowsStack.push(crossPoint.x, crossPoint.y, fill, hatchFill);
+    } else {
+      /*
+       The below part is needed to handle coincident lines.
+       The crossPoint section doesn't work for coincident lines.
+       The lines will become coincident on a low height charts.
+       */
+      var isCoincidentLine = anychart.math.isCoincidentLineLine(
+        this.prevX_, this.prevHigh_,
+        x, high,
+        this.prevX_, this.prevLow_,
+        x, low);
+      if (isCoincidentLine) {
+        this.currentShapes = shapes;
+
+        fill = /** @type {acgraph.vector.Path} */(this.currentShapes[names.fill]);
+        hatchFill = /** @type {acgraph.vector.Path} */(this.currentShapes[names.hatchFill]);
+
+        /*
+         this.prevX_ and this.prevHigh_ are used as these coordinates are readily available and in the event of 
+         coincident lines the 'y' coordinate( this.prevHigh_ || this.prevLow_) doesn't matter.
+         */
+        anychart.core.drawers.move(fill, this.isVertical, this.prevX_, this.prevHigh_);
+        anychart.core.drawers.move(hatchFill, this.isVertical, this.prevX_, this.prevHigh_);
+
+        this.lowsStack.push(this.prevX_, this.prevHigh_, fill, hatchFill);
+      }
     }
   }
 
