@@ -1750,16 +1750,55 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
           }
           break;
         case anychart.enums.TLElementTypes.PERIODS:
-          periodIndex = el.tag.periodIndex;
-          periodStart = /** @type {number} */ (dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START));
-          var periodEnd = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END);
-          delta = newActualStart - periodStart;
-          var newPeriodEnd = periodEnd + delta;
-          if (!isNaN(newPeriodEnd)) {
-            dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
-            dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
-            dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
-            dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
+          // Create event object for period update to be cancelable.
+          var beforeUpdatePeriodEvent = this.getInteractivityEvent(e);
+          if(beforeUpdatePeriodEvent) {
+            var destinationItem = beforeUpdatePeriodEvent['item'];
+            periodIndex = el.tag.periodIndex;
+            periodStart = /** @type {number} */ (dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START));
+            var periodEnd = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END);
+            delta = newActualStart - periodStart;
+            var newPeriodEnd = periodEnd + delta;
+
+            if ( !isNaN(newPeriodEnd)) {
+            // Update event object for it to be of correct type and hold necessary fields.
+            beforeUpdatePeriodEvent.type = anychart.enums.EventType.BEFORE_UPDATE_PERIOD;
+            beforeUpdatePeriodEvent['sourceItem'] = dataItem;
+            beforeUpdatePeriodEvent['originalPeriodIndex'] = periodIndex;
+
+              if (dataItem === destinationItem) {
+                // Handle period dropped on same row.
+                if (this.interactivityHandler.dispatchEvent(beforeUpdatePeriodEvent)) {
+                  // Update period start/end times.
+                  dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
+                  dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
+                  dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
+                  dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
+                }
+              } else {
+                // Handle period dropped on different row.
+                var destinationItemPeriods = destinationItem.get(anychart.enums.GanttDataFields.PERIODS) || [];
+                // The event object will be updated with this field only if it is necessary as to not double the info.
+                beforeUpdatePeriodEvent['newPeriodIndex'] = destinationItemPeriods.length;
+
+                if (this.interactivityHandler.dispatchEvent(beforeUpdatePeriodEvent)) {
+                  // Add new period to the end of array of periods in the destination item.
+                  var periodObj = dataItem.get(anychart.enums.GanttDataFields.PERIODS, periodIndex);
+                  periodObj[anychart.enums.GanttDataFields.START] = newActualStart;
+                  periodObj[anychart.enums.GanttDataFields.END] = newPeriodEnd;
+                  destinationItemPeriods.push(periodObj);
+                  destinationItem.set(anychart.enums.GanttDataFields.PERIODS, destinationItemPeriods);
+
+                  // Remove original period.
+                  var oldPeriods = dataItem.get(anychart.enums.GanttDataFields.PERIODS);
+                  var newPeriods = goog.array.filter(oldPeriods, function(_, index) {
+                    return index !== periodIndex;
+                  });
+                  dataItem.set(anychart.enums.GanttDataFields.PERIODS, newPeriods);
+                  dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, newPeriods);
+                }
+              }
+            }
           }
           break;
         case anychart.enums.TLElementTypes.BASELINES:

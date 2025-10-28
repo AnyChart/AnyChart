@@ -43,13 +43,5 @@ anychart.ganttModule.draggers.BarDragger.prototype.computeInitialPosition = func
  * @override
  */
 anychart.ganttModule.draggers.BarDragger.prototype.defaultAction = function(x, y) {
-  this.element.setTransformationMatrix(1, 0, 0, 1, x, 0);
-};
-
-
-/**
- * @override
- */
-anychart.ganttModule.draggers.BarDragger.prototype.limitY = function(y) {
-  return 0;
+  this.element.setTransformationMatrix(1, 0, 0, 1, x, y);
 };
