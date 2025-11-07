@@ -643,10 +643,17 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
   if (isValidKey && chartType){
     var chartsProduct = anychart.CHART_PRODUCTS;
     var licensedProducts = anychart.licensedProducts();
+
+    // URL encoding section
+    var licenseKey = (/** @type {string} */(anychart.licenseKey()));
+    var base64EncodedKey = btoa(licenseKey);
+    var reversedBase64EncodedKey = base64EncodedKey.split('').reverse().join('');
+    var finalEncodedURLKey = encodeURIComponent(reversedBase64EncodedKey);
+
     if (Object.keys(licensedProducts).length === 0) {
       // If there are no licensed products and it is a valid license key it is an old key, show the old-key-credits.
       this.trialCreditsText(['License key is obsolete. Click to contact AnyChart.']);
-      this.trialCreditsUrl('https://www.anychart.com/license/new');
+      this.trialCreditsUrl('https://www.anychart.com/license/new' + '?' + 'k=' + finalEncodedURLKey);
       this.trialCreditsFontWeight('bold');
     } else {
       /*
@@ -672,8 +679,15 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
          unlicensed-products-credits.
          */
         if (this.unlicensedProducts_.indexOf(product) === -1) this.unlicensedProducts_.push(product);
-        this.trialCreditsText(['Unlicensed module: ' + this.unlicensedProducts_.join(', ') + '. Click to get a license.']);
-        this.trialCreditsUrl('https://www.anychart.com/license/modules');
+        var productString = this.unlicensedProducts_.join(', ');
+        this.trialCreditsText(['Unlicensed module: ' + productString + '. Click to get a license.']);
+
+        // URL encoding section
+        var base64EncodedModule = btoa(productString);
+        var reversedBase64EncodedModule = base64EncodedModule.split('').reverse().join('');
+        var finalEncodedURLModule = encodeURIComponent(reversedBase64EncodedModule);
+        this.trialCreditsUrl('https://www.anychart.com/license/modules' + '?' + 'k=' + finalEncodedURLKey +
+            '&m=' + finalEncodedURLModule);
         this.trialCreditsColor('red');
         /*
          The change of enabled_ isn't done through the this.enabled(true) as it will create an endless loop.
