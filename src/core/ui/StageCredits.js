@@ -101,6 +101,14 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
   this.unlicensedProducts_ = [];
 
   /**
+   * Array of chart types included on the stage these credits belong to.
+   * Used for adding parameter to the credits url.
+   * @type {Array.<string>}
+   * @private
+   */
+  this.chartTypes_ = [];
+
+  /**
    * Flag that indicates if styles are installed.
    * Used to avoid uncontrollable installation of styles multiple times.
    * @type {boolean}
@@ -553,7 +561,8 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   }
 
   // As it is now an instance method, to avoid installing styles multiple times, the flag is used.
-  if (!this.installedStyles) {
+  var stylesInstalled = this.installedStyles;
+  if (!stylesInstalled) {
     this.installStyles_();
   }
 
@@ -579,6 +588,31 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     goog.dom.setProperties(this.image_, {
       'alt': valid ? this.imgAlt() : 'AnyChart - JavaScript Charts'
     });
+
+    /*
+     In case of multiple charts per stage, the styles are reinstalled as it is possible that the first chart will
+     have a different validity from any of the rest.
+     This reinstallation is done only if the styles are installed and color or font weight were changed.
+     This can and will cause a repaint and a reflow, but since stage is drawn before most of the visible elements
+     the impact is minimal.
+     */
+    if (stylesInstalled) {
+      var selectorText = '#' + this.span_.id;
+      var newFontWeight = this.trialCreditsFontWeight();
+      var newColor = this.trialCreditsColor();
+      var styleSheet, rules;
+      if (document.styleSheets) {
+        styleSheet = document.styleSheets[0];
+        rules = styleSheet.cssRules;
+        for (var i = 0; i < rules.length; i++) {
+          var rule = rules[i];
+          if (rule.selectorText && rule.selectorText.toLowerCase() === selectorText.toLowerCase()) {
+            rule.style.setProperty('font-weight', newFontWeight);
+            rule.style.setProperty('color', newColor);
+          }
+        }
+      }
+    }
     this.markConsistent(anychart.core.ui.StageCredits.States.URL_ALT);
   }
 
@@ -644,16 +678,28 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
     var chartsProduct = anychart.CHART_PRODUCTS;
     var licensedProducts = anychart.licensedProducts();
 
-    // URL encoding section
+    // For the trialCreditsUrl two URL parameters are needed, so they are prepared by encoding.
     var licenseKey = (/** @type {string} */(anychart.licenseKey()));
     var base64EncodedKey = btoa(licenseKey);
     var reversedBase64EncodedKey = base64EncodedKey.split('').reverse().join('');
     var finalEncodedURLKey = encodeURIComponent(reversedBase64EncodedKey);
 
+    /*
+     As there is a possibility that there are more than one chart per stage, the chartTypes_ array is used to store all
+     chart types that are displayed on a stage of these credits.
+     We don't need to validate chart of the recorded chartTypes_ as the chart type is used only in the case of
+     valid old key, which expected to not have any product licenses in it.
+     */
+    if (this.chartTypes_.indexOf(chartType) === -1) this.chartTypes_.push(chartType);
+
+    var base64EncodedChartType = btoa(this.chartTypes_.join(', '));
+    var reversedBase64EncodedChartType = base64EncodedChartType.split('').reverse().join('');
+    var finalEncodedURLChartType = encodeURIComponent(reversedBase64EncodedChartType);
+
     if (Object.keys(licensedProducts).length === 0) {
       // If there are no licensed products and it is a valid license key it is an old key, show the old-key-credits.
       this.trialCreditsText(['License key is obsolete. Click to contact AnyChart.']);
-      this.trialCreditsUrl('https://www.anychart.com/license/new' + '?' + 'k=' + finalEncodedURLKey);
+      this.trialCreditsUrl('https://www.anychart.com/license/new?k=' + finalEncodedURLKey + '&m=' + finalEncodedURLChartType);
       this.trialCreditsFontWeight('bold');
     } else {
       /*
@@ -679,15 +725,8 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
          unlicensed-products-credits.
          */
         if (this.unlicensedProducts_.indexOf(product) === -1) this.unlicensedProducts_.push(product);
-        var productString = this.unlicensedProducts_.join(', ');
-        this.trialCreditsText(['Unlicensed module: ' + productString + '. Click to get a license.']);
-
-        // URL encoding section
-        var base64EncodedModule = btoa(productString);
-        var reversedBase64EncodedModule = base64EncodedModule.split('').reverse().join('');
-        var finalEncodedURLModule = encodeURIComponent(reversedBase64EncodedModule);
-        this.trialCreditsUrl('https://www.anychart.com/license/modules' + '?' + 'k=' + finalEncodedURLKey +
-            '&m=' + finalEncodedURLModule);
+        this.trialCreditsText(['Unlicensed module: ' + this.unlicensedProducts_.join(', ') + '. Click to get a license.']);
+        this.trialCreditsUrl('https://www.anychart.com/license/modules?k=' + finalEncodedURLKey + '&m=' + finalEncodedURLChartType);
         this.trialCreditsColor('red');
         /*
          The change of enabled_ isn't done through the this.enabled(true) as it will create an endless loop.
