@@ -115,6 +115,16 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
    * @private
    */
   this.installedStyles = false;
+
+  /**
+   * A variable that keeps style node.
+   * 
+   * It is used to reinstall styles if the stage has multiple charts and there is a discrepancy in 
+   * validity between them.
+   * @type {?Element}
+   * @private
+   */
+  this.styleNode = null;
 };
 goog.inherits(anychart.core.ui.StageCredits, goog.Disposable);
 
@@ -223,6 +233,7 @@ anychart.core.ui.StageCredits.prototype.installStyles_ = function() {
       goog.dom.getElementsByTagNameAndClass('head')[0],
       css, 0
   );
+  this.styleNode = css;
   this.installedStyles = true;
 };
 
@@ -561,8 +572,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   }
 
   // As it is now an instance method, to avoid installing styles multiple times, the flag is used.
-  var stylesInstalled = this.installedStyles;
-  if (!stylesInstalled) {
+  if (!this.installedStyles) {
     this.installStyles_();
   }
 
@@ -596,14 +606,13 @@ anychart.core.ui.StageCredits.prototype.render = function() {
      This can and will cause a repaint and a reflow, but since stage is drawn before most of the visible elements
      the impact is minimal.
      */
-    if (stylesInstalled) {
+    if (this.installedStyles) {
       var selectorText = '#' + this.span_.id;
       var newFontWeight = this.trialCreditsFontWeight();
       var newColor = this.trialCreditsColor();
-      var styleSheet, rules;
-      if (document.styleSheets) {
-        styleSheet = document.styleSheets[0];
-        rules = styleSheet.cssRules;
+      if (this.styleNode) {
+        var styleSheet = this.styleNode.sheet;
+        var rules = styleSheet.cssRules;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
           if (rule.selectorText && rule.selectorText.toLowerCase() === selectorText.toLowerCase()) {
@@ -690,9 +699,12 @@ anychart.core.ui.StageCredits.prototype.isValid = function() {
      We don't need to validate chart of the recorded chartTypes_ as the chart type is used only in the case of
      valid old key, which expected to not have any product licenses in it.
      */
-    if (this.chartTypes_.indexOf(chartType) === -1) this.chartTypes_.push(chartType);
+    if (this.chartTypes_.indexOf(chartType) === -1) {
+      this.chartTypes_.push(chartType);
+    }
 
-    var base64EncodedChartType = btoa(this.chartTypes_.join(', '));
+    var chartTypesString = this.chartTypes_.join(', ');
+    var base64EncodedChartType = btoa(chartTypesString);
     var reversedBase64EncodedChartType = base64EncodedChartType.split('').reverse().join('');
     var finalEncodedURLChartType = encodeURIComponent(reversedBase64EncodedChartType);
 
