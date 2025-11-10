@@ -110,21 +110,14 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
 
   /**
    * Flag that indicates if styles are installed.
-   * Used to avoid uncontrollable installation of styles multiple times.
-   * @type {boolean}
-   * @private
-   */
-  this.installedStyles = false;
-
-  /**
-   * A variable that keeps style node.
    * 
-   * It is used to reinstall styles if the stage has multiple charts and there is a discrepancy in 
+   * Used to avoid uncontrollable installation of styles multiple times.
+   * It is also used to reinstall styles if the stage has multiple charts and there is a discrepancy in 
    * validity between them.
-   * @type {?Element}
+   * @type {?HTMLStyleElement}
    * @private
    */
-  this.styleNode = null;
+  this.installedStyles_ = null;
 };
 goog.inherits(anychart.core.ui.StageCredits, goog.Disposable);
 
@@ -233,8 +226,7 @@ anychart.core.ui.StageCredits.prototype.installStyles_ = function() {
       goog.dom.getElementsByTagNameAndClass('head')[0],
       css, 0
   );
-  this.styleNode = css;
-  this.installedStyles = true;
+  this.installedStyles = css;
 };
 
 
@@ -606,20 +598,16 @@ anychart.core.ui.StageCredits.prototype.render = function() {
      This can and will cause a repaint and a reflow, but since stage is drawn before most of the visible elements
      the impact is minimal.
      */
-    if (this.installedStyles) {
-      var selectorText = '#' + this.span_.id;
-      var newFontWeight = this.trialCreditsFontWeight();
-      var newColor = this.trialCreditsColor();
-      if (this.styleNode) {
-        var styleSheet = this.styleNode.sheet;
-        var rules = styleSheet.cssRules;
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i];
-          if (rule.selectorText && rule.selectorText.toLowerCase() === selectorText.toLowerCase()) {
-            rule.style.setProperty('font-weight', newFontWeight);
-            rule.style.setProperty('color', newColor);
-          }
-        }
+    var selectorText = '#' + this.span_.id;
+    var newFontWeight = this.trialCreditsFontWeight();
+    var newColor = this.trialCreditsColor();
+    var styleSheet = this.installedStyles.sheet;
+    var rules = styleSheet.cssRules;
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      if (rule.selectorText && rule.selectorText.toLowerCase() === selectorText.toLowerCase()) {
+        rule.style.setProperty('font-weight', newFontWeight);
+        rule.style.setProperty('color', newColor);
       }
     }
     this.markConsistent(anychart.core.ui.StageCredits.States.URL_ALT);
