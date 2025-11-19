@@ -1,4 +1,4 @@
-// Type definitions for AnyChart JavaScript Charting Library, v8.13.1
+// Type definitions for AnyChart JavaScript Charting Library, v8.14.0
 // Project: https://www.anychart.com/
 // Definitions by: AnyChart <https://www.anychart.com>
 declare namespace anychart {
@@ -24625,6 +24625,7 @@ declare namespace anychart.core.ui {
         rowStroke(strokeFunction: (() => void)): anychart.core.ui.Timeline;
         scale(): anychart.scales.GanttDateTime;
         scale(value?: Object): anychart.core.ui.Timeline;
+        selectTimelineRow(item: anychart.data.Tree.DataItem, periodIndex?: number): boolean;
         tasks(): anychart.core.gantt.elements.TasksElement;
         tasks(settings?: Object): anychart.core.ui.Timeline;
         textMarker(index?: number): anychart.core.axisMarkers.GanttText;

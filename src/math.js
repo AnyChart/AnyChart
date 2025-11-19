@@ -1854,6 +1854,36 @@ anychart.math.intersectLineLine = function(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2
 };
 
 
+/**
+ * Determines whether two line segments are coincident (collinear and overlapping).
+ * @param {number} a1x X coordinate of the first point of the first segment.
+ * @param {number} a1y Y coordinate of the first point of the first segment.
+ * @param {number} a2x X coordinate of the second point of the first segment.
+ * @param {number} a2y Y coordinate of the second point of the first segment.
+ * @param {number} b1x X coordinate of the first point of the second segment.
+ * @param {number} b1y Y coordinate of the first point of the second segment.
+ * @param {number} b2x X coordinate of the second point of the second segment.
+ * @param {number} b2y Y coordinate of the second point of the second segment.
+ * @return {boolean} True if the segments are coincident, false otherwise.
+ */
+anychart.math.isCoincidentLineLine = function(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2y) {
+  // Denominator for solving the intersection of two line segments.
+  var denominator = (b2y - b1y) * (a2x - a1x) - (b2x - b1x) * (a2y - a1y);
+
+  // If denominator is zero, the lines are parallel or coincident (collinear and overlapping).
+  if (anychart.math.roughlyEqual(denominator, 0)) {
+    // numerators for parametric equations of the lines
+    var uaNumerator = (b2x - b1x) * (a1y - b1y) - (b2y - b1y) * (a1x - b1x);
+    var ubNumerator = (a2x - a1x) * (a1y - b1y) - (a2y - a1y) * (a1x - b1x);
+    // If either numerator is zero, the segments touch at an endpoint.
+    if (anychart.math.roughlyEqual(uaNumerator, 0) || anychart.math.roughlyEqual(ubNumerator, 0)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+
 
 //exports
 goog.exportSymbol('anychart.math.rect', anychart.math.rect);

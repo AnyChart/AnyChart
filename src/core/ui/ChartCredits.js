@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.ChartCredits');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.settings');
 
 
 
@@ -14,13 +15,22 @@ goog.require('anychart.core.Base');
  */
 anychart.core.ui.ChartCredits = function(chart) {
   /**
-   * Stage gredits.
+   * Stage credits.
    * @type {anychart.core.Chart}
    * @private
    */
   this.chart_ = chart;
 
   anychart.core.ui.ChartCredits.base(this, 'constructor');
+
+  anychart.core.settings.createDescriptorsMeta(this.descriptorsMeta, [
+    ['text', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION],
+    ['url', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION],
+    ['alt', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION],
+    ['imgAlt', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION],
+    ['logoSrc', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION],
+    ['enabled', anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION]
+  ]);
 };
 goog.inherits(anychart.core.ui.ChartCredits, anychart.core.Base);
 
@@ -33,225 +43,45 @@ anychart.core.ui.ChartCredits.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.
 anychart.core.ui.ChartCredits.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
+//region --- Descriptors and Meta
 /**
- * @type {string}
- * @private
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.ChartCredits.prototype.text_;
+anychart.core.ui.ChartCredits.prototype.PROPERTY_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+  anychart.core.settings.createDescriptors(map, [
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'text', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'url', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'alt', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'imgAlt', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'logoSrc', anychart.core.settings.stringNormalizer],
+    [anychart.enums.PropertyHandlerType.SINGLE_ARG, 'enabled', anychart.core.settings.boolOrNullNormalizer]
+  ]);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.ChartCredits, anychart.core.ui.ChartCredits.prototype.PROPERTY_DESCRIPTORS);
 
 
-/**
- * @type {string}
- * @private
- */
-anychart.core.ui.ChartCredits.prototype.url_;
-
-
-/**
- * @type {string}
- * @private
- */
-anychart.core.ui.ChartCredits.prototype.alt_;
-
-
-/**
- * @type {string}
- * @private
- */
-anychart.core.ui.ChartCredits.prototype.logoSrc_;
-
-
-/**
- * @type {?boolean}
- * @private
- */
-anychart.core.ui.ChartCredits.prototype.enabled_;
-
-
-/**
- * Universal credits properties setter.
- * @param {string} field
- * @param {(string|boolean|null)=} opt_value
- * @return {string|boolean|null|anychart.core.ui.ChartCredits}
- * @private
- */
-anychart.core.ui.ChartCredits.prototype.getStageCreditsValue_ = function(field, opt_value) {
-  var stageCredits = this.chart_.container() ? this.chart_.container().getStage().credits() : null;
-  if (stageCredits) {
-    if (goog.isDef(opt_value)) {
-      stageCredits[field](opt_value);
-      return this;
-    }
-    return stageCredits[field]();
-  } else {
-    if (goog.isDef(opt_value)) {
-      if (this[field + '_'] !== opt_value) {
-        this[field + '_'] = opt_value;
-      }
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REAPPLICATION);
-      return this;
-    } else {
-      return this[field + '_'];
-    }
-  }
-};
-
-
-/**
- * Getter/setter for text.
- * @param {string=} opt_value Text value.
- * @return {anychart.core.ui.ChartCredits|string} Credits text or itself for chaining call.
- */
-anychart.core.ui.ChartCredits.prototype.text = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|string} */(this.getStageCreditsValue_('text', opt_value));
-};
-
-
-/**
- * Getter/setter for url.
- * @param {string=} opt_value Url value.
- * @return {anychart.core.ui.ChartCredits|string} Credits url or itself for chaining call.
- */
-anychart.core.ui.ChartCredits.prototype.url = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|string} */(this.getStageCreditsValue_('url', opt_value));
-};
-
-
-/**
- * Getter/setter for alt.
- * @param {string=} opt_value Title value.
- * @return {anychart.core.ui.ChartCredits|string} Credits alt or itself for chaining call.
- */
-anychart.core.ui.ChartCredits.prototype.alt = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|string} */(this.getStageCreditsValue_('alt', opt_value));
-};
-
-
-/**
- * Getter/setter for image alt.
- * @param {string=} opt_value Alt value.
- * @return {anychart.core.ui.ChartCredits|string} Credits img alt or itself for chaining call.
- */
-anychart.core.ui.ChartCredits.prototype.imgAlt = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|string} */(this.getStageCreditsValue_('imgAlt', opt_value));
-};
-
-
-/**
- * Getter/setter for logoSrc.
- * @param {string=} opt_value Logo src value.
- * @return {anychart.core.ui.ChartCredits|string} Credits logo src or itself for chaining call.
- */
-anychart.core.ui.ChartCredits.prototype.logoSrc = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|string} */(this.getStageCreditsValue_('logoSrc', opt_value));
-};
-
-
-/**
- * Getter/setter for enabled.
- * @param {?boolean=} opt_value Value to set.
- * @return {!anychart.core.ui.ChartCredits|boolean|null} .
- */
-anychart.core.ui.ChartCredits.prototype.enabled = function(opt_value) {
-  return /** @type {anychart.core.ui.ChartCredits|boolean|null} */(this.getStageCreditsValue_('enabled', opt_value));
-};
-
-
-/**
- * Drops self settings.
- */
-anychart.core.ui.ChartCredits.prototype.dropSettings = function() {
-  delete this['text_'];
-  delete this['url_'];
-  delete this['alt_'];
-  delete this['imgAlt_'];
-  delete this['logoSrc_'];
-  delete this['enabled_'];
-};
-
-
+//endregion
+//region --- Serialization and Setup
 /** @inheritDoc */
 anychart.core.ui.ChartCredits.prototype.serialize = function() {
   var json = {};
-  var text = this.text();
-  var url = this.url();
-  var alt = this.alt();
-  var imgAlt = this.imgAlt();
-  var logoSrc = this.logoSrc();
-  var enabled = this.enabled();
-
-  if (goog.isDef(text)) json['text'] = text;
-  if (goog.isDef(url)) json['url'] = url;
-  if (goog.isDef(alt)) json['alt'] = alt;
-  if (goog.isDef(imgAlt)) json['imgAlt'] = imgAlt;
-  if (goog.isDef(logoSrc)) json['logoSrc'] = logoSrc;
-  if (goog.isDef(enabled)) json['enabled'] = enabled;
-  return json;
-};
-
-
-/**
- * Serializes only values that are not passed to stage credits yet.
- * @return {Object}
- */
-anychart.core.ui.ChartCredits.prototype.serializeDiff = function() {
-  var json = {};
-  var text = this['text_'];
-  var url = this['url_'];
-  var alt = this['alt_'];
-  var imgAlt = this['imgAlt_'];
-  var logoSrc = this['logoSrc_'];
-  var enabled = this['enabled_'];
-
-  if (goog.isDef(text)) json['text'] = text;
-  if (goog.isDef(url)) json['url'] = url;
-  if (goog.isDef(alt)) json['alt'] = alt;
-  if (goog.isDef(imgAlt)) json['imgAlt'] = imgAlt;
-  if (goog.isDef(logoSrc)) json['logoSrc'] = logoSrc;
-  if (goog.isDef(enabled)) json['enabled'] = enabled;
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.ChartCredits.prototype.resolveSpecialValue = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isString(arg0)) {
-    return {
-      'text': arg0,
-      'enabled': true
-    };
-  } else if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    return {'enabled': !!arg0};
+  anychart.core.settings.serialize(this, this.PROPERTY_DESCRIPTORS, json, 'ChartCredits', this.descriptorsMeta);
+  // chartType is needed to decern products used for validation and credits text in stage credits.
+  var chartType = this.chart_.getType();
+  if (goog.isDef(chartType)) {
+    json['chartType'] = chartType;
   }
-  return null;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.ChartCredits.prototype.setupSpecial = function(isDefault, var_args) {
-  var resolvedValue = this.resolveSpecialValue(arguments[1]);
-  if (resolvedValue) {
-    if ('text' in resolvedValue)
-      this.text(resolvedValue['text']);
-
-    this.enabled(resolvedValue['enabled']);
-
-    return true;
-  }
-  return false;
+  return json;
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.ChartCredits.prototype.setupByJSON = function(config) {
   this.suspendSignalsDispatching();
-  this.text(config['text']);
-  this.url(config['url']);
-  this.alt(config['alt']);
-  this.imgAlt(config['imgAlt']);
-  this.logoSrc(config['logoSrc']);
-  this.enabled(config['enabled']);
+  anychart.core.settings.deserialize(this, this.PROPERTY_DESCRIPTORS, config);
   this.resumeSignalsDispatching(true);
 };
 
@@ -259,10 +89,4 @@ anychart.core.ui.ChartCredits.prototype.setupByJSON = function(config) {
 //exports
 (function() {
   var proto = anychart.core.ui.ChartCredits.prototype;
-  proto['text'] = proto.text;//doc|ex
-  proto['url'] = proto.url;//doc|ex
-  proto['alt'] = proto.alt;//doc|ex
-  proto['imgAlt'] = proto.imgAlt;
-  proto['logoSrc'] = proto.logoSrc;//doc|ex
-  proto['enabled'] = proto.enabled;//doc|ex
 })();

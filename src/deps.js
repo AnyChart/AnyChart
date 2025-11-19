@@ -158,7 +158,7 @@ goog.addDependency('../../../../src/core/shapeManagers/shapeManagers.js', ['anyc
 goog.addDependency('../../../../src/core/ui/Background.js', ['anychart.core.ui.Background', 'anychart.standalones.Background'], ['acgraph', 'anychart.core.IStandaloneBackend', 'anychart.core.VisualBaseWithBounds', 'anychart.core.settings', 'anychart.enums', 'anychart.math.Rect', 'goog.array'], {});
 goog.addDependency('../../../../src/core/ui/Button.js', ['anychart.core.ui.Button'], ['acgraph', 'anychart.core.Text', 'anychart.core.utils.Padding', 'anychart.enums', 'anychart.math'], {});
 goog.addDependency('../../../../src/core/ui/Center.js', ['anychart.core.ui.Center'], ['anychart.core.Base', 'anychart.core.settings'], {});
-goog.addDependency('../../../../src/core/ui/ChartCredits.js', ['anychart.core.ui.ChartCredits'], ['anychart.core.Base'], {});
+goog.addDependency('../../../../src/core/ui/ChartCredits.js', ['anychart.core.ui.ChartCredits'], ['anychart.core.Base', 'anychart.core.settings'], {});
 goog.addDependency('../../../../src/core/ui/ChartScroller.js', ['anychart.core.ui.ChartScroller'], ['anychart.core.ui.Scroller', 'anychart.enums'], {});
 goog.addDependency('../../../../src/core/ui/CircularLabelsFactory.js', ['anychart.core.ui.CircularLabelsFactory'], ['anychart.core.settings', 'anychart.core.ui.LabelsFactory', 'anychart.math.Rect'], {});
 goog.addDependency('../../../../src/core/ui/Crosshair.js', ['anychart.core.ui.Crosshair'], ['anychart.core.VisualBase', 'anychart.core.settings', 'anychart.core.ui.CrosshairLabel', 'anychart.core.utils.TokenParser', 'anychart.format.Context', 'goog.array'], {});

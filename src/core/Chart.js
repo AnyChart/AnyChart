@@ -370,7 +370,9 @@ anychart.core.Chart.prototype.createStage = function() {
   var stage = acgraph.create();
   stage.allowCreditsDisabling = this.allowCreditsDisabling;
 
-  stage.credits(this.credits().serializeDiff());
+  var stageCredits = stage.credits();
+  var chartCredits = this.credits();
+  stageCredits.setup(chartCredits.serialize());
   return stage;
 };
 
@@ -1356,11 +1358,23 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
     this.credits_ = new anychart.core.ui.ChartCredits(this);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
     this.setupCreated('credits', this.credits_);
-    this.credits_.setupByJSON(this.credits_.themeSettings);
   }
 
   if (goog.isDef(opt_value)) {
-    this.credits_.setup(opt_value);
+    /*
+     The below if() has been brought here from the ChartCredits as there is no point in having a separate function just
+     for one call. 
+     Also this functionality is needed for legacy support of chart.credits(false)/chart.credits("My text here") use.
+     */
+    if (goog.isString(opt_value)) {
+      var config = {
+        'text': opt_value,
+        'enabled': true
+      };
+      this.credits_.setupByJSON(config);
+    } else {
+      this.credits_.enabled(opt_value);
+    }
     return this;
   } else {
     return this.credits_;
@@ -1525,8 +1539,7 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
   }
 
   boundsWithoutBackgroundThickness = background && background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
-  boundsWithoutCredits = this.drawCredits(boundsWithoutBackgroundThickness);
-  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
+  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutBackgroundThickness);
 
   var title = this.title();
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_TITLE | anychart.ConsistencyState.BOUNDS)) {
@@ -1547,23 +1560,22 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
 
 
 /**
- * Draw credits.
- * @param {anychart.math.Rect} parentBounds Parent bounds.
- * @return {!anychart.math.Rect} Bounds without credits bounds.
+ * Synchronizes the stage credits with chart credits settings.
+ * @return {void} Nothing.
  */
-anychart.core.Chart.prototype.drawCredits = function(parentBounds) {
+anychart.core.Chart.prototype.drawCredits = function() {
   var stage = this.container().getStage();
-  if (!stage)
-    return /** @type {!anychart.math.Rect} */(parentBounds);
+  if (!stage) {
+    return;
+  }
 
   var stageCredits = stage.credits();
   var chartCredits = this.credits();
+  stageCredits.setup(chartCredits.serialize());
 
-  stageCredits.setup(chartCredits.serializeDiff());
-  chartCredits.dropSettings();
-
+  // chartCredits.markConsistent() added as there was a perpetually invalidated APPEARANCE for chart credits.
+  chartCredits.markConsistent(anychart.ConsistencyState.APPEARANCE);
   this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
-  return /** @type {!anychart.math.Rect} */(parentBounds);
 };
 
 
@@ -1708,6 +1720,9 @@ anychart.core.Chart.prototype.drawInternal = function() {
       }
       this.shadowRect.setBounds(this.contentBounds);
     }
+
+    // Draw credits. Moved here from calculateContentAreaSpace, there is no reason for drawCredits to be there.
+    this.drawCredits();
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
       for (var i = 0, count = this.chartLabels_.length; i < count; i++) {

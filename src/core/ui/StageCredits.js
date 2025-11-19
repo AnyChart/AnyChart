@@ -22,6 +22,46 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
   this.stage_ = stage;
 
   /**
+   * Chart type.
+   * Used for the key validation and credits text.
+   * @type {string}
+   * @private
+   */
+  this.chartType_ = '';
+
+  /**
+   * Array of text strings used for trial/evaluation version credits.
+   * These messages are displayed when using an unlicensed version of the product.
+   * @type {Array.<string>}
+   * @private
+   */
+  this.creditsText_ = anychart.core.ui.StageCredits.DEFAULT_CREDITS_TEXT;
+
+  /**
+   * URL used for trial/evaluation version credits.
+   * This URL is opened when user clicks on the credits text.
+   * @type {string}
+   * @private
+   */
+  this.creditsUrl_ = anychart.core.ui.StageCredits.DEFAULT_CREDITS_URL;
+
+  /**
+   * Color used for trial/evaluation version credits text.
+   * This color is used in the css installation process.
+   * @type {string}
+   * @private
+   */
+  this.creditsColor_ = anychart.core.ui.StageCredits.DEFAULT_CREDITS_COLOR;
+
+  /**
+   * Font weight used for trial/evaluation version credits text.
+   * This font weight is used in the css installation process.
+   * @type {string}
+   * @private
+   */
+  this.creditsFontWeight_ = anychart.core.ui.StageCredits.DEFAULT_CREDITS_FONT_WEIGHT;
+
+  /**
    * If the credits should be disabled by default.
    * @type {boolean}
    * @private
@@ -51,9 +91,69 @@ anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
       anychart.core.ui.StageCredits.States.URL_ALT |
       anychart.core.ui.StageCredits.States.TEXT |
       anychart.core.ui.StageCredits.States.IMAGE;
+
+  /**
+   * Array of products included on the stage these credits belong to.
+   * Used for validation and trial credits text.
+   * @type {Array.<string>}
+   * @private
+   */
+  this.unlicensedProducts_ = [];
+
+  /**
+   * Array of chart types included on the stage these credits belong to.
+   * Used for adding parameter to the credits url.
+   * @type {Array.<string>}
+   * @private
+   */
+  this.chartTypes_ = [];
+
+  /**
+   * Flag that indicates if styles are installed.
+   * 
+   * Used to avoid uncontrollable installation of styles multiple times.
+   * It is also used to reinstall styles if the stage has multiple charts and there is a discrepancy in 
+   * validity between them.
+   * @type {?HTMLStyleElement}
+   * @private
+   */
+  this.installedStyles_ = null;
 };
 goog.inherits(anychart.core.ui.StageCredits, goog.Disposable);
 
+/**
+ * Array of text strings used as default credits messages for trial/evaluation version.
+ * These messages are randomly displayed when using an unlicensed version of the product.
+ * @type {Array.<string>}
+ */
+anychart.core.ui.StageCredits.DEFAULT_CREDITS_TEXT = [
+  'AnyChart Trial Version',
+  'AnyChart - Trial Use Only',
+  'UNLICENSED: AnyChart Trial',
+  'AnyChart | Evaluation Copy',
+  'Trial Version of AnyChart'
+];
+
+/**
+ * URL used for trial/evaluation version credits.
+ * This URL is opened when user clicks on the credits text.
+ * @type {string}
+ */
+anychart.core.ui.StageCredits.DEFAULT_CREDITS_URL = 'https://www.anychart.com/?utm_source=trial';
+
+/**
+ * Color used for trial/evaluation version credits text.
+ * This color is used in the css installation process.
+ * @type {string}
+ */
+anychart.core.ui.StageCredits.DEFAULT_CREDITS_COLOR = '#929292';
+
+/**
+ * Font weight used for trial/evaluation version credits text.
+ * This font weight is used in the css installation process.
+ * @type {string}
+ */
+anychart.core.ui.StageCredits.DEFAULT_CREDITS_FONT_WEIGHT = 'normal';
 
 /**
  * Regular expression for domain check.
@@ -69,23 +169,22 @@ anychart.core.ui.StageCredits.DOMAIN_REGEXP = /^(.*\.)?anychart\.(com|stg|dev)$/
 //
 //------------------------------------------------------------------------------
 /**
- * A flag to install styles only one time.
- * @type {boolean}
- * @private
- */
-anychart.core.ui.StageCredits.stylesInstalled_ = false;
-
-
-/**
  * Installing default css.
  * @private
  */
-anychart.core.ui.StageCredits.installStyles_ = function() {
+anychart.core.ui.StageCredits.prototype.installStyles_ = function() {
   var styles = '';
   var css = goog.dom.createDom(goog.dom.TagName.STYLE);
+
+  var cssIdCredits = this.domElement_.id;
+  var cssIdLogo = this.image_.id;
+  var cssIdText = this.span_.id;
+
+  var creditsColor = this.trialCreditsColor();
+  var creditsFontWeight = this.trialCreditsFontWeight();
   css.type = 'text/css';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
+  styles += '#' + cssIdCredits + '{' +
       'position:absolute;' +
       'overflow:hidden;' +
       'right:9px;' +
@@ -93,11 +192,11 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
       'height:10px;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
+  styles += '#' + cssIdCredits + ' a {' +
       'text-decoration:none;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.LOGO + '{' +
+  styles += '#' + cssIdLogo + '{' +
       'border:none;' +
       'margin-right:2px;' +
       'height:10px;' +
@@ -106,14 +205,15 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
       'vertical-align:top;' +
       '}';
 
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
+  styles += '#' + cssIdText + '{' +
       'font-size:10px;' +
       'line-height:9px;' +
       'display:inline-block;' +
       'vertical-align:top;' +
       'text-decoration:none;' +
       'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
-      'color:#929292;' +
+      'color: ' + creditsColor + ';' +
+      'font-weight: ' + creditsFontWeight + ';' +
       'height:10px;' +
       '}';
 
@@ -126,6 +226,7 @@ anychart.core.ui.StageCredits.installStyles_ = function() {
       goog.dom.getElementsByTagNameAndClass('head')[0],
       css, 0
   );
+  this.installedStyles = css;
 };
 
 
@@ -307,6 +408,22 @@ anychart.core.ui.StageCredits.prototype.logoSrc = function(opt_value) {
 
 
 /**
+ * Gets or sets the chart type associated with these credits.
+ * The chart type is used for license validation and determining appropriate credits text.
+ * @param {(string)=} opt_value Optional chart type value to set. A string containing chart type information.
+ * @return {(string|anychart.core.ui.StageCredits)} Current chart type if no parameter passed, or if value was set this instance for method chaining.
+ * @private
+ */
+anychart.core.ui.StageCredits.prototype.chartType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.chartType_ = opt_value;
+    return this;
+  }
+  return this.chartType_;
+};
+
+
+/**
  * Stage.
  * @return {acgraph.vector.Stage} Stage.
  */
@@ -324,19 +441,69 @@ anychart.core.ui.StageCredits.prototype.domElement = function() {
 };
 
 
-//endregion
-//region --- UTILS ---
 /**
- * @enum {string}
+ * Gets or sets the array of text strings used for trial/evaluation version credits.
+ * These messages are displayed when using an unlicensed version of the product.
+ * @param {Array<string>=} opt_stringArray Optional array of credits text strings to set
+ * @return {Array<string>} Current array of credits text strings
  * @private
  */
-anychart.core.ui.StageCredits.CssClass_ = {
-  CREDITS: goog.getCssName('anychart-credits'),
-  LOGO: goog.getCssName('anychart-credits-logo'),
-  TEXT: goog.getCssName('anychart-credits-text')
+anychart.core.ui.StageCredits.prototype.trialCreditsText = function(opt_stringArray) {
+  if (goog.isDefAndNotNull(opt_stringArray)) {
+    this.creditsText_ = opt_stringArray;
+    this.invalidate(anychart.core.ui.StageCredits.States.TEXT, false);
+  }
+  return this.creditsText_;
 };
 
 
+/**
+ * Gets or sets the URL used for trial/evaluation version credits.
+ * This URL is opened when user clicks on the credits text.
+ * @param {string=} opt_url Optional URL to set.
+ * @return {string} Current URL.
+ */
+anychart.core.ui.StageCredits.prototype.trialCreditsUrl = function(opt_url) {
+  if (goog.isDefAndNotNull(opt_url)) {
+    this.creditsUrl_ = opt_url;
+    this.invalidate(anychart.core.ui.StageCredits.States.URL_ALT, false);
+  }
+  return this.creditsUrl_;
+};
+
+
+/**
+ * Gets or sets the color used for trial/evaluation version credits text.
+ * This color is used in the CSS installation process.
+ * @param {string=} opt_color Optional color to set.
+ * @return {string} Current color.
+ */
+anychart.core.ui.StageCredits.prototype.trialCreditsColor = function(opt_color) {
+  if (goog.isDefAndNotNull(opt_color)) {
+    this.creditsColor_ = opt_color;
+    this.invalidate(anychart.core.ui.StageCredits.States.URL_ALT, false);
+  }
+  return this.creditsColor_;
+};
+
+
+/**
+ * Gets or sets the font weight used for trial/evaluation version credits text.
+ * This font weight is used in the CSS installation process.
+ * @param {string=} opt_weight Optional font weight to set.
+ * @return {string} Current font weight.
+ */
+anychart.core.ui.StageCredits.prototype.trialCreditsFontWeight = function(opt_weight) {
+  if (goog.isDefAndNotNull(opt_weight)) {
+    this.creditsFontWeight_ = opt_weight;
+    this.invalidate(anychart.core.ui.StageCredits.States.URL_ALT, false);
+  }
+  return this.creditsFontWeight_;
+};
+
+
+//endregion
+//region --- UTILS ---
 //endregion
 //region --- DRAWING ---
 /**
@@ -347,7 +514,15 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   var valid = this.isValid();
 
   if (valid && (goog.isDef(this.prevValidState) && !this.prevValidState)) {
-    this.invalidate(anychart.core.ui.StageCredits.States.ENABLED, false);
+    this.invalidate(
+      anychart.core.ui.StageCredits.States.ENABLED |
+      /*
+       Text invalidation is needed here in case of a multiple charts per stage, and use of the new valid key that is
+       licensed for all the charts on the stage.
+       */
+      anychart.core.ui.StageCredits.States.TEXT, 
+      false
+    );
   }
   this.prevValidState = valid;
 
@@ -362,27 +537,42 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     return this;
   }
 
-  if (!anychart.core.ui.StageCredits.stylesInstalled_) {
-    anychart.core.ui.StageCredits.installStyles_();
-    anychart.core.ui.StageCredits.stylesInstalled_ = true;
-  }
+  // An array of decoy prefixes for dom element id.
+  var cssIdPrefix = ['chart', 'layer', 'path'];
 
   if (!this.domElement_) {
-    this.domElement_ = goog.dom.createDom(goog.dom.TagName.DIV, anychart.core.ui.StageCredits.CssClass_.CREDITS);
+    this.domElement_ = goog.dom.createDom(goog.dom.TagName.DIV);
+    // A random prefix is used to make an id of the dom element less predictable.
+    var domElementId = acgraph.utils.IdGenerator.getInstance().generateId(this.domElement_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.domElement_.id = domElementId;
   }
 
   if (!this.a_) {
     this.a_ = goog.dom.createDom(goog.dom.TagName.A);
-    this.span_ = goog.dom.createDom(goog.dom.TagName.SPAN, anychart.core.ui.StageCredits.CssClass_.TEXT);
-    this.image_ = goog.dom.createDom(goog.dom.TagName.IMG, anychart.core.ui.StageCredits.CssClass_.LOGO);
+    this.span_ = goog.dom.createDom(goog.dom.TagName.SPAN);
+    // A random prefix is used to make an id of the span less predictable.
+    var spanId = acgraph.utils.IdGenerator.getInstance().generateId(this.span_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.span_.id = spanId;
+
+    this.image_ = goog.dom.createDom(goog.dom.TagName.IMG);
+    // A random prefix is used to make an id of the image less predictable.
+    var imageId = acgraph.utils.IdGenerator.getInstance().generateId(this.image_, cssIdPrefix[Math.floor(Math.random() * 3)]);
+    this.image_.id = imageId;
+
     goog.dom.append(this.a_, this.span_);
     goog.dom.appendChild(this.domElement_, this.a_);
+  }
+
+  // As it is now an instance method, to avoid installing styles multiple times, the flag is used.
+  if (!this.installedStyles) {
+    this.installStyles_();
   }
 
   var containerElement = this.stage_.getDomWrapper();
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.ENABLED)) {
     if (containerElement)
-      goog.dom.appendChild(containerElement, this.domElement_);
+      // A random place is used to put the dom element inside the container.
+      goog.dom.insertChildAt(containerElement, this.domElement_, Math.floor(Math.random() * 3));
     this.markConsistent(anychart.core.ui.StageCredits.States.ENABLED);
   }
 
@@ -393,18 +583,41 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     var defaultTitle = 'AnyChart - JavaScript Charts designed to be embedded and integrated{{anychart-version}}';
     var title = valid ? this.alt() : defaultTitle;
     goog.dom.setProperties(this.a_, {
-      'href': valid ? this.url() : 'https://www.anychart.com/?utm_source=trial',
+      'href': valid ? this.url() : this.trialCreditsUrl(),
       'title': title.replace('{{anychart-version}}', version),
       'target': '_blank'
     });
     goog.dom.setProperties(this.image_, {
       'alt': valid ? this.imgAlt() : 'AnyChart - JavaScript Charts'
     });
+
+    /*
+     In case of multiple charts per stage, the styles are reinstalled as it is possible that the first chart will
+     have a different validity from any of the rest.
+     This reinstallation is done only if the styles are installed and color or font weight were changed.
+     This can and will cause a repaint and a reflow, but since stage is drawn before most of the visible elements
+     the impact is minimal.
+     */
+    var selectorText = '#' + this.span_.id;
+    var newFontWeight = this.trialCreditsFontWeight();
+    var newColor = this.trialCreditsColor();
+    var styleSheet = this.installedStyles.sheet;
+    var rules = styleSheet.cssRules;
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      if (rule.selectorText && rule.selectorText.toLowerCase() === selectorText.toLowerCase()) {
+        rule.style.setProperty('font-weight', newFontWeight);
+        rule.style.setProperty('color', newColor);
+      }
+    }
     this.markConsistent(anychart.core.ui.StageCredits.States.URL_ALT);
   }
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.TEXT)) {
-    var text = valid ? this.text() : 'AnyChart Trial Version';
+    // The array is used to display trial version credits. It's backed up to ensure that credits will be shown.
+    var lineVariants = this.trialCreditsText();
+    // If the license key is valid, the text is not changed. If it isn't the random text from the array will be shown.
+    var text = valid ? this.text() : lineVariants[Math.floor(Math.random() * lineVariants.length)];
     goog.dom.setTextContent(this.span_, /** @type {string} */ (text));
     this.markConsistent(anychart.core.ui.StageCredits.States.TEXT);
   }
@@ -439,11 +652,99 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
 
 /**
- *
- * @return {boolean}
+ * Checks if credits should be displayed based on license validation.
+ * For old license keys, displays a special old-key-credits.
+ * For new license keys, checks if the current chart type is licensed. And displays a warning message if it isn't.
+ * For stage that has multiple charts, displays a special message if there are unlicensed products.
+ * Always omit credits on AnyChart domains.
+ * @return {boolean} Whether credits should be displayed
  */
 anychart.core.ui.StageCredits.prototype.isValid = function() {
-  return anychart.isValidKey() || this.onAnyChartDomain_;
+  /*
+   The old validation function can say if the key old and valid or new and valid yet it's limited in telling us which
+   product is valid for the new key and which chart is displayed on a stage of these credits.
+   */
+  var isValidKey = anychart.isValidKey();
+  var isLicensedProduct = false;
+  /*
+   There are credits in every stage meaning there are credits in the tooltip that are erroring out even if
+   they aren't visible. For that case we need to check if the chartType_ was populated before using it.
+   */
+  var chartType = this.chartType_;
+  if (isValidKey && chartType){
+    var chartsProduct = anychart.CHART_PRODUCTS;
+    var licensedProducts = anychart.licensedProducts();
+
+    // For the trialCreditsUrl two URL parameters are needed, so they are prepared by encoding.
+    var licenseKey = (/** @type {string} */(anychart.licenseKey()));
+    var base64EncodedKey = btoa(licenseKey);
+    var reversedBase64EncodedKey = base64EncodedKey.split('').reverse().join('');
+    var finalEncodedURLKey = encodeURIComponent(reversedBase64EncodedKey);
+
+    /*
+     As there is a possibility that there are more than one chart per stage, the chartTypes_ array is used to store all
+     chart types that are displayed on a stage of these credits.
+     We don't need to validate chart of the recorded chartTypes_ as the chart type is used only in the case of
+     valid old key, which expected to not have any product licenses in it.
+     */
+    if (this.chartTypes_.indexOf(chartType) === -1) {
+      this.chartTypes_.push(chartType);
+    }
+
+    var chartTypesString = this.chartTypes_.join(', ');
+    var base64EncodedChartType = btoa(chartTypesString);
+    var reversedBase64EncodedChartType = base64EncodedChartType.split('').reverse().join('');
+    var finalEncodedURLChartType = encodeURIComponent(reversedBase64EncodedChartType);
+
+    if (Object.keys(licensedProducts).length === 0) {
+      // If there are no licensed products and it is a valid license key it is an old key, show the old-key-credits.
+      this.trialCreditsText(['License key is obsolete. Click to contact AnyChart.']);
+      this.trialCreditsUrl('https://www.anychart.com/license/new?k=' + finalEncodedURLKey + '&m=' + finalEncodedURLChartType);
+      this.trialCreditsFontWeight('bold');
+    } else {
+      /*
+       If there are licensed products and it's a valid key, it's a new key, check if the chart that is displayed on
+       a stage of these credits is licensed.
+       */
+      var product = '';
+      for (var key in chartsProduct) {
+        if (chartsProduct[key].indexOf(chartType) !== -1) {
+          product = key;
+          break;
+        }
+      }
+      /*
+       If the chart is licensed, check if there are unlicensed products on the stage. If there are, behave as if this
+       chart is unlicensed, but don't add the product of this chart to the unlicensed list.
+       */
+      if (licensedProducts[product]) {
+        isLicensedProduct = this.unlicensedProducts_.length === 0 ? true : false;
+      } else {
+        /*
+         If there are unlicensed products, add products to a list in case of multiple charts per stage. Show the 
+         unlicensed-products-credits.
+         */
+        if (this.unlicensedProducts_.indexOf(product) === -1) this.unlicensedProducts_.push(product);
+        this.trialCreditsText(['Unlicensed module: ' + this.unlicensedProducts_.join(', ') + '. Click to get a license.']);
+        this.trialCreditsUrl('https://www.anychart.com/license/modules?k=' + finalEncodedURLKey + '&m=' + finalEncodedURLChartType);
+        this.trialCreditsColor('red');
+        /*
+         The change of enabled_ isn't done through the this.enabled(true) as it will create an endless loop.
+         The change and invalidation are done here in case of multiple licensed and unlicensed charts displayed on the
+         same stage.
+         */
+        this.enabled_ = !(this.isDisabledByDefault_ || this.onAnyChartDomain_);
+        this.invalidate(anychart.core.ui.StageCredits.States.ENABLED, false);
+      }
+    }
+  }
+
+  /*
+   Should be return isValidKey && isLicensedProduct || this.onAnyChartDomain_, but
+   isLicensedProduct is always false if isValidKey is false,
+   isLicensedProduct is true or false if the isValidKey is true.
+   */
+  return isLicensedProduct || this.onAnyChartDomain_;
 };
 
 
@@ -514,6 +815,7 @@ anychart.core.ui.StageCredits.prototype.setup = function(config) {
     this.imgAlt(config['imgAlt']);
     this.logoSrc(config['logoSrc']);
     this.enabled(config['enabled']);
+    this.chartType(config['chartType']);
   }
   this.stage_.resume();
 };
