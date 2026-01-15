@@ -139,7 +139,12 @@ anychart.CHART_PRODUCTS = {
     'sankey',
     'surface',
     'wordtree',
-    'graph'
+    'graph',
+    'circular-gauge',
+    'linear-gauge',
+    'tank',
+    'thermometer',
+    'led'
   ],
   'stock' : ['stock'],
   'map' : [
