@@ -1372,6 +1372,9 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
         'enabled': true
       };
       this.credits_.setupByJSON(config);
+    } else if (goog.isObject(opt_value)) {
+      // If it is an object - it is a json config. 
+      this.credits_.setupByJSON(opt_value);
     } else {
       this.credits_.enabled(opt_value);
     }
