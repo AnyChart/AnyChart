@@ -18,6 +18,7 @@ goog.require('anychart.annotationsModule.TrendChannel');
 goog.require('anychart.annotationsModule.Triangle');
 goog.require('anychart.annotationsModule.VerticalLine');
 goog.require('anychart.annotationsModule.VerticalRange');
+goog.require('anychart.annotationsModule.Wave');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBase');
 goog.require('goog.array');
@@ -872,6 +873,20 @@ anychart.annotationsModule.PlotController.prototype.triangle = function(opt_conf
 
 
 /**
+ * Creates and returns a wave annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.Wave}
+ */
+anychart.annotationsModule.PlotController.prototype.wave = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.Wave} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.WAVE));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
  * Creates and returns a trendChannel annotation.
  * @param {Object=} opt_config
  * @return {anychart.annotationsModule.TrendChannel}
@@ -887,7 +902,7 @@ anychart.annotationsModule.PlotController.prototype.trendChannel = function(opt_
 
 /**
  * Creates and returns a finiteTrendChannel annotation.
- * @param {Object=} opt_config 
+ * @param {Object=} opt_config
  * @return {anychart.annotationsModule.FiniteTrendChannel}
  */
 anychart.annotationsModule.PlotController.prototype.finiteTrendChannel = function(opt_config) {
@@ -1192,6 +1207,7 @@ anychart.annotationsModule.PlotController.AnchorDragger = function(plotControlle
    *   0 - moving first annotation anchor;
    *   1 - moving second annotation anchor;
    *   2 - moving third annotation anchor;
+   *   3 - moving fourth annotation anchor;
    * @type {number}
    * @private
    */
@@ -1333,6 +1349,7 @@ anychart.annotationsModule.PlotController.AnchorDragger.prototype.handleDragEnd_
   proto['rectangle'] = proto.rectangle;
   proto['ellipse'] = proto.ellipse;
   proto['triangle'] = proto.triangle;
+  proto['wave'] = proto.wave;
   proto['trendChannel'] = proto.trendChannel;
   proto['finiteTrendChannel'] = proto.finiteTrendChannel;
   proto['andrewsPitchfork'] = proto.andrewsPitchfork;
