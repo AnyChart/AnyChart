@@ -12,6 +12,7 @@ goog.require('anychart.annotationsModule.InfiniteLine');
 goog.require('anychart.annotationsModule.Label');
 goog.require('anychart.annotationsModule.Line');
 goog.require('anychart.annotationsModule.Marker');
+goog.require('anychart.annotationsModule.Position');
 goog.require('anychart.annotationsModule.Ray');
 goog.require('anychart.annotationsModule.Rectangle');
 goog.require('anychart.annotationsModule.TrendChannel');
@@ -858,6 +859,20 @@ anychart.annotationsModule.PlotController.prototype.ellipse = function(opt_confi
 
 
 /**
+ * Creates and returns a position annotation.
+ * @param {Object=} opt_config
+ * @return {anychart.annotationsModule.Position}
+ */
+anychart.annotationsModule.PlotController.prototype.position = function(opt_config) {
+  var annotation = /** @type {anychart.annotationsModule.Position} */(
+      this.controller_.createAnnotationByType(anychart.enums.AnnotationTypes.POSITION));
+  annotation.setup(opt_config);
+  this.bindAnnotation(annotation, true);
+  return annotation;
+};
+
+
+/**
  * Creates and returns a triangle annotation.
  * @param {Object=} opt_config
  * @return {anychart.annotationsModule.Triangle}
@@ -887,7 +902,7 @@ anychart.annotationsModule.PlotController.prototype.trendChannel = function(opt_
 
 /**
  * Creates and returns a finiteTrendChannel annotation.
- * @param {Object=} opt_config 
+ * @param {Object=} opt_config
  * @return {anychart.annotationsModule.FiniteTrendChannel}
  */
 anychart.annotationsModule.PlotController.prototype.finiteTrendChannel = function(opt_config) {
@@ -1332,6 +1347,7 @@ anychart.annotationsModule.PlotController.AnchorDragger.prototype.handleDragEnd_
   proto['horizontalRange'] = proto.horizontalRange;
   proto['rectangle'] = proto.rectangle;
   proto['ellipse'] = proto.ellipse;
+  proto['position'] = proto.position;
   proto['triangle'] = proto.triangle;
   proto['trendChannel'] = proto.trendChannel;
   proto['finiteTrendChannel'] = proto.finiteTrendChannel;

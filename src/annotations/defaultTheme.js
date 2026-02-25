@@ -1,6 +1,25 @@
 goog.provide('anychart.annotationsModule.defaultTheme');
 goog.require('anychart.core.defaultTheme');
 
+/**
+ * @this {{
+*    sourceColor: (acgraph.vector.SolidFill|string)
+* }}
+* @return {*}
+*/
+anychart.core.defaultTheme.returnRisingColor20 = function() {
+ return anychart.color.setOpacity(anychart.core.defaultTheme.risingColor, 0.2, true);
+};
+
+/**
+ * @this {{
+*    sourceColor: (acgraph.vector.SolidFill|string)
+* }}
+* @return {*}
+*/
+anychart.core.defaultTheme.returnFallingColor20 = function() {
+ return anychart.color.setOpacity(anychart.core.defaultTheme.fallingColor, 0.2, true);
+};
 
 goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
   'defaultAnnotationSettings': {
@@ -61,6 +80,12 @@ goog.mixin(goog.global['anychart']['themes']['defaultTheme']['chart'], {
     'horizontalLine': {},
     'rectangle': {},
     'ellipse': {},
+    'position': {
+        'normal': {
+          'winFill': anychart.core.defaultTheme.returnRisingColor20,
+          'lossFill': anychart.core.defaultTheme.returnFallingColor20
+        }
+    },
     'triangle': {},
     'trendChannel': {},
     'finiteTrendChannel': {
