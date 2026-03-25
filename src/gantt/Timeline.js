@@ -1765,6 +1765,8 @@ anychart.ganttModule.TimeLine.prototype.editPreviewEnd_ = function(e) {
             beforeUpdatePeriodEvent.type = anychart.enums.EventType.BEFORE_UPDATE_PERIOD;
             beforeUpdatePeriodEvent['sourceItem'] = dataItem;
             beforeUpdatePeriodEvent['originalPeriodIndex'] = periodIndex;
+            beforeUpdatePeriodEvent['newStart'] = newActualStart;
+            beforeUpdatePeriodEvent['newEnd'] = newPeriodEnd;
 
               if (dataItem === destinationItem) {
                 // Handle period dropped on same row.
