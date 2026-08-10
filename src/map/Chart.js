@@ -158,9 +158,12 @@ anychart.mapModule.Chart = function() {
       }
     }
 
-    // Use a per-series-type map (not boolean true). drawContent may later write
-    // applyLabelsOverlapState_[seriesType] when APPEARANCE invalidates SERIES mid-draw.
-    this.ensureLabelsOverlapStateMap_(true);
+    // Keep a per-series-type map. Assigning boolean true here used to crash later when
+    // drawContent wrote applyLabelsOverlapState_[seriesType] after an APPEARANCE redraw.
+    this.applyLabelsOverlapState_ = {};
+    for (i = this.seriesList.length; i--;) {
+      this.applyLabelsOverlapState_[this.seriesList[i].getType()] = true;
+    }
     if (!this.noOneLabelDrew)
       this.applyLabelsOverlapState();
   }, false, this);
@@ -2628,31 +2631,6 @@ anychart.mapModule.Chart.prototype.getIndexedGeoData = function() {
 //endregion
 //region --- Labels overlap
 /**
- * Ensures applyLabelsOverlapState_ is an Object keyed by series type.
- *
- * Historically ANIMATION_END set this field to boolean true ("all series dirty").
- * That form is safe to read, but unsafe to write with applyLabelsOverlapState_[type]
- * when APPEARANCE invalidates SERIES_CHART_SERIES mid-draw without resetting the map.
- *
- * @param {boolean=} opt_markAll If true, mark every current series type dirty.
- * @private
- */
-anychart.mapModule.Chart.prototype.ensureLabelsOverlapStateMap_ = function(opt_markAll) {
-  if (opt_markAll || this.applyLabelsOverlapState_ === true) {
-    this.applyLabelsOverlapState_ = {};
-    for (var i = this.seriesList.length; i--;) {
-      this.applyLabelsOverlapState_[this.seriesList[i].getType()] = true;
-    }
-    return;
-  }
-
-  if (!goog.isObject(this.applyLabelsOverlapState_)) {
-    this.applyLabelsOverlapState_ = {};
-  }
-};
-
-
-/**
  * Calculates which labels need to draw and sets the label drawing map to every map series.
  */
 anychart.mapModule.Chart.prototype.applyLabelsOverlapState = function() {
@@ -2666,13 +2644,11 @@ anychart.mapModule.Chart.prototype.applyLabelsOverlapState = function() {
 
   this.noOneLabelDrew = true;
 
-  this.ensureLabelsOverlapStateMap_();
-
   for (i = this.seriesList.length; i--;) {
     series = this.seriesList[i];
     var seriesType = series.getType();
 
-    if (!this.applyLabelsOverlapState_[seriesType])
+    if (goog.isBoolean(this.applyLabelsOverlapState_) ? !this.applyLabelsOverlapState_ : !this.applyLabelsOverlapState_[seriesType])
       continue;
 
     iterator = series.getIterator();
@@ -4123,7 +4099,13 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SERIES)) {
     // APPEARANCE can invalidate SERIES here without the early drawContent reset to {}.
-    this.ensureLabelsOverlapStateMap_();
+    // Guard against a non-object leftover so per-type writes stay valid.
+    if (!goog.isObject(this.applyLabelsOverlapState_)) {
+      this.applyLabelsOverlapState_ = {};
+      for (i = this.seriesList.length; i--;) {
+        this.applyLabelsOverlapState_[this.seriesList[i].getType()] = true;
+      }
+    }
 
     for (i = this.seriesList.length; i--;) {
       series = this.seriesList[i];
