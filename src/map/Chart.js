@@ -158,7 +158,12 @@ anychart.mapModule.Chart = function() {
       }
     }
 
-    this.applyLabelsOverlapState_ = true;
+    // Keep a per-series-type map. Assigning boolean true here used to crash later when
+    // drawContent wrote applyLabelsOverlapState_[seriesType] after an APPEARANCE redraw.
+    this.applyLabelsOverlapState_ = {};
+    for (i = this.seriesList.length; i--;) {
+      this.applyLabelsOverlapState_[this.seriesList[i].getType()] = true;
+    }
     if (!this.noOneLabelDrew)
       this.applyLabelsOverlapState();
   }, false, this);
@@ -4093,6 +4098,15 @@ anychart.mapModule.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SERIES)) {
+    // APPEARANCE can invalidate SERIES here without the early drawContent reset to {}.
+    // Guard against a non-object leftover so per-type writes stay valid.
+    if (!goog.isObject(this.applyLabelsOverlapState_)) {
+      this.applyLabelsOverlapState_ = {};
+      for (i = this.seriesList.length; i--;) {
+        this.applyLabelsOverlapState_[this.seriesList[i].getType()] = true;
+      }
+    }
+
     for (i = this.seriesList.length; i--;) {
       series = this.seriesList[i];
 
